@@ -4,34 +4,49 @@ const cors = require('cors');
 
 const app = express();
 
-// Middleware រៀបចំឱ្យមានសុវត្ថិភាព និងការអានទិន្នន័យ JSON
+// 🛠️ ដំណោះស្រាយបញ្ហា PayloadTooLargeError: បើកឱ្យទទួលទិន្នន័យ Base64 បានទំហំរហូតដល់ 10MB
 app.use(cors({ origin: '*' }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+// ទាញយកលីងភ្ជាប់ទៅកាន់ MongoDB ពី .env តាមរយៈ variable ឈ្មោះ MONGOURL
 const mongoURI = process.env.MONGOURL;
 
 if (mongoURI) {
     mongoose.connect(mongoURI)
       .then(() => console.log("✅ MongoDB Connected Successfully"))
       .catch(err => console.error("❌ MongoDB Connection Error:", err));
+} else {
+    console.error("❌ Critical: process.env.MONGOURL is undefined!");
 }
 
-// 1. Schema សម្រាប់ទាញយកចំនួន User
+// ==========================================
+// 🗂️ DATABASE SCHEMAS & MODELS (បែងចែកដាច់ពីគ្នា មិនឡូកឡំ)
+// ==========================================
+
+// ១. សម្រាប់ទាញយកចំនួន User
 const UserSchema = new mongoose.Schema({}, { strict: false });
 const User = mongoose.model('User', UserSchema, 'users');
 
-// 2. Schema ថ្មីសម្រាប់កត់ត្រា និងរាប់ចំនួនទំព័រដែលបានប្រើប្រាស់
+// ២. សម្រាប់កត់ត្រា និងរាប់ចំនួនទំព័រដែលបានប្រើប្រាស់ (Analytics)
 const PageTrackSchema = new mongoose.Schema({
     pageName: { type: String, required: true, unique: true },
     views: { type: Number, default: 0 }
 });
 const PageTrack = mongoose.model('PageTrack', PageTrackSchema, 'pagetracks');
 
-/**
- * 🛠️ សង់ផ្ទាំង UI ថ្មីកម្រិត Advanced Analytics Dashboard (UX/UI)
- */
+// ៣. សម្រាប់ផ្ទុករូបភាព Base64 ទៅក្នុង Cloud MongoDB
+const ImageSchema = new mongoose.Schema({
+    base64Data: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+const ImageModel = mongoose.model('Image', ImageSchema, 'images');
+
+
+// ==========================================
+// 🎨 UX/UI ANALYTICS DASHBOARD HTML TEMPLATE
+// ==========================================
 const renderDashboard = (req, totalUsers, topPages, isEnvMissing) => {
-    // បង្កើតជួរតារាងបង្ហាញទំព័រដែលប្រើច្រើនជាងគេ
     const tableRows = topPages.map((p, index) => {
         let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📄';
         return `
@@ -57,7 +72,7 @@ const renderDashboard = (req, totalUsers, topPages, isEnvMissing) => {
         
         <header class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">Analytics v2.0</span></h1>
+                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">Ultimate v3.0</span></h1>
                 <span class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <span class="h-2 w-2 rounded-full ${isEnvMissing ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}"></span> 
                     ${isEnvMissing ? 'Database Disconnected' : 'Live Engine Connected'}
@@ -69,7 +84,7 @@ const renderDashboard = (req, totalUsers, topPages, isEnvMissing) => {
             
             ${isEnvMissing ? `
             <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl p-4 text-sm">
-                <span class="font-bold">⚠️ Environment Variable Missing:</span> Please configure <code class="bg-rose-950 px-1.5 py-0.5 rounded text-rose-300 font-mono text-xs">MONGOURL</code> in Vercel.
+                <span class="font-bold">⚠️ Environment Variable Missing:</span> Please configure <code class="bg-rose-950 px-1.5 py-0.5 rounded text-rose-300 font-mono text-xs">MONGOURL</code> in Vercel settings.
             </div>` : ''}
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -103,41 +118,11 @@ const renderDashboard = (req, totalUsers, topPages, isEnvMissing) => {
                 </div>
             </div>
 
-            <div class="space-y-4 pt-4">
-                <h3 class="text-lg font-bold text-slate-300">System API Endpoints</h3>
-                
-                <div class="bg-[#1e293b]/30 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-                    <div class="p-4 bg-slate-900/40 border-b border-slate-800 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-md border border-emerald-500/20">GET</span>
-                            <code class="text-sm font-semibold text-slate-200">/api/usercount</code>
-                        </div>
-                        <span class="text-xs text-slate-400">ទាញយកចំនួន User (សម្រាប់ KWGT)</span>
-                    </div>
-                    <div class="p-4 space-y-2 text-xs font-mono">
-                        <div class="bg-slate-950 rounded-lg p-3 text-amber-400 border border-slate-800">{\n  "count": ${totalUsers}\n}</div>
-                    </div>
-                </div>
-
-                <div class="bg-[#1e293b]/30 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-                    <div class="p-4 bg-slate-900/40 border-b border-slate-800 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-sky-500/10 text-sky-400 text-xs font-bold px-2.5 py-1 rounded-md border border-sky-500/20">POST</span>
-                            <code class="text-sm font-semibold text-slate-200">/api/track-page</code>
-                        </div>
-                        <span class="text-xs text-slate-400">ផ្ញើមកកត់ត្រាពេល User បើកទំព័រណាមួយ</span>
-                    </div>
-                    <div class="p-4 space-y-3 text-xs">
-                        <div>
-                            <span class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Headers Required</span>
-                            <pre class="bg-slate-950 rounded-lg p-2.5 font-mono text-sky-300 border border-slate-800">"Content-Type": "application/json"</pre>
-                        </div>
-                        <div>
-                            <span class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Body Payload Sample</span>
-                            <pre class="bg-slate-950 rounded-lg p-2.5 font-mono text-teal-300 border border-slate-800">{\n  "pageName": "/downloader"\n}</pre>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-indigo-950/10 border border-indigo-900/30 rounded-xl p-5 space-y-2">
+                <h4 class="text-sm font-bold text-indigo-400 flex items-center gap-2">📂 Cloud Image Cloud Storage Status</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    ប្រព័ន្ធ <code class="bg-slate-950 px-1 py-0.5 rounded text-teal-300">/api/upload-image</code> និង <code class="bg-slate-950 px-1 py-0.5 rounded text-teal-300">/api/get-image/:id</code> ត្រូវបានដំឡើងនិងបើកឱ្យដំណើរការរួចរាល់ ជាមួយទំហំផ្ទុកទិន្នន័យអតិបរមា 10MB ក្នុងមួយរូបភាព។
+                </p>
             </div>
         </main>
 
@@ -150,9 +135,54 @@ const renderDashboard = (req, totalUsers, topPages, isEnvMissing) => {
     `;
 };
 
+
+// ==========================================
+// 📡 SYSTEM API ROUTERS & ENDPOINTS
+// ==========================================
+
 /**
- * 📡 1. ROUTE: /api/track-page (POST)
- * សម្រាប់ឱ្យ Frontend ហៅមកកត់ត្រារាល់ពេល User ចូលមើលទំព័រផ្សេងៗ
+ * 📡 ROUTE 1: POST /api/upload-image (ថ្មី)
+ * សម្រាប់ផ្ទុករូបភាព Base64 ទៅកាន់ Cloud MongoDB
+ */
+app.post('/api/upload-image', async (req, res) => {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
+
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(500).json({ error: "Database មិនទាន់ភ្ជាប់ជោគជ័យទេបង! សូមពិនិត្យ IP Whitelist ក្នុង MongoDB Atlas" });
+    }
+
+    try {
+        const newImage = new ImageModel({ base64Data: image });
+        const savedData = await newImage.save();
+        return res.status(200).json({ success: true, id: savedData._id });
+    } catch (error) {
+        return res.status(500).json({ error: "MongoDB Error: " + error.message });
+    }
+});
+
+/**
+ * 📡 ROUTE 2: GET /api/get-image/:id (ថ្មី)
+ * សម្រាប់ទាញយករូបភាពពិតប្រាកដត្រឡប់ទៅបង្ហាញនៅលើ Frontend វិញតាមរយៈ ID
+ */
+app.get('/api/get-image/:id', async (req, res) => {
+    const { id } = req.params;
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(500).json({ error: "Database មិនទាន់បានតភ្ជាប់ឡើយ!" });
+    }
+
+    try {
+        const imageData = await ImageModel.findById(id);
+        if (!imageData) return res.status(404).json({ error: "រកមិនឃើញរូបភាពនេះឡើយបង!" });
+        return res.status(200).json({ image: imageData.base64Data });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * 📡 ROUTE 3: POST /api/track-page
+ * សម្រាប់កត់ត្រាចំនួនទំព័រដែលត្រូវបានបើកមើលច្រើនជាងគេ
  */
 app.post('/api/track-page', async (req, res) => {
     const { pageName } = req.body;
@@ -160,7 +190,6 @@ app.post('/api/track-page', async (req, res) => {
 
     try {
         if (mongoose.connection.readyState === 1) {
-            // បើមានឈ្មោះទំព័រហ្នឹងហើយ ឱ្យបូកថែម ១ (views + 1) បើមិនទាន់មាន ឱ្យបង្កើតថ្មី
             const updatedPage = await PageTrack.findOneAndUpdate(
                 { pageName: pageName },
                 { $inc: { views: 1 } },
@@ -175,8 +204,8 @@ app.post('/api/track-page', async (req, res) => {
 });
 
 /**
- * 📡 2. ROUTE: /api/usercount (GET)
- * គាំទ្រទាំង Browser UI និង KWGT Client JSON
+ * 📡 ROUTE 4: GET /api/usercount
+ * គាំទ្រទាំង Browser UI Dashboard និង KWGT JSON Output
  */
 app.get('/api/usercount', async (req, res) => {
     const isEnvMissing = !process.env.MONGOURL;
@@ -186,19 +215,16 @@ app.get('/api/usercount', async (req, res) => {
         let topPages = [];
 
         if (!isEnvMissing && mongoose.connection.readyState === 1) {
-            // ១. រាប់ចំនួន User សរុប
             totalUsers = await User.countDocuments({});
-            // ២. ទាញយកបញ្ជីទំព័រដែលគេប្រើច្រើនជាងគេ តម្រៀបពីច្រើនទៅតិច (Limit យកតែ Top 5)
             topPages = await PageTrack.find({}).sort({ views: -1 }).limit(5);
         }
 
-        // 🛠️ ពិនិត្យមើលថាជាការហៅពី Browser (HTML) ឬហៅពី Widget/Code (JSON)
         const acceptHeader = req.headers.accept || '';
         if (acceptHeader.includes('text/html') && !req.headers['user-agent']?.includes('Kustom')) {
             res.setHeader('Content-Type', 'text/html');
             return res.status(200).send(renderDashboard(req, totalUsers, topPages, isEnvMissing));
         } else {
-            return res.status(200).json({ count: totalUsers });
+            return res.status(200).json({ count: totalUsers, topPages: topPages });
         }
     } catch (error) {
         return res.status(500).json({ error: error.message });
@@ -206,60 +232,5 @@ app.get('/api/usercount', async (req, res) => {
 });
 
 app.get('/api', (req, res) => { res.redirect('/api/usercount'); });
-
-// 1. បង្កើត Schema និង Collection ថ្មីដាច់ដោយឡែក ដើម្បីកុំឱ្យឡូកឡំគ្នា
-const ImageSchema = new mongoose.Schema({
-    base64Data: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
-});
-// បង្កើត Model ឈ្មោះ 'Image' វានឹងបង្កើត Collection ឈ្មោះ 'images' ក្នុង Database ដោយស្វ័យប្រវត្តិ
-const ImageModel = mongoose.model('Image', ImageSchema, 'images');
-
-/**
- * 📡 ROUTE: POST /api/upload-image
- * សម្រាប់ទទួលរូបភាព Base64 ពី Frontend រួចរក្សាទុកក្នុង MongoDB និងបោះ ID ត្រឡប់ទៅវិញ
- */
-app.post('/api/upload-image', async (req, res) => {
-    const { image } = req.body;
-    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
-
-    try {
-        if (mongoose.connection.readyState === 1) {
-            // បង្កើតទិន្នន័យថ្មីទៅក្នុង Collection 'images'
-            const newImage = new ImageModel({ base64Data: image });
-            await newImage.save();
-
-            // បោះតែ ID ទៅឱ្យ Frontend បានហើយ ដើម្បីកុំឱ្យលីងវែងពេក
-            return res.status(200).json({ success: true, id: newImage._id });
-        }
-        return res.status(500).json({ error: "Database មិនទាន់មានការតភ្ជាប់ឡើយ!" });
-    } catch (error) {
-        return res.status(500).json({ error: error.message });
-    }
-});
-
-/**
- * 📡 ROUTE: GET /api/get-image/:id
- * សម្រាប់ឱ្យ Frontend ហៅមកទាញយករូបភាពពិតប្រាកដយកទៅបង្ហាញតាមរយៈ ID
- */
-app.post('/api/upload-image', async (req, res) => {
-    const { image } = req.body;
-    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
-
-    // ពិនិត្យមើលស្ថានភាព Database មុននឹង Save
-    if (mongoose.connection.readyState !== 1) {
-        return res.status(500).json({ error: "Database មិនទាន់ភ្ជាប់ជោគជ័យទេបង! សូមពិនិត្យ MONGOURL ឡើងវិញ។" });
-    }
-
-    try {
-        const newImage = new ImageModel({ base64Data: image });
-        const savedData = await newImage.save();
-        
-        return res.status(200).json({ success: true, id: savedData._id });
-    } catch (error) {
-        // បោះកំហុសពិតប្រាកដចេញពី MongoDB មកឱ្យយើងដឹងភ្លាមៗ
-        return res.status(500).json({ error: "MongoDB Error: " + error.message });
-    }
-});
 
 module.exports = app;
