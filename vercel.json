@@ -14,7 +14,8 @@
       "destination": "/register.html"
     },
     {
-      "source": "/((?!api).*)"
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
     }
   ]
 }
