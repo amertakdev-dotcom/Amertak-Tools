@@ -18,24 +18,21 @@
     </header>
 
     <main class="max-w-3xl w-full mx-auto p-6 flex-grow flex flex-col justify-center">
-        <div id="converterSection" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700/50 shadow-xl space-y-6">
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700/50 shadow-xl space-y-6">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-white">Cloud Image to URL</h2>
-                <p class="text-sm text-slate-400 mt-1">រក្សាទុករូបភាពទៅក្នុង MongoDB សុវត្ថិភាព និងទទួលបានលីងងាយស្រួលចែករំលែកដែលមាន Preview</p>
+                <p class="text-sm text-slate-400 mt-1">ទាញយករូបភាព និងទទួលបានលីងមាន Open Graph Preview</p>
             </div>
 
             <div class="border-2 border-dashed border-slate-700 hover:border-teal-500 rounded-xl p-8 text-center cursor-pointer bg-slate-950/30 transition relative group min-h-[160px] flex items-center justify-center">
                 <input type="file" id="imageInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
-                
                 <div class="space-y-2 pointer-events-none" id="uploadPrompt">
-                    <span class="block text-4xl group-hover:scale-110 transition duration-300">☁️</span>
+                    <span class="block text-4xl">☁️</span>
                     <p class="text-sm font-semibold text-slate-300">ជ្រើសរើសរូបភាព ឬទាញរូបភាពមកទម្លាក់ទីនេះ</p>
-                    <p class="text-xs text-slate-500">គាំទ្ររូបភាពទូទៅទំហំរហូតដល់ 10MB</p>
                 </div>
-
                 <div class="hidden space-y-3 pointer-events-none text-teal-400 font-medium text-sm" id="uploadingProgress">
                     <div class="w-8 h-8 border-4 border-teal-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <p>កំពុងរក្សាទុកទៅកាន់ MongoDB Cloud...</p>
+                    <p>កំពុងរក្សាទុក...</p>
                 </div>
             </div>
 
@@ -51,7 +48,7 @@
     </main>
 
     <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500 bg-[#0b0f19]">
-        <p>© 2026 Amertak Tools · Developed by Kin Thavrath</p>
+        <p>© 2026 Amertak Tools</p>
     </footer>
 
     <script>
@@ -92,8 +89,8 @@
                     uploadingProgress.classList.add('hidden');
 
                     if (data.success) {
-                        // 🎯 បោះលីងទៅកាន់ /api/view/:id ដើម្បីកុំឱ្យរញ៉េរញ៉ៃច្បាប់ Vercel Routes
-                        urlOutput.value = `${window.location.origin}/api/view/${data.id}`;
+                        // បោះលីងចេញជាទម្រង់ខ្លី /view/:id
+                        urlOutput.value = `${window.location.origin}/view/${data.id}`;
                         resultSection.classList.remove('hidden');
                     } else {
                         alert("Error: " + data.error);
