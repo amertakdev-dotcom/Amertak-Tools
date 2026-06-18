@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors());
 
 // ភ្ជាប់ទៅកាន់ MongoDB
-const mongoURI = process.env.MONGOURI;
+const mongoURI = process.env.MONGOURL;
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
