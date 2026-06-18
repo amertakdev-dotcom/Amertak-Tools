@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
-// 🛠️ អនុញ្ញាតឱ្យទទួលទិន្នន័យ Base64 បានទំហំរហូតដល់ 10MB
+// អនុញ្ញាតឱ្យទទួលទិន្នន័យរូបភាពរហូតដល់ 10MB
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -35,7 +35,7 @@ const ImageModel = mongoose.model('Image', new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }), 'images');
 
-// 🎨 Dashboard HTML Template (Default Web UI)
+// 🎨 ផ្ទាំង UI សម្រាប់ Analytics
 const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     const tableRows = topPages.map((p, index) => {
         let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📄';
@@ -103,28 +103,17 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
 };
 
 // ==========================================
-// 📡 SYSTEM API ROUTERS
+// 📡 ROUTERS
 // ==========================================
 
 app.post('/api/upload-image', async (req, res) => {
     const { image } = req.body;
-    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
+    if (!image) return res.status(400).json({ error: "Missing Image Data" });
     try {
         await connectToDatabase();
         const newImage = new ImageModel({ base64Data: image });
         const savedData = await newImage.save();
         return res.status(200).json({ success: true, id: savedData._id });
-    } catch (error) {
-        return res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/get-image/:id', async (req, res) => {
-    try {
-        await connectToDatabase();
-        const imageData = await ImageModel.findById(req.params.id);
-        if (!imageData) return res.status(404).json({ error: "រកមិនឃើញរូបភាពទេ!" });
-        return res.status(200).json({ image: imageData.base64Data });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -145,9 +134,9 @@ app.post('/api/track-page', async (req, res) => {
 });
 
 /**
- * 🔗 ផ្លូវថ្មីសុវត្ថិភាព: GET /api/view/:id (លោត Preview Image លើ Telegram/Messenger)
+ * 🔗 ROUTE សម្រាប់បង្ហាញលីងរូបភាពមាន Preview OG Tags
  */
-app.get('/api/view/:id', async (req, res) => {
+app.get('/view/:id', async (req, res) => {
     try {
         await connectToDatabase();
         const imageData = await ImageModel.findById(req.params.id);
@@ -161,15 +150,15 @@ app.get('/api/view/:id', async (req, res) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Shared Image - Amertak Tools</title>
+            
             <meta property="og:title" content="រូបភាពចែករំលែកពី Amertak Tools">
             <meta property="og:description" content="ចុចទីនេះដើម្បីចូលមើលរូបភាពពេញទំហំច្បាស់ៗ">
             <meta property="og:image" content="${imageData.base64Data}">
             <meta property="og:type" content="website">
             <meta name="twitter:card" content="summary_large_image">
             <meta name="twitter:image" content="${imageData.base64Data}">
+            
             <script src="https://cdn.tailwindcss.com"></script>
-            <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-            <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
         </head>
         <body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col justify-between">
             <header class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4">
@@ -179,15 +168,11 @@ app.get('/api/view/:id', async (req, res) => {
                 </div>
             </header>
             <main class="max-w-3xl w-full mx-auto p-6 flex-grow flex flex-col justify-center text-center space-y-6">
-                <h2 class="text-lg font-semibold text-slate-300">🖼️ រូបភាពដែលបានទាញចេញពី Cloud Database</h2>
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl inline-block max-w-full mx-auto shadow-2xl">
                     <img src="${imageData.base64Data}" class="max-h-[65vh] rounded-xl mx-auto shadow-md">
                 </div>
-                <div>
-                    <a href="/tools/image-to-url/" class="inline-block bg-teal-500 hover:bg-teal-600 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm">បំប្លែងរូបភាពថ្មីមួយទៀត</a>
-                </div>
             </main>
-            <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500 bg-[#0b0f19]"><p>© 2026 Amertak Tools · Developed by Kin Thavrath</p></footer>
+            <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500 bg-[#0b0f19]"><p>© 2026 Amertak Tools</p></footer>
         </body>
         </html>`);
     } catch (error) {
