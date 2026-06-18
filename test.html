@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Styled Multi-Select Dropdown</title>
+<style>
+  /* Basic styling for the select */
+  .custom-multiselect {
+    width: 250px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Styling for options container */
+  .options-container {
+    display: none;
+    position: absolute;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 2px;
+    z-index: 1000;
+  }
+
+  /* Individual option styling */
+  .option {
+    padding: 8px;
+    cursor: pointer;
+  }
+  .option:hover {
+    background-color: #e6f0ff;
+  }
+
+  /* Selected option styling */
+  .option.selected {
+    background-color: #007bff;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<div class="custom-multiselect-wrapper">
+  <div class="custom-multiselect">Select options</div>
+  <div class="options-container">
+    <div class="option">Option 1</div>
+    <div class="option">Option 2</div>
+    <div class="option">Option 3</div>
+    <div class="option">Option 4</div>
+  </div>
+</div>
+
+<script>
+  const multiselect = document.querySelector('.custom-multiselect');
+  const optionsContainer = document.querySelector('.options-container');
+  const options = document.querySelectorAll('.option');
+
+  multiselect.addEventListener('click', () => {
+    optionsContainer.style.display = optionsContainer.style.display === 'block' ? 'none' : 'block';
+  });
+
+  options.forEach(option => {
+    option.addEventListener('click', () => {
+      option.classList.toggle('selected');
+      const selectedOptions = [...options].filter(o => o.classList.contains('selected')).map(o => o.textContent);
+      multiselect.textContent = selectedOptions.length ? selectedOptions.join(', ') : 'Select options';
+    });
+  });
+
+  // Close dropdown if clicked outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-multiselect-wrapper')) {
+      optionsContainer.style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
