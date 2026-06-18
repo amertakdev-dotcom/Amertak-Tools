@@ -35,8 +35,7 @@ const ImageModel = mongoose.model('Image', new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }), 'images');
 
-
-// 🎨 មុខងារបង្កើតផ្ទាំង UI DEFAULT WEB DASHBOARD (ដូចដើមវិញ ១០០%)
+// 🎨 Dashboard HTML Template (Default Web UI)
 const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     const tableRows = topPages.map((p, index) => {
         let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📄';
@@ -62,7 +61,7 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     <body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col justify-between">
         <header class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v4.1</span></h1>
+                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v5.0</span></h1>
                 <span class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <span class="h-2 w-2 rounded-full ${isEnvMissing ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}"></span> 
                     ${isEnvMissing ? 'Database Disconnected' : 'Live Engine Connected'}
@@ -103,14 +102,10 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     </html>`;
 };
 
-
 // ==========================================
 // 📡 SYSTEM API ROUTERS
 // ==========================================
 
-/**
- * 📡 ROUTE: POST /api/upload-image
- */
 app.post('/api/upload-image', async (req, res) => {
     const { image } = req.body;
     if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
@@ -124,9 +119,6 @@ app.post('/api/upload-image', async (req, res) => {
     }
 });
 
-/**
- * 📡 ROUTE: GET /api/get-image/:id
- */
 app.get('/api/get-image/:id', async (req, res) => {
     try {
         await connectToDatabase();
@@ -138,9 +130,6 @@ app.get('/api/get-image/:id', async (req, res) => {
     }
 });
 
-/**
- * 📡 ROUTE: POST /api/track-page
- */
 app.post('/api/track-page', async (req, res) => {
     try {
         await connectToDatabase();
@@ -156,9 +145,9 @@ app.post('/api/track-page', async (req, res) => {
 });
 
 /**
- * 🔗 ROUTE: GET /view/:id (ផ្ទាំងបង្ហាញរូបភាពពេលគេចុចមើលលីង Share - Premium UX/UI)
+ * 🔗 ផ្លូវថ្មីសុវត្ថិភាព: GET /api/view/:id (លោត Preview Image លើ Telegram/Messenger)
  */
-app.get('/view/:id', async (req, res) => {
+app.get('/api/view/:id', async (req, res) => {
     try {
         await connectToDatabase();
         const imageData = await ImageModel.findById(req.params.id);
@@ -206,9 +195,6 @@ app.get('/view/:id', async (req, res) => {
     }
 });
 
-/**
- * 📡 ROUTE: GET /api/usercount (គាំទ្រទាំង Web UI Dashboard ដើម និង KWGT JSON)
- */
 app.get('/api/usercount', async (req, res) => {
     const isEnvMissing = !process.env.MONGOURL;
     try {
