@@ -207,4 +207,55 @@ app.get('/api/usercount', async (req, res) => {
 
 app.get('/api', (req, res) => { res.redirect('/api/usercount'); });
 
+// 1. បង្កើត Schema និង Collection ថ្មីដាច់ដោយឡែក ដើម្បីកុំឱ្យឡូកឡំគ្នា
+const ImageSchema = new mongoose.Schema({
+    base64Data: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+// បង្កើត Model ឈ្មោះ 'Image' វានឹងបង្កើត Collection ឈ្មោះ 'images' ក្នុង Database ដោយស្វ័យប្រវត្តិ
+const ImageModel = mongoose.model('Image', ImageSchema, 'images');
+
+/**
+ * 📡 ROUTE: POST /api/upload-image
+ * សម្រាប់ទទួលរូបភាព Base64 ពី Frontend រួចរក្សាទុកក្នុង MongoDB និងបោះ ID ត្រឡប់ទៅវិញ
+ */
+app.post('/api/upload-image', async (req, res) => {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
+
+    try {
+        if (mongoose.connection.readyState === 1) {
+            // បង្កើតទិន្នន័យថ្មីទៅក្នុង Collection 'images'
+            const newImage = new ImageModel({ base64Data: image });
+            await newImage.save();
+
+            // បោះតែ ID ទៅឱ្យ Frontend បានហើយ ដើម្បីកុំឱ្យលីងវែងពេក
+            return res.status(200).json({ success: true, id: newImage._id });
+        }
+        return res.status(500).json({ error: "Database មិនទាន់មានការតភ្ជាប់ឡើយ!" });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * 📡 ROUTE: GET /api/get-image/:id
+ * សម្រាប់ឱ្យ Frontend ហៅមកទាញយករូបភាពពិតប្រាកដយកទៅបង្ហាញតាមរយៈ ID
+ */
+app.get('/api/get-image/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        if (mongoose.connection.readyState === 1) {
+            const imageData = await ImageModel.findById(id);
+            if (!imageData) return res.status(404).json({ error: "រកមិនឃើញរូបភាពនេះឡើយបង!" });
+
+            return res.status(200).json({ image: imageData.base64Data });
+        }
+        return res.status(500).json({ error: "Database មិនទាន់មានការតភ្ជាប់ឡើយ!" });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = app;
