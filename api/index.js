@@ -242,19 +242,23 @@ app.post('/api/upload-image', async (req, res) => {
  * 📡 ROUTE: GET /api/get-image/:id
  * សម្រាប់ឱ្យ Frontend ហៅមកទាញយករូបភាពពិតប្រាកដយកទៅបង្ហាញតាមរយៈ ID
  */
-app.get('/api/get-image/:id', async (req, res) => {
-    const { id } = req.params;
-    
-    try {
-        if (mongoose.connection.readyState === 1) {
-            const imageData = await ImageModel.findById(id);
-            if (!imageData) return res.status(404).json({ error: "រកមិនឃើញរូបភាពនេះឡើយបង!" });
+app.post('/api/upload-image', async (req, res) => {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ error: "សូមបញ្ជូនទិន្នន័យរូបភាពមកផងបង!" });
 
-            return res.status(200).json({ image: imageData.base64Data });
-        }
-        return res.status(500).json({ error: "Database មិនទាន់មានការតភ្ជាប់ឡើយ!" });
+    // ពិនិត្យមើលស្ថានភាព Database មុននឹង Save
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(500).json({ error: "Database មិនទាន់ភ្ជាប់ជោគជ័យទេបង! សូមពិនិត្យ MONGOURL ឡើងវិញ។" });
+    }
+
+    try {
+        const newImage = new ImageModel({ base64Data: image });
+        const savedData = await newImage.save();
+        
+        return res.status(200).json({ success: true, id: savedData._id });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        // បោះកំហុសពិតប្រាកដចេញពី MongoDB មកឱ្យយើងដឹងភ្លាមៗ
+        return res.status(500).json({ error: "MongoDB Error: " + error.message });
     }
 });
 
