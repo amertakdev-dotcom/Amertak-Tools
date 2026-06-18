@@ -257,3 +257,21 @@ function initQrTool() {
 }
 
 document.addEventListener('DOMContentLoaded', initQrTool);
+
+// កូដស្វ័យប្រវត្តិកត់ត្រាការចូលមើលទំព័រ
+window.addEventListener('DOMContentLoaded', () => {
+    // ចាប់យកឈ្មោះផ្លូវទំព័រនាពេលបច្ចុប្បន្ន (ឧទាហរណ៍៖ /tools/downloader/index.html)
+    const currentPage = window.location.pathname; 
+
+    fetch('https://tools-amertak.vercel.app/api/track-page', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pageName: currentPage })
+    })
+    .then(res => res.json())
+    .then(data => console.log('Page view tracked:', data))
+    .catch(err => console.error('Analytics Error:', err));
+});
+
