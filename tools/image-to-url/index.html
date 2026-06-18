@@ -18,11 +18,10 @@
     </header>
 
     <main class="max-w-3xl w-full mx-auto p-6 flex-grow flex flex-col justify-center">
-        
         <div id="converterSection" class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700/50 shadow-xl space-y-6">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-white">Cloud Image to URL</h2>
-                <p class="text-sm text-slate-400 mt-1">រក្សាទុករូបភាពទៅក្នុង MongoDB សុវត្ថិភាព និងទទួលបានលីងខ្លីងាយស្រួលចែករំលែកដែលមាន Preview</p>
+                <p class="text-sm text-slate-400 mt-1">រក្សាទុករូបភាពទៅក្នុង MongoDB សុវត្ថិភាព និងទទួលបានលីងងាយស្រួលចែករំលែកដែលមាន Preview</p>
             </div>
 
             <div class="border-2 border-dashed border-slate-700 hover:border-teal-500 rounded-xl p-8 text-center cursor-pointer bg-slate-950/30 transition relative group min-h-[160px] flex items-center justify-center">
@@ -49,7 +48,6 @@
                 <p id="alertMsg" class="text-xs text-emerald-400 hidden">✅ បានចម្លងលីងទៅកាន់ Clipboard រួចរាល់!</p>
             </div>
         </div>
-
     </main>
 
     <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500 bg-[#0b0f19]">
@@ -65,7 +63,6 @@
         const copyBtn = document.getElementById('copyBtn');
         const alertMsg = document.getElementById('alertMsg');
 
-        // 📊 បាញ់កត់ត្រាការចូលប្រើប្រាស់ទំព័រនេះទៅកាន់ Analytics Table ស្វ័យប្រវត្តិ
         window.addEventListener('DOMContentLoaded', () => {
             fetch('/api/track-page', {
                 method: 'POST',
@@ -74,7 +71,6 @@
             }).catch(err => console.log(err));
         });
 
-        // 🔄 មុខងារបំប្លែង និងបង្ហោះរូបភាព
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -96,8 +92,8 @@
                     uploadingProgress.classList.add('hidden');
 
                     if (data.success) {
-                        // 🎯 បង្កើតលីងតម្រង់ទៅកាន់ Route /view/:id ដើម្បីឱ្យមាន Preview Image
-                        urlOutput.value = `${window.location.origin}/view/${data.id}`;
+                        // 🎯 បោះលីងទៅកាន់ /api/view/:id ដើម្បីកុំឱ្យរញ៉េរញ៉ៃច្បាប់ Vercel Routes
+                        urlOutput.value = `${window.location.origin}/api/view/${data.id}`;
                         resultSection.classList.remove('hidden');
                     } else {
                         alert("Error: " + data.error);
@@ -112,7 +108,6 @@
             reader.readAsDataURL(file);
         });
 
-        // 🔄 មុខងារ Copy Link
         copyBtn.addEventListener('click', function() {
             urlOutput.select();
             navigator.clipboard.writeText(urlOutput.value);
