@@ -1,18 +1,43 @@
-const { loginUser, createToken, buildAuthCookie } = require('../_lib/auth');
+const {
+  loginUser,
+  createToken,
+  buildAuthCookie
+} = require('../_lib/auth');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
+    return res.status(405).json({
+      message: 'Method not allowed'
+    });
   }
 
   try {
-    const { email, password } = req.body;
-    const { user } = await loginUser({ email, password });
+    const { email, password } = req.body || {};
+
+    const { user } = await loginUser({
+      email,
+      password
+    });
+
     const token = createToken(user);
-    res.setHeader('Set-Cookie', buildAuthCookie(token));
-    res.status(200).json({ user, token });
+
+    res.setHeader(
+      'Set-Cookie',
+      buildAuthCookie(token)
+    );
+
+    return res.status(200).json({
+      success: true,
+      user,
+      token
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message || 'Unable to login.' });
+    console.error('LOGIN ERROR:', error);
+
+    return res.status(400).json({
+      success: false,
+      message:
+        error.message || 'Unable to login.'
+    });
   }
 };
