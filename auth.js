@@ -8,14 +8,27 @@ function showMessage(message, type = 'error') {
 async function postJson(endpoint, data) {
   const response = await fetch(`/api/auth/${endpoint}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-    credentials: 'include'
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(data)
   });
-  const payload = await response.json();
+
+  let payload;
+
+  try {
+    payload = await response.json();
+  } catch {
+    payload = {
+      message: `Server returned ${response.status}`
+    };
+  }
+
   if (!response.ok) {
     throw new Error(payload.message || 'Request failed');
   }
+
   return payload;
 }
 
