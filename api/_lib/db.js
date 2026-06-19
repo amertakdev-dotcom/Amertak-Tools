@@ -1,22 +1,31 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const mongoUrl = process.env.MONGOURL;
-let cachedClient = null;
-let cachedDb = null;
+
+let client;
+let clientPromise;
+
+if (!mongoUrl) {
+  throw new Error('MONGOURL environment variable is required.');
+}
+
+if (!global._mongoClientPromise) {
+  client = new MongoClient(mongoUrl, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true
+    }
+  });
+
+  global._mongoClientPromise = client.connect();
+}
+
+clientPromise = global._mongoClientPromise;
 
 async function getDb() {
-  if (cachedDb) return cachedDb;
-  if (!mongoUrl) {
-    throw new Error('MONGOURL environment variable is required.');
-  }
-
-  const client = new MongoClient(mongoUrl, {
-    serverApi: { version: '1' }
-  });
-  await client.connect();
-  cachedClient = client;
-  cachedDb = client.db();
-  return cachedDb;
+  const client = await clientPromise;
+  return client.db();
 }
 
 module.exports = { getDb };
