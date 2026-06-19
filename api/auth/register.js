@@ -1,22 +1,60 @@
-const { registerUser, createToken, buildAuthCookie } = require('../_lib/auth');
+const {
+  registerUser,
+  createToken,
+  buildAuthCookie
+} = require('../_lib/auth');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
+    return res.status(405).json({
+      message: 'Method not allowed'
+    });
   }
 
   try {
-    const { name, email, password } = req.body;
-    const { user } = await registerUser({ name, email, password });
+    const {
+      name,
+      email,
+      password
+    } = req.body || {};
+
+    const { user } =
+      await registerUser({
+        name,
+        email,
+        password
+      });
+
     const token = createToken(user);
-    res.setHeader('Set-Cookie', buildAuthCookie(token));
-    res.status(201).json({ user, token });
+
+    res.setHeader(
+      'Set-Cookie',
+      buildAuthCookie(token)
+    );
+
+    return res.status(201).json({
+      success: true,
+      user,
+      token
+    });
   } catch (error) {
+    console.error(
+      'REGISTER ERROR:',
+      error
+    );
+
     if (error.code === 'USER_EXISTS') {
-      res.status(409).json({ message: error.message });
-      return;
+      return res.status(409).json({
+        success: false,
+        message: error.message
+      });
     }
-    res.status(400).json({ message: error.message || 'Unable to register user.' });
+
+    return res.status(400).json({
+      success: false,
+      message:
+        error.message ||
+        'Unable to register user.'
+    });
   }
 };
