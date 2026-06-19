@@ -1,26 +1,9 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/view/(.*)",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/upload-image",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/track-page",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/raw-image/(.*)",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/usercount",
+      "source": "/(.*)",
       "destination": "/api/index"
     }
   ]
