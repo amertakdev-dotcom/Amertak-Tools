@@ -4,11 +4,23 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/view/(.*)",
       "destination": "/api/index"
     },
     {
-      "source": "/view/(.*)",
+      "source": "/upload-image",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/track-page",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/raw-image/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/usercount",
       "destination": "/api/index"
     }
   ]
