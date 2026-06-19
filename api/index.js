@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
-// 🛠️ ប្រព័ន្ធទទួលទិន្នន័យ Base64 បានទំហំរហូតដល់ 10MB
+// 🛠️ ប្រព័ន្ធទទួលទិន្នន័យ Base64 ធានាបានទំហំធំរហូតដល់ 10MB
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -17,9 +17,11 @@ async function connectToDatabase() {
         return cachedConnection;
     }
     if (!mongoURI) throw new Error("process.env.MONGOURL is undefined!");
+    
+    // បន្ថែម Timeouts ការពារការ Hang យូរនាំឱ្យដាច់ Server
     cachedConnection = await mongoose.connect(mongoURI, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 4000,
+        connectTimeoutMS: 8000,
     });
     return cachedConnection;
 }
@@ -61,7 +63,7 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     <body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col justify-between">
         <header class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v6.3</span></h1>
+                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v6.4</span></h1>
                 <span class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <span class="h-2 w-2 rounded-full ${isEnvMissing ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}"></span> 
                     ${isEnvMissing ? 'Database Disconnected' : 'Live Engine Connected'}
@@ -103,10 +105,10 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
 };
 
 // ==========================================
-// 📡 MULTI-MATCH API ROUTERS (គាំទ្រទាំងមាន /api និងអត់មាន)
+// 📡 BULLETPROOF ROUTERS WITH PATH ARRAYS (ស្ទាក់ចាប់គ្រប់ស្ថានភាព URL)
 // ==========================================
 
-app.post(['/api/upload-image', '/upload-image'], async (req, res) => {
+app.post(['*/upload-image', '/api/upload-image', '/upload-image'], async (req, res) => {
     const { image } = req.body;
     if (!image) return res.status(400).json({ error: "Missing Image Data" });
     try {
@@ -119,7 +121,7 @@ app.post(['/api/upload-image', '/upload-image'], async (req, res) => {
     }
 });
 
-app.post(['/api/track-page', '/track-page'], async (req, res) => {
+app.post(['*/track-page', '/api/track-page', '/track-page'], async (req, res) => {
     try {
         await connectToDatabase();
         const updated = await PageTrack.findOneAndUpdate(
@@ -133,7 +135,7 @@ app.post(['/api/track-page', '/track-page'], async (req, res) => {
     }
 });
 
-app.get(['/api/raw-image/:id', '/raw-image/:id'], async (req, res) => {
+app.get(['*/raw-image/:id', '/api/raw-image/:id', '/raw-image/:id'], async (req, res) => {
     try {
         await connectToDatabase();
         const imageData = await ImageModel.findById(req.params.id);
@@ -156,9 +158,9 @@ app.get(['/api/raw-image/:id', '/raw-image/:id'], async (req, res) => {
 });
 
 /**
- * 🔗 ROUTE មើលរូបភាពទម្រង់ខ្លី /view/:id (លោត Preview ដុំការ៉េតូចចំហៀងស្តាំ ដូច Pinterest)
+ * 🔗 ROUTE មើលរូបភាពទម្រង់ខ្លី /view/:id (បង្ហាញកូនរូបភាព Preview ចំហៀងស្តាំ ដូច Pinterest)
  */
-app.get(['/view/:id', '/api/view/:id'], async (req, res) => {
+app.get(['*/view/:id', '/view/:id', '/api/view/:id'], async (req, res) => {
     try {
         await connectToDatabase();
         const imageData = await ImageModel.findById(req.params.id);
@@ -166,7 +168,6 @@ app.get(['/view/:id', '/api/view/:id'], async (req, res) => {
 
         const protocol = req.headers['x-forwarded-proto'] || 'https';
         const host = req.headers.host;
-        // បង្ខំលីងរូបភាពឱ្យចំផ្នែក API Raw ជានិច្ច
         const directImageUrl = `${protocol}://${host}/api/raw-image/${req.params.id}`;
 
         res.setHeader('Content-Type', 'text/html');
@@ -210,7 +211,7 @@ app.get(['/view/:id', '/api/view/:id'], async (req, res) => {
     }
 });
 
-app.get(['/api/usercount', '/usercount'], async (req, res) => {
+app.get(['*/usercount', '/api/usercount', '/usercount'], async (req, res) => {
     const isEnvMissing = !process.env.MONGOURL;
     try {
         await connectToDatabase();
