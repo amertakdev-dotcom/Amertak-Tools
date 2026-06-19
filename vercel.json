@@ -3,11 +3,7 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/view/(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/api/(.*)",
+      "source": "/view/:id",
       "destination": "/api/index.js"
     }
   ]
