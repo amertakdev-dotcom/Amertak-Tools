@@ -4,16 +4,12 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/view/:id",
+      "source": "/api/(.*)",
       "destination": "/api/index"
     },
     {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register.html"
+      "source": "/view/(.*)",
+      "destination": "/api/index"
     }
   ]
 }
