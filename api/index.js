@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
+// 🛠️ ប្រព័ន្ធទទួលទិន្នន័យ Base64 បានទំហំរហូតដល់ 10MB
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
@@ -23,7 +24,7 @@ async function connectToDatabase() {
     return cachedConnection;
 }
 
-// DATABASE SCHEMAS
+// 🗂️ DATABASE SCHEMAS
 const User = mongoose.model('User', new mongoose.Schema({}, { strict: false }), 'users');
 const PageTrack = mongoose.model('PageTrack', new mongoose.Schema({
     pageName: { type: String, required: true, unique: true },
@@ -34,7 +35,7 @@ const ImageModel = mongoose.model('Image', new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }), 'images');
 
-// UI Analytics Dashboard
+// 🎨 Dashboard HTML Template
 const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     const tableRows = topPages.map((p, index) => {
         let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '📄';
@@ -60,7 +61,7 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
     <body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col justify-between">
         <header class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4">
             <div class="max-w-4xl mx-auto flex justify-between items-center">
-                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v6.1</span></h1>
+                <h1 class="text-xl font-bold text-teal-400 tracking-wide">AMERTAK TOOLS <span class="text-xs bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded-full font-normal">v6.2</span></h1>
                 <span class="flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
                     <span class="h-2 w-2 rounded-full ${isEnvMissing ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}"></span> 
                     ${isEnvMissing ? 'Database Disconnected' : 'Live Engine Connected'}
@@ -102,7 +103,7 @@ const renderDashboard = (totalUsers, topPages, isEnvMissing) => {
 };
 
 // ==========================================
-// API ROUTERS
+// 📡 SYSTEM API ROUTERS
 // ==========================================
 
 app.post('/api/upload-image', async (req, res) => {
@@ -154,6 +155,9 @@ app.get('/api/raw-image/:id', async (req, res) => {
     }
 });
 
+/**
+ * 🔗 ROUTE មើលរូបភាពទម្រង់ខ្លី /view/:id (លោត Preview ដុំការ៉េតូចចំហៀងស្តាំ ដូច Pinterest)
+ */
 app.get('/view/:id', async (req, res) => {
     try {
         await connectToDatabase();
@@ -172,14 +176,17 @@ app.get('/view/:id', async (req, res) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Shared Image - Amertak Tools</title>
+            
             <meta property="og:title" content="រូបភាពចែករំលែកពី Amertak Tools">
             <meta property="og:description" content="ចុចទីនេះដើម្បីចូលមើលរូបភាពពេញទំហំច្បាស់ៗ">
             <meta property="og:image" content="${directImageUrl}">
             <meta property="og:type" content="website">
+            
             <meta name="twitter:card" content="summary">
             <meta name="twitter:title" content="រូបភាពចែករំលែកពី Amertak Tools">
             <meta name="twitter:description" content="ចុចទីនេះដើម្បីចូលមើលរូបភាពពេញទំហំច្បាស់ៗ">
             <meta name="twitter:image" content="${directImageUrl}">
+            
             <script src="https://cdn.tailwindcss.com"></script>
         </head>
         <body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col justify-between">
