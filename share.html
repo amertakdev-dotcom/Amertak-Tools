@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="shareTitle">Image from Amertak Tools</title>
+    <meta name="description" id="shareDesc" content="Shared image from Amertak Tools">
+    
+    <!-- Dynamic Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="ogTitle" content="Image from Amertak Tools">
+    <meta property="og:description" id="ogDesc" content="Shared image from Amertak Tools">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Amertak Tools">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitterTitle" content="Image from Amertak Tools">
+    <meta name="twitter:description" id="twitterDesc" content="Shared image from Amertak Tools">
+    <meta name="twitter:image" id="twitterImage" content="">
+    
+    <link rel="icon" type="image/png" href="/svg/logo.svg">
+    <link rel="shortcut icon" href="/svg/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .app-wrapper {
+            padding: 72px 20px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .share-image {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .share-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .share-info h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .share-info p {
+            font-size: 14px;
+            color: var(--text-main);
+            opacity: 0.8;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .share-meta {
+            font-size: 12px;
+            color: var(--text-main);
+            opacity: 0.6;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff0080, #ff3366);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 0, 128, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid rgba(255, 0, 128, 0.3);
+            color: #ff0080;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 0, 128, 0.2);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--text-dim);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 0, 128, 0.2);
+            border-top-color: #ff0080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
+    <aside id="sidebar" class="sidebar-mobile"></aside>
+
+    <div class="app-wrapper">
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="brand">
+                        <div class="brand-icon"><img src="/svg/logo.svg" alt="logo" width="150px"></div>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()" class="hamburger-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
+                </button>
+                <button id="loginBtn" class="login-btn" onclick="window.location.href='/login'">Login</button>
+                <button class="toggleMode" id="toggleMode" onclick="toggleMode()">
+                    <img id="mode-btn" src="/svg/light-mode.svg">
+                </button>
+            </div>
+        </header>
+
+        <div class="share-container">
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading image...</p>
+            </div>
+
+            <div id="imageState" style="display:none;">
+                <div class="share-image">
+                    <img id="sharedImage" src="" alt="Shared image">
+                </div>
+                <div class="share-info">
+                    <h1 id="imageName"></h1>
+                    <p id="imageDesc"></p>
+                    <div class="share-meta">
+                        <span id="viewCount">Views: 0</span>
+                        <span id="uploadTime"></span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="downloadImage()">Download</button>
+                    <button class="btn btn-secondary" onclick="goToTool()">Try Tool</button>
+                </div>
+            </div>
+
+            <div id="errorState" style="display:none;">
+                <h1 style="color: #ff3366; margin-bottom: 16px;">Image not found</h1>
+                <p style="margin-bottom: 24px;">This image may have been deleted or the link is incorrect.</p>
+                <button class="btn btn-primary" onclick="window.location.href='/'">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/app.js"></script>
+    <script>
+        const imageId = window.location.pathname.split('/').pop();
+
+        async function loadImage() {
+            try {
+                const response = await fetch(`/api/tools/image-to-url/image/${imageId}`);
+                
+                if (!response.ok) {
+                    showError();
+                    return;
+                }
+
+                const data = await response.json();
+                const image = data.image;
+
+                // Update OG tags
+                const pageUrl = window.location.href;
+                document.getElementById('ogTitle').content = image.fileName;
+                document.getElementById('ogDesc').content = image.description;
+                document.getElementById('ogUrl').content = pageUrl;
+                document.getElementById('ogImage').content = image.imageData;
+                document.getElementById('twitterTitle').content = image.fileName;
+                document.getElementById('twitterDesc').content = image.description;
+                document.getElementById('twitterImage').content = image.imageData;
+                document.getElementById('shareTitle').textContent = `${image.fileName} - Amertak Tools`;
+                document.getElementById('shareDesc').content = image.description;
+
+                // Update UI
+                document.getElementById('sharedImage').src = image.imageData;
+                document.getElementById('imageName').textContent = image.fileName;
+                document.getElementById('imageDesc').textContent = image.description;
+                document.getElementById('viewCount').textContent = `Views: ${image.views}`;
+                
+                const uploadDate = new Date(image.uploadedAt);
+                document.getElementById('uploadTime').textContent = `Uploaded: ${uploadDate.toLocaleDateString()}`;
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('imageState').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading image:', error);
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('sharedImage').src;
+            link.download = document.getElementById('imageName').textContent;
+            link.click();
+        }
+
+        function goToTool() {
+            window.location.href = '/tools/image-to-url';
+        }
+
+        // Load image on page load
+        document.addEventListener('DOMContentLoaded', loadImage);
+    </script>
+</body>
+</html>

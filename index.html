@@ -63,7 +63,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
                 </button>
 
-                <button class="login-btn" onclick="window.location.href='/login'">Login</button>
+                <button id="loginBtn" class="login-btn" onclick="window.location.href='/login'">Login</button>
 
                 <button class="toggleMode" id="toggleMode" onclick="toggleMode()">
                     <img id="mode-btn" src="/svg/light-mode.svg">
@@ -83,6 +83,8 @@
                             <li onclick="window.location.href=`/tools/qr-code`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16 17V16H13V13H16V15H18V17H17V19H15V21H13V18H15V17H16ZM21 21H17V19H19V17H21V21ZM3 3H11V11H3V3ZM5 5V9H9V5H5ZM13 3H21V11H13V3ZM15 5V9H19V5H15ZM3 13H11V21H3V13ZM5 15V19H9V15H5ZM18 13H21V15H18V13ZM6 6H8V8H6V6ZM6 16H8V18H6V16ZM16 6H18V8H16V6Z"></path></svg>QR Code</li>
 
                             <li onclick="window.location.href=`/tools/image-to-pdf`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5 4H15V8H19V20H5V4ZM3.9985 2C3.44749 2 3 2.44405 3 2.9918V21.0082C3 21.5447 3.44476 22 3.9934 22H20.0066C20.5551 22 21 21.5489 21 20.9925L20.9997 7L16 2H3.9985ZM7 14L10 11L12 13L15 10L17 12V18H7V14Z"></path></svg>Image PDF</li>
+
+                            <li onclick="window.location.href=`/tools/image-to-url`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C15.3137 4 18 6.68629 18 10C18 13.3137 15.3137 16 12 16C8.68629 16 6 13.3137 6 10C6 6.68629 8.68629 4 12 4ZM12 17C15.3137 17 18 18.5 18 20.5C18 20.7761 17.7761 21 17.5 21H6.5C6.22386 21 6 20.7761 6 20.5C6 18.5 8.68629 17 12 17Z"></path></svg>Image to URL</li>
 
                             <li onclick="window.location.href=`/tools/text-translator`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5 15V17C5 18.0544 5.81588 18.9182 6.85074 18.9945L7 19H10V21H7C4.79086 21 3 19.2091 3 17V15H5ZM18 10L22.4 21H20.245L19.044 18H14.954L13.755 21H11.601L16 10H18ZM17 12.8852L15.753 16H18.245L17 12.8852ZM8 2V4H12V11H8V14H6V11H2V4H6V2H8ZM17 3C19.2091 3 21 4.79086 21 7V9H19V7C19 5.89543 18.1046 5 17 5H14V3H17ZM6 6H4V9H6V6ZM10 6H8V9H10V6Z"></path></svg>Text Translator</li>
 
@@ -171,6 +173,18 @@
                     <h2>Image to PDF</h2>
                     <p>Convert your photo images to PDF file with any photo file type for free. Use this tool now!</p>
                     <button onclick="window.location.href=`/tools/image-to-pdf`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(255,255,255,1)"><path d="M12 11V8L16 12L12 16V13H8V11H12ZM12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2ZM12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20Z"></path></svg>use</button>
+                </div>
+            </div>
+
+            <!-- IMAGE TO URL -->
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="450"  onclick="window.location.href='/tools/image-to-url'">
+                <div class="tool-icons bg5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C15.3137 4 18 6.68629 18 10C18 13.3137 15.3137 16 12 16C8.68629 16 6 13.3137 6 10C6 6.68629 8.68629 4 12 4ZM12 17C15.3137 17 18 18.5 18 20.5C18 20.7761 17.7761 21 17.5 21H6.5C6.22386 21 6 20.7761 6 20.5C6 18.5 8.68629 17 12 17Z"></path></svg>
+                </div>
+                <div class="tool-txt">
+                    <h2>Image to URL</h2>
+                    <p>Convert images into shareable URLs with social media preview banners and descriptions.</p>
+                    <button onclick="window.location.href=`/tools/image-to-url`"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(255,255,255,1)"><path d="M12 11V8L16 12L12 16V13H8V11H12ZM12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2ZM12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20Z"></path></svg>use</button>
                 </div>
             </div>
 

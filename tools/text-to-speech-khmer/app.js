@@ -5,91 +5,65 @@ const audioPlayer = document.getElementById('audioPlayer');
 const downloadBtn = document.getElementById('downloadBtn');
 const statusText = document.getElementById('statusText');
 
-let lastFileId = null;
-
 function setStatus(message, isError = false) {
     statusText.textContent = message;
     statusText.style.color = isError ? '#ff8080' : '';
 }
 
-async function generateSpeech() {
+function getKhmerVoice() {
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    return voices.find((voice) => voice.lang === 'km-KH')
+        || voices.find((voice) => voice.lang.toLowerCase().startsWith('km'))
+        || voices.find((voice) => voice.lang === 'th-TH')
+        || voices[0];
+}
+
+function generateSpeech() {
     const text = inputText.value.trim();
 
     if (!text) {
-        setStatus("សូមវាយអត្ថបទជាមុនសិន", true);
+        setStatus('សូមវាយអត្ថបទជាមុនសិន', true);
         return;
     }
 
-    try {
-        setStatus("កំពុងបង្កើតសំឡេង...");
-
-        const res = await fetch("/api/tts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                text,
-                voice: "en-US-JennyNeural"
-            })
-        });
-
-        const data = await res.json();
-
-        if (!data.file_id) {
-            throw new Error("No file_id returned");
-        }
-
-        lastFileId = data.file_id;
-
-        const audioUrl = `/api/audio/${lastFileId}`;
-
-        audioPlayer.src = audioUrl;
-        audioPlayer.hidden = false;
-        downloadBtn.hidden = false;
-
-        setStatus("រួចរាល់ ✔");
-
-        audioPlayer.play();
-
-    } catch (err) {
-        console.error(err);
-
-        setStatus("API error → fallback to browser TTS", true);
-
-        fallbackTTS();
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+        setStatus('Browser text-to-speech is not supported here.', true);
+        return;
     }
-}
 
-function fallbackTTS() {
-    const text = inputText.value.trim();
+    window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "km-KH";
+    utterance.lang = 'km-KH';
     utterance.rate = 0.95;
+    utterance.pitch = 1;
 
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+    const voice = getKhmerVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onstart = () => setStatus('កំពុងអាន...');
+    utterance.onend = () => setStatus('រួចរាល់');
+    utterance.onerror = () => setStatus('Unable to play speech in this browser.', true);
+
+    audioPlayer.hidden = true;
+    downloadBtn.hidden = true;
+    window.speechSynthesis.speak(utterance);
 }
 
 function clearForm() {
-    inputText.value = "";
-    audioPlayer.src = "";
+    inputText.value = '';
+    audioPlayer.src = '';
     audioPlayer.hidden = true;
     downloadBtn.hidden = true;
-    speechSynthesis.cancel();
-    setStatus("Ready.");
+    window.speechSynthesis?.cancel();
+    setStatus('Ready.');
 }
 
-function downloadAudio() {
-    if (!lastFileId) return;
+speakBtn.addEventListener('click', generateSpeech);
+clearBtn.addEventListener('click', clearForm);
+downloadBtn.addEventListener('click', () => {
+    setStatus('Download is unavailable for browser speech playback.', true);
+});
 
-    const link = document.createElement("a");
-    link.href = `/api/audio/${lastFileId}`;
-    link.download = "speech.mp3";
-    link.click();
-}
-
-speakBtn.addEventListener("click", generateSpeech);
-clearBtn.addEventListener("click", clearForm);
-downloadBtn.addEventListener("click", downloadAudio);
-
-setStatus("Ready.");
+window.speechSynthesis?.addEventListener?.('voiceschanged', getKhmerVoice);
+setStatus('Ready.');

@@ -3,8 +3,65 @@
   "cleanUrls": true,
   "rewrites": [
     {
+<<<<<<< HEAD
       "source": "/(.*)",
       "destination": "/api/index"
+=======
+      "source": "/about",
+      "destination": "/about/index.html"
+    },
+    {
+      "source": "/share/:id",
+      "destination": "/share.html"
+    },
+    {
+      "source": "/tools/downloader",
+      "destination": "/tools/downloader/index.html"
+    },
+    {
+      "source": "/tools/qr-code",
+      "destination": "/tools/qr-code/index.html"
+    },
+    {
+      "source": "/tools/image-to-pdf",
+      "destination": "/tools/image-to-pdf/index.html"
+    },
+    {
+      "source": "/tools/image-to-url",
+      "destination": "/tools/image-to-url/index.html"
+    },
+    {
+      "source": "/tools/text-translator",
+      "destination": "/tools/text-translator/index.html"
+    },
+    {
+      "source": "/tools/text-to-speech-khmer",
+      "destination": "/tools/text-to-speech-khmer/index.html"
+    },
+    {
+      "source": "/tools/text-counter",
+      "destination": "/tools/text-counter/index.html"
+    },
+    {
+      "source": "/tools/video-audio-transcribe",
+      "destination": "/tools/video-audio-transcribe/index.html"
+    },
+    {
+      "source": "/tools/color-converter",
+      "destination": "/tools/color-converter/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+>>>>>>> 186d5a5 (Fix downloader API and Vercel tool routes)
     }
   ]
 }

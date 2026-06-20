@@ -12,6 +12,8 @@ function toggleSidebar() {
 const navIcons = {
     home: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M13 19H19V9.97815L12 4.53371L5 9.97815V19H11V13H13V19ZM21 20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V9.48907C3 9.18048 3.14247 8.88917 3.38606 8.69972L11.3861 2.47749C11.7472 2.19663 12.2528 2.19663 12.6139 2.47749L20.6139 8.69972C20.8575 8.88917 21 9.18048 21 9.48907V20Z"></path></svg>',
     login: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10 17L15 12L10 7V10H3V14H10V17ZM19 3H11C9.89543 3 9 3.89543 9 5V9H11V5H19V19H11V15H9V19C9 20.1046 9.89543 21 11 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z"></path></svg>',
+    logout: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5 11H13V13H5V16H3L8 21L13 16H11V11H13L8 6L3 11H5V13H5V11Z"></path></svg>',
+    profile: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C15.3137 4 18 6.68629 18 10C18 13.3137 15.3137 16 12 16C8.68629 16 6 13.3137 6 10C6 6.68629 8.68629 4 12 4ZM12 17C15.3137 17 18 18.5 18 20.5C18 20.7761 17.7761 21 17.5 21H6.5C6.22386 21 6 20.7761 6 20.5C6 18.5 8.68629 17 12 17Z"></path></svg>',
     tools: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"></path></svg>',
     downloader: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.4142 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H10.4142L12.4142 5ZM4 5V19H20V7H11.5858L9.58579 5H4ZM13 13H16L12 17L8 13H11V9H13V13Z"></path></svg>',
     qr: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16 17V16H13V13H16V15H18V17H17V19H15V21H13V18H15V17H16ZM21 21H17V19H19V17H21ZM3 3H11V11H3ZM5 5V9H9V5ZM13 3H21V11H13ZM15 5V9H19V5ZM3 13H11V21H3ZM5 15V19H9V15ZM18 13H21V15H18ZM6 6H8V8H6ZM6 16H8V18H6ZM16 6H18V8H16Z"></path></svg>',
@@ -37,6 +39,7 @@ const navSections = [
             { label: 'Downloader', href: '/tools/downloader', icon: navIcons.downloader },
             { label: 'QR Code', href: '/tools/qr-code', icon: navIcons.qr },
             { label: 'Image PDF', href: '/tools/image-to-pdf', icon: navIcons.pdf },
+            { label: 'Image to URL', href: '/tools/image-to-url', icon: navIcons.pdf },
             { label: 'Text Translator', href: '/tools/text-translator', icon: navIcons.translate },
             { label: 'Text to Speech', href: '/tools/text-to-speech-khmer', icon: navIcons.speech },
             { label: 'Text Counter', href: '/tools/text-counter', icon: navIcons.count },
@@ -82,6 +85,40 @@ function createNavLink(item) {
     return link;
 }
 
+function createSection(section) {
+    const sectionWrapper = document.createElement('div');
+    sectionWrapper.className = 'nav-section';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'nav-link section-toggle';
+    button.innerHTML = `${section.icon}<span>${section.label}</span><svg class="section-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 15.1716L6.34315 9.51472L7.75736 8.10051L12 12.3431L16.2426 8.10051L17.6569 9.51472L12 15.1716Z"></path></svg>`;
+
+    const itemsWrapper = document.createElement('div');
+    itemsWrapper.className = 'section-items';
+
+    section.items.forEach((item) => {
+        const itemLink = createNavLink(item);
+        itemLink.classList.add('section-item');
+        itemsWrapper.appendChild(itemLink);
+    });
+
+    button.addEventListener('click', () => {
+        button.classList.toggle('open');
+        itemsWrapper.classList.toggle('open');
+    });
+
+    // Open section if it contains the active route
+    if (section.items.some((item) => isActiveHref(item.href))) {
+        button.classList.add('open');
+        itemsWrapper.classList.add('open');
+    }
+
+    sectionWrapper.appendChild(button);
+    sectionWrapper.appendChild(itemsWrapper);
+    return sectionWrapper;
+}
+
 function createNavLabel(section) {
     const label = document.createElement('div');
     label.className = 'nav-label';
@@ -96,14 +133,106 @@ function renderSidebar() {
     const nav = document.createElement('nav');
     nav.className = 'mobile-nav';
     nav.appendChild(createNavLink({ label: 'Home', href: '/', icon: navIcons.home }));
-    nav.appendChild(createNavLink({ label: 'Login', href: '/login', icon: navIcons.login }));
+
+    // Check if user is authenticated
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (user) {
+        // User is logged in - show profile card with expandable logout
+        const profileWrapper = document.createElement('div');
+        profileWrapper.className = 'user-profile-wrapper';
+
+        const profileToggle = document.createElement('button');
+        profileToggle.type = 'button';
+        profileToggle.className = 'user-profile-section user-profile-toggle';
+        profileToggle.innerHTML = `
+            <div class="user-info">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C15.3137 4 18 6.68629 18 10C18 13.3137 15.3137 16 12 16C8.68629 16 6 13.3137 6 10C6 6.68629 8.68629 4 12 4ZM12 17C15.3137 17 18 18.5 18 20.5C18 20.7761 17.7761 21 17.5 21H6.5C6.22386 21 6 20.7761 6 20.5C6 18.5 8.68629 17 12 17Z"></path></svg>
+                <div>
+                    <div class="user-name">${user.name || 'User'}</div>
+                    <div class="user-email">${user.email || ''}</div>
+                </div>
+            </div>
+            <span class="profile-arrow"></span>
+        `;
+
+        const userActions = document.createElement('div');
+        userActions.className = 'user-actions';
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.type = 'button';
+        logoutBtn.className = 'nav-link logout-link user-action-btn';
+        logoutBtn.innerHTML = `${navIcons.logout}<span>Logout</span>`;
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        userActions.appendChild(logoutBtn);
+        profileToggle.addEventListener('click', () => {
+            profileToggle.classList.toggle('open');
+            userActions.classList.toggle('open');
+        });
+
+        profileWrapper.appendChild(profileToggle);
+        profileWrapper.appendChild(userActions);
+        nav.appendChild(profileWrapper);
+    } else {
+        // User not logged in - show login link
+        nav.appendChild(createNavLink({ label: 'Login', href: '/login', icon: navIcons.login }));
+    }
 
     navSections.forEach((section) => {
-        nav.appendChild(createNavLabel(section));
-        section.items.forEach((item) => nav.appendChild(createNavLink(item)));
+        nav.appendChild(createSection(section));
     });
 
     sidebar.replaceChildren(nav);
+}
+
+// Fetch user info on page load
+async function fetchUserInfo() {
+    try {
+        const response = await fetch('/api/auth/me', { 
+            credentials: 'include' 
+        });
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
+            // Hide login button when user is logged in
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.style.display = 'none';
+            }
+            // Re-render sidebar with user info
+            renderSidebar();
+        } else {
+            localStorage.removeItem('user');
+            // Show login button when not logged in
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.style.display = 'flex';
+            }
+        }
+    } catch (error) {
+        localStorage.removeItem('user');
+        console.log('Not authenticated or error fetching user');
+        // Show login button on error
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.style.display = 'flex';
+        }
+    }
 }
 
 function renderDesktopDropdowns() {
@@ -133,6 +262,78 @@ function renderDesktopDropdowns() {
             });
             return listItem;
         }));
+    });
+}
+
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+}
+
+function createAuthPopup() {
+    if (document.getElementById('authPopup')) return;
+
+    const popup = document.createElement('div');
+    popup.id = 'authPopup';
+    popup.className = 'auth-popup hidden';
+    popup.innerHTML = `
+        <div class="auth-popup-card">
+            <button type="button" class="auth-popup-close" aria-label="Close">&times;</button>
+            <div class="auth-popup-icon">${navIcons.tools}</div>
+            <h3>Register or login to use the tools.</h3>
+            <p>Please sign in to access the tools and save your progress.</p>
+            <div class="auth-popup-actions">
+                <button type="button" class="auth-popup-register">Register</button>
+                <button type="button" class="auth-popup-login">Login</button>
+                <button type="button" class="auth-popup-close-btn">Close</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    popup.querySelector('.auth-popup-close')?.addEventListener('click', hideAuthPopup);
+    popup.querySelector('.auth-popup-close-btn')?.addEventListener('click', hideAuthPopup);
+    popup.querySelector('.auth-popup-register')?.addEventListener('click', () => {
+        window.location.href = '/register';
+    });
+    popup.querySelector('.auth-popup-login')?.addEventListener('click', () => {
+        window.location.href = '/login';
+    });
+    popup.addEventListener('click', (event) => {
+        if (event.target === popup) {
+            hideAuthPopup();
+        }
+    });
+}
+
+function showAuthPopup() {
+    createAuthPopup();
+    const popup = document.getElementById('authPopup');
+    if (!popup) return;
+    popup.classList.remove('hidden');
+    popup.classList.add('open');
+}
+
+function hideAuthPopup() {
+    const popup = document.getElementById('authPopup');
+    if (!popup) return;
+    popup.classList.remove('open');
+    popup.classList.add('hidden');
+}
+
+function initAuthToolBlocker() {
+    const targets = document.querySelectorAll('.tool-card, .tool-card button');
+    if (!targets.length) return;
+
+    targets.forEach((target) => {
+        target.addEventListener('click', (event) => {
+            if (getCurrentUser()) return;
+            const card = event.target.closest('.tool-card');
+            if (!card) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            showAuthPopup();
+        }, true);
     });
 }
 
@@ -173,6 +374,8 @@ function initThemeToggle() {
 }
 
 // auto-init on load
+document.addEventListener('DOMContentLoaded', fetchUserInfo);
 document.addEventListener('DOMContentLoaded', renderSidebar);
 document.addEventListener('DOMContentLoaded', renderDesktopDropdowns);
 document.addEventListener('DOMContentLoaded', initThemeToggle);
+document.addEventListener('DOMContentLoaded', initAuthToolBlocker);
