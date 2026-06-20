@@ -3,10 +3,8 @@
   "cleanUrls": true,
   "rewrites": [
     {
-<<<<<<< HEAD
       "source": "/(.*)",
-      "destination": "/api/index"
-=======
+      "destination": "/api/index",
       "source": "/about",
       "destination": "/about/index.html"
     },
@@ -61,7 +59,6 @@
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
->>>>>>> 186d5a5 (Fix downloader API and Vercel tool routes)
     }
   ]
 }

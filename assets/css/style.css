@@ -109,7 +109,7 @@ a {
 .desktop-navbar {
     display: flex;
     margin-left: auto;
-    margin-right: 0px;
+    margin-right: 55px;
 }
 
 .nav-item {
@@ -566,18 +566,25 @@ svg {
 }
 
 .toggleMode {
-    position: fixed;
-    right: 20px;
+    position: relative;
+    right: 65px;
     width: 40px;
     height: 40px;
     display: flex;
-    margin: auto;
+    align-items: center;
+    cursor: pointer;
     justify-content: center;
     background: var(--card-bg);
     box-shadow: 0 0 15px var(--shadow);
     border: 1px solid var(--danger);
     border-radius: 50%;
     transition: all 0.5s;
+}
+
+@media (max-width: 760px) {
+   .toggleMode {
+    right: 0;
+   }
 }
 .toggleMode:active {
     rotate: 360deg;
@@ -589,8 +596,8 @@ svg {
 }
 
 .login-btn {
-    position: fixed;
-    right: 72px;
+    position: relative;
+    right: 80px;
     width: auto;
     height: 40px;
     padding: 0 18px;
@@ -606,6 +613,13 @@ svg {
     cursor: pointer;
     transition: 0.3s ease;
     z-index: 300;
+}
+@media (max-width: 760px) {
+    .login-btn {
+        position: fixed;
+        display: flex;
+        right: 135px;
+    }
 }
 
 .login-btn:hover {
