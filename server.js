@@ -19,7 +19,7 @@ app.use(express.urlencoded({ limit: '50mb' }));
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/tools/image-to-url', imageToUrlRouter);
-app.use('/api/tools/downloader', downloaderRouter);
+app.all('/api/tools/downloader', downloaderRouter);
 app.use('/api/tools/qr-code', qrCodeRouter);
 app.use('/api/tools/text-translator', textTranslatorRouter);
 app.use('/api/tools/text-counter', textCounterRouter);
