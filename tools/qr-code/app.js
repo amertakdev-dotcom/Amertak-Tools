@@ -48,22 +48,6 @@ function revokeGeneratedUrl() {
     }
 }
 
-function getCreateUrl(text, size, margin) {
-    const params = new URLSearchParams({
-        data: text,
-        size: `${size}x${size}`,
-        margin: String(margin),
-        format: 'png',
-        ecc: 'M',
-        color: '05070c',
-        bgcolor: 'ffffff',
-        'charset-source': 'UTF-8',
-        'charset-target': 'UTF-8'
-    });
-
-    return `${apiBaseUrl}/create-qr-code/?${params.toString()}`;
-}
-
 async function generateQrCode() {
     const text = qrText.value.trim();
     if (!text) {
@@ -79,13 +63,20 @@ async function generateQrCode() {
 
     try {
         setStatus(qrStatus, 'Fetching QR image...');
-        const response = await fetch(getCreateUrl(text, width, margin));
+        const response = await fetch('/api/tools/qr-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ text, size: width, margin })
+        });
 
         if (!response.ok) {
-            throw new Error('QR API request failed');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || 'QR API request failed');
         }
 
-        generatedBlob = await response.blob();
+        const payload = await response.json();
+        generatedBlob = await (await fetch(payload.dataUrl)).blob();
         revokeGeneratedUrl();
         generatedObjectUrl = URL.createObjectURL(generatedBlob);
         qrPreviewImage.src = generatedObjectUrl;

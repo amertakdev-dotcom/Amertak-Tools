@@ -75,27 +75,37 @@ function rgbToHsv({ r, g, b }) {
     };
 }
 
-function updateColor(value) {
-    const hex = normalizeHex(value);
-    if (!hex) {
+async function updateColor(value) {
+    if (!normalizeHex(value)) {
         statusText.textContent = 'Invalid HEX color.';
         statusText.style.color = '#ff5c7a';
         return;
     }
 
-    const rgb = hexToRgb(hex);
-    const hsl = rgbToHsl(rgb);
-    const hsv = rgbToHsv(rgb);
+    try {
+        const response = await fetch('/api/tools/color-converter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ hex: value })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.message || 'Color conversion failed.');
 
-    statusText.textContent = 'Ready.';
-    statusText.style.color = '';
-    hexInput.value = hex;
-    colorInput.value = hex;
-    preview.style.background = hex;
-    hexOut.textContent = hex;
-    rgbOut.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-    hslOut.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-    hsvOut.textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+        const { hex, rgb, hsl, hsv } = payload;
+        statusText.textContent = 'Ready.';
+        statusText.style.color = '';
+        hexInput.value = hex;
+        colorInput.value = hex;
+        preview.style.background = hex;
+        hexOut.textContent = hex;
+        rgbOut.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        hslOut.textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        hsvOut.textContent = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+    } catch (error) {
+        statusText.textContent = error.message || 'Color conversion failed.';
+        statusText.style.color = '#ff5c7a';
+    }
 }
 
 hexInput.addEventListener('input', () => updateColor(hexInput.value));

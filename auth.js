@@ -1,4 +1,13 @@
 const statusEl = document.getElementById('status');
+const params = new URLSearchParams(window.location.search);
+const nextPath = params.get('next');
+
+function getRedirectPath() {
+  if (nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//')) {
+    return nextPath;
+  }
+  return '/';
+}
 
 function showMessage(message, type = 'error') {
   if (!statusEl) return;
@@ -41,9 +50,12 @@ async function handleLogin(event) {
   }
 
   try {
-    await postJson('login', { email, password });
+    const data = await postJson('login', { email, password });
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
     showMessage('Login successful. Redirecting...', 'success');
-    window.location.href = '/';
+    window.location.href = getRedirectPath();
   } catch (error) {
     showMessage(error.message);
   }
@@ -59,9 +71,12 @@ async function handleRegister(event) {
   }
 
   try {
-    await postJson('register', { name, email, password });
+    const data = await postJson('register', { name, email, password });
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
     showMessage('Registration successful. Redirecting...', 'success');
-    window.location.href = '/';
+    window.location.href = getRedirectPath();
   } catch (error) {
     showMessage(error.message);
   }

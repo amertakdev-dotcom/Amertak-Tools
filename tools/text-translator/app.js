@@ -87,29 +87,25 @@ async function translateText(text, source, target) {
     }
 
     try {
-        // Build request to unofficial Google Translate web endpoint
-        const sl = source === 'auto' ? 'auto' : source;
-        const tl = target;
-        const q = encodeURIComponent(text);
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${q}`;
-
-        const response = await fetch(url, { method: 'GET' });
+        const response = await fetch('/api/tools/text-translator', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                text,
+                source: source === 'auto' ? 'auto' : source,
+                target
+            })
+        });
 
         if (!response.ok) {
-            setStatus(`Translation failed: ${response.status}`, true);
+            const error = await response.json().catch(() => ({}));
+            setStatus(error.message || `Translation failed: ${response.status}`, true);
             return;
         }
 
         const json = await response.json();
-
-        // json[0] is an array of translation segments
-        if (!Array.isArray(json) || !Array.isArray(json[0])) {
-            setStatus('Unexpected API response format.', true);
-            return;
-        }
-
-        const translated = json[0].map(segment => segment[0]).join('');
-        setOutput(translated);
+        setOutput(json.translatedText || '');
         setStatus('Translation complete.');
     } catch (error) {
         setStatus('Unable to connect to translation API.', true);

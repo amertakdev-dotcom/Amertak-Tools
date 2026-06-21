@@ -1,5 +1,5 @@
 const { getDb } = require('../_lib/db');
-const { getUserFromRequest } = require('../_lib/auth');
+const { requireUser } = require('../_lib/require-user');
 
 function generateShortId() {
   return Math.random().toString(36).slice(2, 11);
@@ -20,6 +20,9 @@ function getSubPath(req) {
 }
 
 async function createImage(req, res) {
+  const user = await requireUser(req, res);
+  if (!user) return;
+
   const { image, fileName, description, imageSize } = req.body || {};
 
   if (!image || !fileName) {
@@ -37,15 +40,8 @@ async function createImage(req, res) {
     imageSize,
     uploadedAt: new Date(),
     views: 0,
-    userId: null
+    userId: user.id
   };
-
-  try {
-    const user = await getUserFromRequest(req);
-    if (user) imageDoc.userId = user.id;
-  } catch {
-    // Anonymous uploads are allowed.
-  }
 
   await db.collection('images').insertOne(imageDoc);
 

@@ -134,11 +134,13 @@ function renderSidebar() {
     nav.className = 'mobile-nav';
     nav.appendChild(createNavLink({ label: 'Home', href: '/', icon: navIcons.home }));
 
-    // Check if user is authenticated
     const user = JSON.parse(localStorage.getItem('user') || 'null');
-    
+
+    navSections.forEach((section) => {
+        nav.appendChild(createSection(section));
+    });
+
     if (user) {
-        // User is logged in - show profile card with expandable logout
         const profileWrapper = document.createElement('div');
         profileWrapper.className = 'user-profile-wrapper';
 
@@ -163,20 +165,9 @@ function renderSidebar() {
         logoutBtn.type = 'button';
         logoutBtn.className = 'nav-link logout-link user-action-btn';
         logoutBtn.innerHTML = `${navIcons.logout}<span>Logout</span>`;
-        logoutBtn.addEventListener('click', async (e) => {
+        logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            try {
-                const response = await fetch('/api/auth/logout', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                if (response.ok) {
-                    localStorage.removeItem('user');
-                    window.location.href = '/';
-                }
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
+            logoutUser();
         });
 
         userActions.appendChild(logoutBtn);
@@ -189,15 +180,65 @@ function renderSidebar() {
         profileWrapper.appendChild(userActions);
         nav.appendChild(profileWrapper);
     } else {
-        // User not logged in - show login link
         nav.appendChild(createNavLink({ label: 'Login', href: '/login', icon: navIcons.login }));
     }
 
-    navSections.forEach((section) => {
-        nav.appendChild(createSection(section));
-    });
-
     sidebar.replaceChildren(nav);
+}
+
+async function logoutUser() {
+    try {
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Logout failed:', error);
+    } finally {
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    }
+}
+
+function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+}
+
+function renderDesktopProfile(user) {
+    const headerContainer = document.querySelector('.header-container');
+    const desktopNavbar = document.querySelector('.desktop-navbar');
+    if (!headerContainer || !desktopNavbar) return;
+
+    document.getElementById('desktopProfile')?.remove();
+    if (!user) return;
+
+    const profile = document.createElement('div');
+    const displayName = user.name || 'User';
+    const email = user.email || '';
+    const initial = (displayName || email || 'U').trim().charAt(0).toUpperCase();
+    profile.id = 'desktopProfile';
+    profile.className = 'desktop-profile';
+    profile.innerHTML = `
+        <button type="button" class="desktop-profile-btn" aria-label="Profile">
+            <span class="desktop-profile-avatar">${escapeHtml(initial)}</span>
+            <span class="desktop-profile-name">${escapeHtml(displayName)}</span>
+        </button>
+        <div class="desktop-profile-menu">
+            <span>${escapeHtml(email)}</span>
+            <button type="button">${navIcons.logout}<span>Logout</span></button>
+        </div>
+    `;
+    profile.querySelector('.desktop-profile-btn')?.addEventListener('click', () => {
+        profile.classList.toggle('open');
+    });
+    profile.querySelector('.desktop-profile-menu button')?.addEventListener('click', logoutUser);
+    headerContainer.insertBefore(profile, desktopNavbar);
 }
 
 // Fetch user info on page load
@@ -216,6 +257,7 @@ async function fetchUserInfo() {
             }
             // Re-render sidebar with user info
             renderSidebar();
+            renderDesktopProfile(data.user);
         } else {
             localStorage.removeItem('user');
             // Show login button when not logged in
@@ -223,6 +265,8 @@ async function fetchUserInfo() {
             if (loginBtn) {
                 loginBtn.style.display = 'flex';
             }
+            renderSidebar();
+            renderDesktopProfile(null);
         }
     } catch (error) {
         localStorage.removeItem('user');
@@ -232,6 +276,8 @@ async function fetchUserInfo() {
         if (loginBtn) {
             loginBtn.style.display = 'flex';
         }
+        renderSidebar();
+        renderDesktopProfile(null);
     }
 }
 
@@ -376,6 +422,7 @@ function initThemeToggle() {
 // auto-init on load
 document.addEventListener('DOMContentLoaded', fetchUserInfo);
 document.addEventListener('DOMContentLoaded', renderSidebar);
+document.addEventListener('DOMContentLoaded', () => renderDesktopProfile(getCurrentUser()));
 document.addEventListener('DOMContentLoaded', renderDesktopDropdowns);
 document.addEventListener('DOMContentLoaded', initThemeToggle);
 document.addEventListener('DOMContentLoaded', initAuthToolBlocker);

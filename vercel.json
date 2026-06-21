@@ -3,14 +3,12 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index",
-      "source": "/about",
-      "destination": "/about/index.html"
-    },
-    {
       "source": "/share/:id",
       "destination": "/share.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about/index.html"
     },
     {
       "source": "/tools/downloader",

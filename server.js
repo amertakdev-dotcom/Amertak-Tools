@@ -5,6 +5,10 @@ const cors = require('cors');
 const authRouter = require('./server/authRoutes');
 const imageToUrlRouter = require('./api/tools/image-to-url');
 const downloaderRouter = require('./api/tools/downloader');
+const qrCodeRouter = require('./api/tools/qr-code');
+const textTranslatorRouter = require('./api/tools/text-translator');
+const textCounterRouter = require('./api/tools/text-counter');
+const colorConverterRouter = require('./api/tools/color-converter');
 
 const app = express();
 const rootDir = path.join(__dirname);
@@ -16,6 +20,10 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/tools/image-to-url', imageToUrlRouter);
 app.use('/api/tools/downloader', downloaderRouter);
+app.use('/api/tools/qr-code', qrCodeRouter);
+app.use('/api/tools/text-translator', textTranslatorRouter);
+app.use('/api/tools/text-counter', textCounterRouter);
+app.use('/api/tools/color-converter', colorConverterRouter);
 app.use(express.static(rootDir));
 
 app.get(['/login', '/register'], (req, res) => {

@@ -1,5 +1,5 @@
-const DOWNLOADER_HOST = 'social-download-all-in-one.p.rapidapi.com';
-const DOWNLOADER_URL = `https://${DOWNLOADER_HOST}/v1/social/autolink`;
+const youtubedl = require('youtube-dl-exec');
+const { requireUser } = require('../_lib/require-user');
 
 const SUPPORTED_PLATFORMS = [
   'TikTok',
@@ -14,19 +14,8 @@ const SUPPORTED_PLATFORMS = [
   'Vimeo',
   'Dailymotion',
   'SoundCloud',
-  'Likee',
-  'CapCut',
   'Bilibili'
 ];
-
-function getRapidApiKey() {
-  return (
-    process.env.SOCIAL_DOWNLOADER_API_KEY ||
-    process.env.DOWNLOADER_API_KEY ||
-    process.env.RAPIDAPI_KEY ||
-    process.env.X_RAPIDAPI_KEY
-  );
-}
 
 function isValidUrl(value) {
   try {
@@ -37,41 +26,65 @@ function isValidUrl(value) {
   }
 }
 
-function normalizeMedia(media = {}) {
-  const type = media.type || media.format || media.extension || 'media';
-  const extension = media.extension || media.ext || String(type).split('/').pop() || 'file';
+function formatBytes(value) {
+  const size = Number(value);
+  return Number.isFinite(size) && size > 0 ? size : null;
+}
+
+function normalizeFormat(format = {}) {
+  const url = format.url || format.fragment_base_url;
+  if (!url) return null;
+
+  const hasVideo = format.vcodec && format.vcodec !== 'none';
+  const hasAudio = format.acodec && format.acodec !== 'none';
+  const extension = format.ext || 'media';
+  const height = format.height ? `${format.height}p` : '';
+  const fps = format.fps ? `${format.fps}fps` : '';
+  const quality = [height, fps, format.format_note || format.resolution].filter(Boolean).join(' ') || format.format_id || extension;
 
   return {
-    url: media.url || media.link || media.download_url,
-    quality: media.quality || media.resolution || media.label || type,
-    type,
+    url,
+    quality,
+    type: hasVideo && hasAudio ? 'video' : hasVideo ? 'video only' : hasAudio ? 'audio' : 'media',
     extension,
-    size: media.data_size || media.size || media.filesize || null
+    size: formatBytes(format.filesize || format.filesize_approx)
   };
 }
 
 function normalizePayload(payload) {
-  const sourceMedias = Array.isArray(payload?.medias)
-    ? payload.medias
-    : Array.isArray(payload?.media)
-      ? payload.media
-      : Array.isArray(payload?.links)
-        ? payload.links
-        : [];
+  const formats = Array.isArray(payload.formats) ? payload.formats : [];
+  const medias = formats
+    .map(normalizeFormat)
+    .filter(Boolean)
+    .filter((media, index, list) => list.findIndex((item) => item.url === media.url) === index)
+    .slice(0, 24);
+
+  if (!medias.length && payload.url) {
+    medias.push({
+      url: payload.url,
+      quality: payload.format || payload.ext || 'media',
+      type: payload.vcodec && payload.vcodec !== 'none' ? 'video' : 'media',
+      extension: payload.ext || 'media',
+      size: formatBytes(payload.filesize || payload.filesize_approx)
+    });
+  }
 
   return {
     success: true,
-    title: payload?.title || payload?.caption || payload?.description || 'Untitled',
-    author: payload?.author || payload?.username || payload?.source || 'Unknown',
-    thumbnail: payload?.thumbnail || payload?.thumb || payload?.cover || '',
-    source: payload?.source || payload?.platform || '',
-    duration: payload?.duration || null,
-    medias: sourceMedias.map(normalizeMedia).filter((media) => media.url),
+    title: payload.title || payload.fulltitle || 'Untitled',
+    author: payload.uploader || payload.channel || payload.creator || 'Unknown',
+    thumbnail: payload.thumbnail || '',
+    source: payload.extractor_key || payload.extractor || '',
+    duration: payload.duration || null,
+    medias,
     supportedPlatforms: SUPPORTED_PLATFORMS
   };
 }
 
 async function handleDownloader(req, res) {
+  const user = await requireUser(req, res);
+  if (!user) return;
+
   if (req.method === 'GET') {
     res.status(200).json({
       success: true,
@@ -91,36 +104,16 @@ async function handleDownloader(req, res) {
     return;
   }
 
-  const apiKey = getRapidApiKey();
-  if (!apiKey) {
-    res.status(500).json({
-      message: 'Downloader API key is not configured. Set SOCIAL_DOWNLOADER_API_KEY in Vercel.'
-    });
-    return;
-  }
-
   try {
-    const response = await fetch(DOWNLOADER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Host': DOWNLOADER_HOST,
-        'X-RapidAPI-Key': apiKey
-      },
-      body: JSON.stringify({ url })
+    const payload = await youtubedl(url, {
+      dumpSingleJson: true,
+      noWarnings: true,
+      noCallHome: true,
+      noCheckCertificates: true,
+      skipDownload: true,
+      preferFreeFormats: true,
+      addHeader: ['referer:youtube.com', 'user-agent:Mozilla/5.0']
     });
-
-    const contentType = response.headers.get('content-type') || '';
-    const payload = contentType.includes('application/json')
-      ? await response.json()
-      : { message: await response.text() };
-
-    if (!response.ok || payload?.error) {
-      res.status(response.status || 502).json({
-        message: payload?.message || payload?.error || 'Downloader service failed.'
-      });
-      return;
-    }
 
     const normalized = normalizePayload(payload);
     if (!normalized.medias.length) {
@@ -133,8 +126,10 @@ async function handleDownloader(req, res) {
 
     res.status(200).json(normalized);
   } catch (error) {
-    console.error('Downloader API error:', error);
-    res.status(502).json({ message: 'Unable to reach downloader service.' });
+    console.error('yt-dlp downloader error:', error);
+    res.status(502).json({
+      message: 'Unable to fetch media with yt-dlp. The site may block downloads or require login.'
+    });
   }
 }
 
