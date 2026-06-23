@@ -1,5 +1,10 @@
+const { execFile } = require('child_process');
+const { promisify } = require('util');
 const youtubedl = require('youtube-dl-exec');
 const { requireUser } = require('../_lib/require-user');
+
+const execFileAsync = promisify(execFile);
+const YTDLP_BINARY = process.env.YTDLP_PATH || 'yt-dlp';
 
 const SUPPORTED_PLATFORMS = [
   'TikTok',
@@ -105,15 +110,40 @@ async function handleDownloader(req, res) {
   }
 
   try {
-    const payload = await youtubedl(url, {
-      dumpSingleJson: true,
-      noWarnings: true,
-      noCallHome: true,
-      noCheckCertificates: true,
-      skipDownload: true,
-      preferFreeFormats: true,
-      addHeader: ['referer:youtube.com', 'user-agent:Mozilla/5.0']
-    });
+    let payload = null;
+    const ytdlpArgs = [
+      '--dump-single-json',
+      '--no-warnings',
+      '--no-call-home',
+      '--no-check-certificate',
+      '--skip-download',
+      '--prefer-free-formats',
+      '--add-header', 'referer:youtube.com',
+      '--add-header', 'user-agent:Mozilla/5.0',
+      url
+    ];
+
+    try {
+      const { stdout } = await execFileAsync(YTDLP_BINARY, ytdlpArgs, { maxBuffer: 20 * 1024 * 1024 });
+      payload = JSON.parse(stdout);
+    } catch (primaryError) {
+      console.warn('yt-dlp failed, falling back to youtube-dl-exec:', primaryError.message || primaryError);
+      try {
+        payload = await youtubedl(url, {
+          dumpSingleJson: true,
+          noWarnings: true,
+          noCallHome: true,
+          noCheckCertificates: true,
+          skipDownload: true,
+          preferFreeFormats: true,
+          addHeader: ['referer:youtube.com', 'user-agent:Mozilla/5.0']
+        });
+      } catch (fallbackError) {
+        console.error('yt-dlp primary error:', primaryError);
+        console.error('youtube-dl-exec fallback error:', fallbackError);
+        throw fallbackError;
+      }
+    }
 
     const normalized = normalizePayload(payload);
     if (!normalized.medias.length) {
@@ -126,9 +156,9 @@ async function handleDownloader(req, res) {
 
     res.status(200).json(normalized);
   } catch (error) {
-    console.error('yt-dlp downloader error:', error);
+    console.error('downloader error:', error);
     res.status(502).json({
-      message: 'Unable to fetch media with yt-dlp. The site may block downloads or require login.'
+      message: 'Unable to fetch media from the provided URL. The site may block downloads or require login.'
     });
   }
 }

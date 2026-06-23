@@ -13,13 +13,12 @@ const transcriptText = document.getElementById('transcriptText');
 const captionList = document.getElementById('captionList');
 const statusText = document.getElementById('statusText');
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
+const TRANSCRIBE_API_URL = '/api/tools/transcribe';
+let selectedFile = null;
 let activePlayer = null;
 let activeObjectUrl = '';
-let recognition = null;
 let captions = [];
-let captionStart = 0;
+let abortController = null;
 
 function setStatus(message, isError = false) {
     statusText.textContent = message;
@@ -41,25 +40,6 @@ function formatVttTime(seconds) {
     return formatSrtTime(seconds).replace(',', '.');
 }
 
-function getPlayerTime() {
-    return activePlayer ? activePlayer.currentTime : captionStart;
-}
-
-function addCaption(text) {
-    const cleanText = text.trim();
-    if (!cleanText) return;
-
-    const end = Math.max(getPlayerTime(), captionStart + 1);
-    captions.push({
-        start: captionStart,
-        end,
-        text: cleanText
-    });
-    captionStart = end;
-    transcriptText.value = `${transcriptText.value}${transcriptText.value ? '\n' : ''}${cleanText}`;
-    renderCaptions();
-}
-
 function renderCaptions() {
     captionList.innerHTML = '';
 
@@ -67,7 +47,7 @@ function renderCaptions() {
         const row = document.createElement('div');
         row.className = 'caption-row';
         row.innerHTML = `
-            <span class="caption-time">${index + 1}. ${formatVttTime(caption.start)} -> ${formatVttTime(caption.end)}</span>
+            <span class="caption-time">${index + 1}. ${formatVttTime(caption.start)} --> ${formatVttTime(caption.end)}</span>
             <span>${caption.text}</span>
         `;
         captionList.appendChild(row);
@@ -78,9 +58,19 @@ function renderCaptions() {
     downloadBtn.disabled = !hasText;
 }
 
+function updateControlState() {
+    const hasFile = !!selectedFile;
+    startBtn.disabled = !hasFile;
+    clearBtn.disabled = !hasFile && !transcriptText.value.trim();
+    stopBtn.disabled = true;
+    copyBtn.disabled = !transcriptText.value.trim();
+    downloadBtn.disabled = !transcriptText.value.trim();
+}
+
 function loadMediaFile(file) {
     if (activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
 
+    selectedFile = file;
     activeObjectUrl = URL.createObjectURL(file);
     fileName.textContent = file.name;
     videoPlayer.hidden = true;
@@ -98,93 +88,118 @@ function loadMediaFile(file) {
         activePlayer = audioPlayer;
     }
 
-    captionStart = 0;
-    setStatus('Media loaded.');
+    captions = [];
+    transcriptText.value = '';
+    renderCaptions();
+    updateControlState();
+    setStatus('Media loaded. Ready to transcribe.');
 }
 
-function startTranscribe() {
-    if (!activePlayer) {
-        setStatus('Please select a file first.', true);
+async function startTranscribe() {
+    if (!selectedFile) {
+        setStatus('Please select an audio or video file first.', true);
         return;
     }
 
-    if (!SpeechRecognition) {
-        setStatus('Speech recognition is not supported in this browser.', true);
-        return;
+    if (abortController) {
+        abortController.abort();
     }
 
-    recognition = new SpeechRecognition();
-    recognition.lang = speechLang.value;
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    recognition.onresult = (event) => {
-        for (let index = event.resultIndex; index < event.results.length; index += 1) {
-            if (event.results[index].isFinal) {
-                addCaption(event.results[index][0].transcript);
-            }
-        }
-    };
-
-    recognition.onerror = (event) => {
-        setStatus(event.error ? `Speech recognition error: ${event.error}` : 'Speech recognition failed.', true);
-    };
-
-    recognition.onend = () => {
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        setStatus(transcriptText.value.trim() ? 'Transcription stopped.' : 'Ready.');
-    };
-
+    abortController = new AbortController();
     startBtn.disabled = true;
     stopBtn.disabled = false;
-    captionStart = getPlayerTime();
-    recognition.start();
-    activePlayer.play().catch(() => {});
-    setStatus('Listening...');
+    clearBtn.disabled = true;
+    setStatus('Uploading and transcribing...');
+
+    const formData = new FormData();
+    formData.append('file', selectedFile, selectedFile.name);
+    formData.append('language', speechLang.value || 'en-US');
+
+    try {
+        const response = await fetch(TRANSCRIBE_API_URL, {
+            method: 'POST',
+            body: formData,
+            signal: abortController.signal
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(data.message || `Transcription failed with status ${response.status}`);
+        }
+
+        transcriptText.value = String(data.text || '').trim();
+        syncCaptionsFromText();
+        setStatus('Transcription completed successfully.');
+        activePlayer?.play().catch(() => {});
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            setStatus('Transcription cancelled.', true);
+        } else {
+            console.error('Transcription error:', error);
+            setStatus(error.message || 'Transcription failed.', true);
+        }
+    } finally {
+        abortController = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        clearBtn.disabled = false;
+        updateControlState();
+    }
 }
 
 function stopTranscribe() {
-    recognition?.stop();
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
     activePlayer?.pause();
     startBtn.disabled = false;
     stopBtn.disabled = true;
+    setStatus('Transcription stopped.');
 }
 
 function syncCaptionsFromText() {
-    captions = transcriptText.value.split('\n').filter(Boolean).map((text, index) => ({
-        start: index * 3,
-        end: index * 3 + 2.5,
-        text
-    }));
-    captionStart = captions.at(-1)?.end || 0;
+    captions = transcriptText.value
+        .split('\n')
+        .map((text) => text.trim())
+        .filter(Boolean)
+        .map((text, index) => ({
+            start: index * 4,
+            end: index * 4 + 3.75,
+            text
+        }));
     renderCaptions();
 }
 
 function buildCaptionFile() {
-    if (!captions.length) syncCaptionsFromText();
+    if (!captions.length) {
+        syncCaptionsFromText();
+    }
 
     if (captionFormat.value === 'vtt') {
-        const body = captions.map((caption) =>
-            `${formatVttTime(caption.start)} --> ${formatVttTime(caption.end)}\n${caption.text}`
-        ).join('\n\n');
+        const body = captions
+            .map((caption) => `${formatVttTime(caption.start)} --> ${formatVttTime(caption.end)}\n${caption.text}`)
+            .join('\n\n');
         return `WEBVTT\n\n${body}\n`;
     }
 
-    return captions.map((caption, index) =>
-        `${index + 1}\n${formatSrtTime(caption.start)} --> ${formatSrtTime(caption.end)}\n${caption.text}`
-    ).join('\n\n') + '\n';
+    return captions
+        .map((caption, index) => `${index + 1}\n${formatSrtTime(caption.start)} --> ${formatSrtTime(caption.end)}\n${caption.text}`)
+        .join('\n\n') + '\n';
 }
 
 function downloadCaptions() {
     if (!transcriptText.value.trim()) return;
 
-    const blob = new Blob([buildCaptionFile()], { type: 'text/plain;charset=utf-8' });
+    const fileContent = buildCaptionFile();
+    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `captions.${captionFormat.value}`;
+    document.body.appendChild(link);
     link.click();
+    link.remove();
     URL.revokeObjectURL(url);
 }
 
@@ -197,10 +212,18 @@ startBtn.addEventListener('click', startTranscribe);
 stopBtn.addEventListener('click', stopTranscribe);
 clearBtn.addEventListener('click', () => {
     stopTranscribe();
+    selectedFile = null;
     captions = [];
-    captionStart = 0;
     transcriptText.value = '';
-    renderCaptions();
+    captionList.innerHTML = '';
+    if (activeObjectUrl) {
+        URL.revokeObjectURL(activeObjectUrl);
+        activeObjectUrl = '';
+    }
+    videoPlayer.hidden = true;
+    audioPlayer.hidden = true;
+    fileName.textContent = 'MP3, WAV, MP4, WEBM, MOV';
+    updateControlState();
     setStatus('Cleared.');
 });
 copyBtn.addEventListener('click', async () => {
@@ -208,6 +231,10 @@ copyBtn.addEventListener('click', async () => {
     setStatus('Copied to clipboard.');
 });
 downloadBtn.addEventListener('click', downloadCaptions);
-transcriptText.addEventListener('input', syncCaptionsFromText);
+transcriptText.addEventListener('input', () => {
+    syncCaptionsFromText();
+    updateControlState();
+});
 
+updateControlState();
 setStatus('Ready.');
