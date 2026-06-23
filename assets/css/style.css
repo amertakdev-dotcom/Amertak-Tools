@@ -370,8 +370,8 @@ svg {
 }
 
 .section-toggle {
-    justify-content: space-between;
-    width: 100%;
+    justify-content: start;
+    width: auto;
     border: none;
     background: rgba(255, 255, 255, 0.04);
     padding: 10px 12px;
@@ -385,7 +385,6 @@ svg {
 
 .section-toggle.open .section-arrow {
     transform: rotate(180deg);
-    fill: #ff0080;
 }
 
 .section-items {
@@ -410,19 +409,6 @@ svg {
     padding-left: 10px;
     font-size: 13px;
     color: var(--text-main);
-}
-
-.section-item:hover,
-.section-item.active {
-    color: #ff0080;
-}
-
-.nav-link.active,
-.nav-link.active svg,
-.nav-link:hover svg,
-.nav-link:hover {
-    color: #ff0080;
-    fill: #ff0080;
 }
 
 .user-profile-wrapper {
@@ -519,6 +505,13 @@ svg {
     cursor: pointer;
     border-radius: 999px;
     font-weight: 700;
+    transition: .25s ease;
+}
+.auth-popup-close:hover,
+.auth-popup-close-btn:hover,
+.auth-popup-register:hover,
+.auth-popup-login:hover {
+    scale: 1.025;
 }
 
 .auth-popup-close {
@@ -1071,8 +1064,6 @@ body.MODE h4 {
 }
 .tool-card:hover {
     scale: 1.01;
-    box-shadow: 0 0 100px #6600fe10;
-    filter: drop-shadow(0px 0px 10px #6600fe4c);
 }
 .tool-icons {
     position: relative;
