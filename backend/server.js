@@ -2,6 +2,8 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+require('dotenv').config();
+
 const authRouter = require('./server/authRoutes');
 const imageToUrlRouter = require('./api/tools/image-to-url');
 const downloaderRouter = require('./api/tools/downloader');
@@ -12,12 +14,33 @@ const textCounterRouter = require('./api/tools/text-counter');
 const colorConverterRouter = require('./api/tools/color-converter');
 
 const app = express();
-const rootDir = path.join(__dirname);
 
-app.use(cors({ origin: true, credentials: true }));
+// CORS configuration for Vercel frontend
+const allowedOrigins = [
+  'https://amertak-tools.vercel.app',
+  'https://www.amertak-tools.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
 app.use(cookieParser());
+
+// API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/tools/image-to-url', imageToUrlRouter);
 app.use('/api/tools/downloader', downloaderRouter);
@@ -26,23 +49,25 @@ app.use('/api/tools/qr-code', qrCodeRouter);
 app.use('/api/tools/text-translator', textTranslatorRouter);
 app.use('/api/tools/text-counter', textCounterRouter);
 app.use('/api/tools/color-converter', colorConverterRouter);
-app.use(express.static(rootDir));
 
-app.get(['/login', '/register'], (req, res) => {
-  const fileName = req.path === '/register' ? 'register.html' : 'login.html';
-  res.sendFile(path.join(rootDir, fileName));
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 
-app.get('/share/:id', (req, res) => {
-  res.sendFile(path.join(rootDir, 'share.html'));
+// Catch-all for undefined routes
+app.use((req, res) => {
+  res.status(404).json({ message: 'API endpoint not found' });
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(rootDir, 'index.html'));
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server listening on port ${port}`);
+  console.log(`🚀 Amertak Tools API Server listening on port ${port}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

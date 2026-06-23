@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { connectToDatabase } = require('./db');
+const { getDb } = require('../api/_lib/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please-change-this-secret';
 const JWT_EXPIRATION = '7d';
@@ -66,7 +66,7 @@ async function registerUser({ name, email, password }) {
     throw new Error('Name, email, and password are required.');
   }
 
-  const db = await connectToDatabase();
+  const db = await getDb();
   const users = db.collection('users');
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -99,7 +99,7 @@ async function loginUser({ email, password }) {
     throw new Error('Email and password are required.');
   }
 
-  const db = await connectToDatabase();
+  const db = await getDb();
   const users = db.collection('users');
   const normalizedEmail = email.trim().toLowerCase();
   const user = await users.findOne({ email: normalizedEmail });
@@ -132,9 +132,10 @@ async function getUserFromRequest(req) {
     return null;
   }
 
-  const db = await connectToDatabase();
+  const db = await getDb();
   const users = db.collection('users');
-  const user = await users.findOne({ _id: new (require('mongodb').ObjectId)(tokenPayload.userId) });
+  const ObjectId = require('mongodb').ObjectId;
+  const user = await users.findOne({ _id: new ObjectId(tokenPayload.userId) });
   if (!user) {
     return null;
   }

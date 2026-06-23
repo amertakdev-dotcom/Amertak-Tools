@@ -8,9 +8,9 @@ function generateShortId() {
 function getBaseUrl(req) {
   if (process.env.BASE_URL) return process.env.BASE_URL.replace(/\/$/, '');
 
-  const proto = req.headers?.['x-forwarded-proto'] || req.protocol || 'http';
+  const proto = req.headers?.['x-forwarded-proto'] || req.protocol || 'https';
   const host = req.headers?.['x-forwarded-host'] || req.headers?.host;
-  return host ? `${proto}://${host}` : 'https://tools-mertak.vercel.app';
+  return host ? `${proto}://${host}` : 'https://amertak-tools.vercel.app';
 }
 
 function getSubPath(req) {

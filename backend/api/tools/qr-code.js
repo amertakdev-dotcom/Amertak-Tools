@@ -49,7 +49,7 @@ module.exports = async function qrCodeHandler(req, res) {
       dataUrl: `data:image/png;base64,${base64}`
     });
   } catch (error) {
-    console.error('QR code API error:', error);
+    console.error('QR Code Generator error:', error);
     res.status(502).json({ message: 'Unable to generate QR code.' });
   }
 };
