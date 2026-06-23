@@ -644,7 +644,7 @@ svg {
 
 .toggleMode {
     position: relative;
-    right: 65px;
+    right: 0px;
     width: 40px;
     height: 40px;
     display: flex;
@@ -674,8 +674,7 @@ svg {
 
 .login-btn {
     position: relative;
-    right: 80px;
-    width: auto;
+    right: 0;
     height: 40px;
     padding: 0 18px;
     display: flex;
