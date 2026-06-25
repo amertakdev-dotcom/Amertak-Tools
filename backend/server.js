@@ -15,10 +15,14 @@ const colorConverterRouter = require('./api/tools/color-converter');
 
 const app = express();
 
-// CORS configuration for Vercel frontend
+// CORS configuration for frontend domains
 const allowedOrigins = [
   'https://amertak-tools.vercel.app',
+  'https://tools-amertak.vercel.app',
   'https://www.amertak-tools.vercel.app',
+  'https://www.tools-amertak.vercel.app',
+  'https://amertak.tools',
+  'https://www.amertak.tools',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3000',

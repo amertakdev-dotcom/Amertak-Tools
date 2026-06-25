@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'amertak bolder';
+    src: url(/assets/fonts/NotoSerifKhmer-Bold.ttf);
+}
+@font-face {
+    font-family: 'amertak';
+    src: url(/assets/fonts/NotoSerifKhmer-Regular.ttf);
+}
 :root {
     --bg-dark: #05070c;
     --bg-withe: #ffffff;
@@ -56,6 +64,35 @@ body::after {
     opacity: .2;
 }
 
+.title {
+    position: relative;
+    margin: auto;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.title h1 {
+    color: var(--bg-withe);
+    font-size: 4rem;
+    font-family: 'amertak bolder';
+    font-weight: normal;
+}
+.title strong {
+    color: var(--danger);
+    font-weight: normal;
+}
+.title p {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-weight: 800;
+}
+@media (max-width: 760px) {
+    .title h1 {
+        font-size: 2.75rem;
+    }
+}
+body.MODE .title h1 {
+    color: #000;
+}
 a {
     text-decoration: none;
     color: var(--text-dim);
@@ -80,7 +117,7 @@ a {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 24px;
 }
 
@@ -107,8 +144,9 @@ a {
 }
 
 .desktop-navbar {
+    position: fixed;
     display: flex;
-    margin: 0;
+    right: 50px;
 }
 
 .desktop-profile {
@@ -212,11 +250,6 @@ a {
     justify-content: center;
     display: flex;
     gap: 5px;
-}
-.nav-item.active {
-    border: 2px solid var(--danger);
-    background-image: linear-gradient(to right, #ff007b2b, #0000002b, #0000002b);
-    backdrop-filter: blur(10px);
 }
 
 .nav-item .svg-drop {
@@ -644,9 +677,9 @@ svg {
 
 .toggleMode {
     position: relative;
-    right: 0px;
     width: 40px;
     height: 40px;
+    right: -25px;
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -660,7 +693,10 @@ svg {
 
 @media (max-width: 760px) {
    .toggleMode {
-    right: 0;
+    position: fixed;
+    right: 10px;
+
+    z-index: 1000;
    }
 }
 .toggleMode:active {
@@ -674,7 +710,6 @@ svg {
 
 .login-btn {
     position: relative;
-    right: 0;
     height: 40px;
     padding: 0 18px;
     display: flex;
@@ -708,16 +743,8 @@ svg {
     display: flex;
 }
 @media (max-width: 1024px) {
-    .toggleMode {
-        position: fixed;
-        display: flex;
-        right: 80px;
-    }
     .login-btn {
         display: none;
-    }
-    .header-container .toggleMode {
-        display: flex;
     }
 }
 /* --- MODE ---- */
@@ -1116,9 +1143,8 @@ body.MODE h4 {
 }
 .tool-txt h2 {
     position: relative;
-    text-transform: uppercase;
-    font-size: 1rem;
-    font-weight: 800;
+    font-family: 'amertak bolder', sans-serif;
+    font-size: 1.15rem;
     color: transparent;
     -webkit-background-clip: text;
     background-image: linear-gradient(to right, #ffffff, #0073ff);
@@ -1126,6 +1152,7 @@ body.MODE h4 {
 }
 .tool-txt p {
     color: var(--text-dim);
+    font-family: 'amertak', sans-serif;
     text-align: left;
     font-weight: 500;
     font-size: 0.8rem;
@@ -1270,7 +1297,7 @@ body.MODE .floating-btn {
         margin-top: 0;
     }
     .tool-card h2 {
-        font-size: 0.9rem;
+        font-size: 1.15rem;
     }
     .tool-box {
         gap: 15px;

@@ -48,7 +48,7 @@ function verifyTokenFromRequest(req) {
 function buildAuthCookie(token, maxAge = 7 * 24 * 60 * 60) {
   const isProduction = process.env.NODE_ENV === 'production';
   const secure = isProduction;
-  const sameSite = 'Lax';
+  const sameSite = isProduction ? 'None' : 'Lax';
 
   return `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; Max-Age=${maxAge}; SameSite=${sameSite}${secure ? '; Secure' : ''}`;
 }
@@ -56,7 +56,7 @@ function buildAuthCookie(token, maxAge = 7 * 24 * 60 * 60) {
 function clearAuthCookie() {
   const isProduction = process.env.NODE_ENV === 'production';
   const secure = isProduction;
-  const sameSite = 'Lax';
+  const sameSite = isProduction ? 'None' : 'Lax';
 
   return `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=${sameSite}${secure ? '; Secure' : ''}`;
 }
