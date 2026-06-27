@@ -1,3 +1,11 @@
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
+function getApiUrl(path) {
+    return `${API_BASE}${path}`;
+}
+
 function toggleSidebar() {
     document.getElementById('sidebar')
         ?.classList.toggle('sidebar-open');
@@ -190,7 +198,7 @@ function renderSidebar() {
 
 async function logoutUser() {
     try {
-        await fetch('/api/auth/logout', {
+        await fetch(getApiUrl('/api/auth/logout'), {
             method: 'POST',
             credentials: 'include'
         });
@@ -246,26 +254,34 @@ function renderDesktopProfile(user) {
 // Fetch user info on page load
 async function fetchUserInfo() {
     try {
-        const response = await fetch('/api/auth/me', { 
+        const response = await fetch(getApiUrl('/api/auth/me'), { 
             credentials: 'include' 
         });
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('user', JSON.stringify(data.user));
-            // Hide login button when user is logged in
+            // Hide login buttons when user is logged in
             const loginBtn = document.getElementById('loginBtn');
+            const loginBtnMobile = document.getElementById('loginBtnMobile');
             if (loginBtn) {
                 loginBtn.style.display = 'none';
+            }
+            if (loginBtnMobile) {
+                loginBtnMobile.style.display = 'none';
             }
             // Re-render sidebar with user info
             renderSidebar();
             renderDesktopProfile(data.user);
         } else {
             localStorage.removeItem('user');
-            // Show login button when not logged in
+            // Show login buttons when not logged in
             const loginBtn = document.getElementById('loginBtn');
+            const loginBtnMobile = document.getElementById('loginBtnMobile');
             if (loginBtn) {
                 loginBtn.style.display = 'flex';
+            }
+            if (loginBtnMobile) {
+                loginBtnMobile.style.display = 'inline-flex';
             }
             renderSidebar();
             renderDesktopProfile(null);
@@ -273,10 +289,14 @@ async function fetchUserInfo() {
     } catch (error) {
         localStorage.removeItem('user');
         console.log('Not authenticated or error fetching user');
-        // Show login button on error
+        // Show login buttons on error
         const loginBtn = document.getElementById('loginBtn');
+        const loginBtnMobile = document.getElementById('loginBtnMobile');
         if (loginBtn) {
             loginBtn.style.display = 'flex';
+        }
+        if (loginBtnMobile) {
+            loginBtnMobile.style.display = 'inline-flex';
         }
         renderSidebar();
         renderDesktopProfile(null);

@@ -1,3 +1,7 @@
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.querySelector('.url-input');
     const fetchBtn = document.getElementById('fetchBtn');
@@ -9,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoThumbnail = document.getElementById('videoThumbnail');
     const downloadOptions = document.getElementById('downloadOptions');
     const platformIcons = document.querySelector('.platform-icons');
-    const API_URL = '/api/tools/downloader';
+    const API_URL = `${API_BASE}/api/tools/downloader`;
 
     fetchBtn.addEventListener('click', fetchVideoInfo);
     urlInput.addEventListener('keydown', (event) => {

@@ -1,3 +1,7 @@
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
 const mediaInput = document.getElementById('mediaInput');
 const fileName = document.getElementById('fileName');
 const videoPlayer = document.getElementById('videoPlayer');
@@ -13,7 +17,7 @@ const transcriptText = document.getElementById('transcriptText');
 const captionList = document.getElementById('captionList');
 const statusText = document.getElementById('statusText');
 
-const TRANSCRIBE_API_URL = '/api/tools/transcribe';
+const TRANSCRIBE_API_URL = `${API_BASE}/api/tools/transcribe`;
 let selectedFile = null;
 let activePlayer = null;
 let activeObjectUrl = '';

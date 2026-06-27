@@ -1,3 +1,7 @@
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
 const inputText = document.getElementById('inputText');
 const clearBtn = document.getElementById('clearBtn');
 const copyBtn = document.getElementById('copyBtn');
@@ -17,7 +21,7 @@ async function countText() {
     const trimmed = text.trim();
 
     try {
-        const response = await fetch('/api/tools/text-counter', {
+        const response = await fetch(`${API_BASE}/api/tools/text-counter`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

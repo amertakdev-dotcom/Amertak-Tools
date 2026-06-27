@@ -1,3 +1,7 @@
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
 const dropZone = document.getElementById('dropZone');
 const imageInput = document.getElementById('imageInput');
 const imageDesc = document.getElementById('imageDesc');
@@ -132,7 +136,7 @@ createUrlBtn.addEventListener('click', async () => {
         loader.style.display = 'flex';
         setStatus('Creating shareable URL...', '');
 
-        const response = await fetch('/api/tools/image-to-url', {
+        const response = await fetch(`${API_BASE}/api/tools/image-to-url`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

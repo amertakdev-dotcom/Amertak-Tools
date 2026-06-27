@@ -15,6 +15,10 @@ const scanPreview = document.getElementById('scanPreview');
 const copyScanBtn = document.getElementById('copyScanBtn');
 const openResultBtn = document.getElementById('openResultBtn');
 
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3001'
+    : 'https://amertak-tools-f3zb.onrender.com';
+
 const defaultText = '';
 const apiBaseUrl = 'https://api.qrserver.com/v1';
 let generatedBlob = null;
@@ -63,7 +67,7 @@ async function generateQrCode() {
 
     try {
         setStatus(qrStatus, 'Fetching QR image...');
-        const response = await fetch('/api/tools/qr-code', {
+        const response = await fetch(`${API_BASE}/api/tools/qr-code`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
