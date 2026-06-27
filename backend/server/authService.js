@@ -5,6 +5,17 @@ const { getDb } = require('../api/_lib/db');
 const JWT_SECRET = process.env.JWT_SECRET || 'please-change-this-secret';
 const JWT_EXPIRATION = '7d';
 const COOKIE_NAME = 'amertak_token';
+const memoryUsers = [];
+
+async function getUserStore() {
+  try {
+    const db = await getDb();
+    return { mode: 'mongodb', users: db.collection('users') };
+  } catch (error) {
+    console.warn('MongoDB unavailable, using in-memory auth fallback:', error.message);
+    return { mode: 'memory', users: memoryUsers };
+  }
+}
 
 function createToken(user) {
   const id = user.id || (user._id ? user._id.toString() : null);
@@ -66,9 +77,35 @@ async function registerUser({ name, email, password }) {
     throw new Error('Name, email, and password are required.');
   }
 
-  const db = await getDb();
-  const users = db.collection('users');
+  const { mode, users } = await getUserStore();
   const normalizedEmail = email.trim().toLowerCase();
+
+  if (mode === 'memory') {
+    const existingUser = memoryUsers.find((user) => user.email === normalizedEmail);
+    if (existingUser) {
+      const error = new Error('A user with this email already exists.');
+      error.code = 'USER_EXISTS';
+      throw error;
+    }
+
+    const passwordHash = await bcrypt.hash(password.trim(), 10);
+    const newUser = {
+      id: `memory-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: name.trim(),
+      email: normalizedEmail,
+      passwordHash,
+      createdAt: new Date()
+    };
+    memoryUsers.push(newUser);
+
+    return {
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email
+      }
+    };
+  }
 
   const existingUser = await users.findOne({ email: normalizedEmail });
   if (existingUser) {
@@ -99,10 +136,11 @@ async function loginUser({ email, password }) {
     throw new Error('Email and password are required.');
   }
 
-  const db = await getDb();
-  const users = db.collection('users');
+  const { mode, users } = await getUserStore();
   const normalizedEmail = email.trim().toLowerCase();
-  const user = await users.findOne({ email: normalizedEmail });
+  const user = mode === 'memory'
+    ? memoryUsers.find((entry) => entry.email === normalizedEmail)
+    : await users.findOne({ email: normalizedEmail });
 
   if (!user) {
     const error = new Error('Invalid email or password.');
@@ -119,7 +157,7 @@ async function loginUser({ email, password }) {
 
   return {
     user: {
-      id: user._id.toString(),
+      id: user.id || user._id?.toString?.() || null,
       name: user.name,
       email: user.email
     }
@@ -132,8 +170,20 @@ async function getUserFromRequest(req) {
     return null;
   }
 
-  const db = await getDb();
-  const users = db.collection('users');
+  const { mode, users } = await getUserStore();
+  if (mode === 'memory') {
+    const user = memoryUsers.find((entry) => entry.id === tokenPayload.userId);
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email
+    };
+  }
+
   const ObjectId = require('mongodb').ObjectId;
   const user = await users.findOne({ _id: new ObjectId(tokenPayload.userId) });
   if (!user) {
