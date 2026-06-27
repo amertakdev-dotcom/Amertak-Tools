@@ -36,11 +36,12 @@
     
     <!-- External Resources -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.x/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
     <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Share+Tech&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/progress-loader/loader.css">
+    <link rel="stylesheet" href="/assets/css/analytics.css">
 </head>
 <body>
 
@@ -133,22 +134,16 @@
                     </div>
                 </section>
                 
-                <!-- Loading Progress -->
-                <div class="loader" id="loader">
-                    <div class="range" id="range">
-                        <div class="range__label" id="range_label"></div>
-                    </div>
-                </div>
-                
         </main>
 
         <!-- AMERTAK TITLE -->
          <div class="title">
-            <h1>អមតៈ <strong>ធូល</strong></h1>
-            <p>amertak tools</p>
+            <h1 data-aos="zoom" data-aos-delay="200">អមតៈ<strong data-aos="zoom" data-aos-delay="400"> ធូល</strong></h1>
+            <p data-aos="zoom" data-aos-delay="700">AMERTAK<strong data-aos="zoom" data-aos-delay="800"> TOOLS</strong> </p>
          </div>
+         
         <!-- Tools Container -->
-        <div class="tool-box" id="tools">
+        <div class="tool-box" id="tools" data-aos="zoom" data-aos-delay="900">
             <!-- URL TO MP3 -->
             <div class="tool-card" data-aos="fade-up" data-aos-delay="100"  onclick="window.location.href='/tools/downloader'">
                 <div class="tool-icons bg3">
@@ -174,7 +169,7 @@
             </div>
 
             <!-- IMAGE TO PDF -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="400"  onclick="window.location.href='/tools/image-to-pdf'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="200"  onclick="window.location.href='/tools/image-to-pdf'">
                 <div class="tool-icons bg5">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4H15V8H19V20H5V4ZM3.9985 2C3.44749 2 3 2.44405 3 2.9918V21.0082C3 21.5447 3.44476 22 3.9934 22H20.0066C20.5551 22 21 21.5489 21 20.9925L20.9997 7L16 2H3.9985ZM10.4999 7.5C10.4999 9.07749 10.0442 10.9373 9.27493 12.6534C8.50287 14.3757 7.46143 15.8502 6.37524 16.7191L7.55464 18.3321C10.4821 16.3804 13.7233 15.0421 16.8585 15.49L17.3162 13.5513C14.6435 12.6604 12.4999 9.98994 12.4999 7.5H10.4999ZM11.0999 13.4716C11.3673 12.8752 11.6042 12.2563 11.8037 11.6285C12.2753 12.3531 12.8553 13.0182 13.5101 13.5953C12.5283 13.7711 11.5665 14.0596 10.6352 14.4276C10.7999 14.1143 10.9551 13.7948 11.0999 13.4716Z"></path></svg>
                 </div>
@@ -186,7 +181,7 @@
             </div>
 
             <!-- IMAGE TO URL -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="450"  onclick="window.location.href='/tools/image-to-url'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="300"  onclick="window.location.href='/tools/image-to-url'">
                 <div class="tool-icons bg5">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4H15V8H19V20H5V4ZM3 2.9918V21.0082C3 21.5447 3.44476 22 3.9934 22H20.0066C20.5551 22 21 21.5489 21 20.9925L20.9997 7L16 2H3.9985C3.44749 2 3 2.44405 3 2.9918ZM7 14L10 11L12 13L15 10L17 12V18H7V14Z"></path></svg>
                 </div>
@@ -198,7 +193,7 @@
             </div>
 
             <!-- TEXT TO SPEECH KHMER -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="300"  onclick="window.location.href='/tools/text-to-speech-khmer'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="400"  onclick="window.location.href='/tools/text-to-speech-khmer'">
                 <div class="tool-icons bg4">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.7134 7.12811L20.4668 7.69379C20.2864 8.10792 19.7136 8.10792 19.5331 7.69379L19.2866 7.12811C18.8471 6.11947 18.0555 5.31641 17.0677 4.87708L16.308 4.53922C15.8973 4.35653 15.8973 3.75881 16.308 3.57612L17.0252 3.25714C18.0384 2.80651 18.8442 1.97373 19.2761 0.930828L19.5293 0.319534C19.7058 -0.106511 20.2942 -0.106511 20.4706 0.319534L20.7238 0.930828C21.1558 1.97373 21.9616 2.80651 22.9748 3.25714L23.6919 3.57612C24.1027 3.75881 24.1027 4.35653 23.6919 4.53922L22.9323 4.87708C21.9445 5.31641 21.1529 6.11947 20.7134 7.12811ZM8.5 6H6.5V18H8.5V6ZM4 10H2V14H4V10ZM13 2H11V22H13V2ZM17.5 8H15.5V18H17.5V8ZM22 10H20V14H22V10Z"></path></svg>
                 </div>
@@ -222,7 +217,7 @@
             </div>
 
             <!-- VIDEO AND AUDIO TRANSCRIBE -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="550"  onclick="window.location.href='/tools/video-audio-transcribe'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="600"  onclick="window.location.href='/tools/video-audio-transcribe'">
                 <div class="tool-icons bg2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4H14C15.1046 4 16 4.89543 16 6V9.17157L20.2929 4.87868C20.9229 4.24871 22 4.69495 22 5.58579V18.4142C22 19.305 20.9229 19.7513 20.2929 19.1213L16 14.8284V18C16 19.1046 15.1046 20 14 20H4C2.89543 20 2 19.1046 2 18V6C2 4.89543 2.89543 4 4 4ZM4 6V18H14V6H4ZM16 12L20 16V8L16 12ZM6 8H12V10H6V8ZM6 12H12V14H6V12Z"></path></svg>
                 </div>
@@ -234,7 +229,7 @@
             </div>
             
             <!-- TELEGRAM BOT -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="600" onclick="window.location.href='https://t.me/amertak_downloaderbot'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="700" onclick="window.location.href='https://t.me/amertak_downloaderbot'">
                 <div class="tool-icons bg8">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 1V2H7C5.34315 2 4 3.34315 4 5V8C4 10.7614 6.23858 13 9 13H15C17.7614 13 20 10.7614 20 8V5C20 3.34315 18.6569 2 17 2H13V1H11ZM6 5C6 4.44772 6.44772 4 7 4H17C17.5523 4 18 4.44772 18 5V8C18 9.65685 16.6569 11 15 11H9C7.34315 11 6 9.65685 6 8V5ZM9.5 9C10.3284 9 11 8.32843 11 7.5C11 6.67157 10.3284 6 9.5 6C8.67157 6 8 6.67157 8 7.5C8 8.32843 8.67157 9 9.5 9ZM14.5 9C15.3284 9 16 8.32843 16 7.5C16 6.67157 15.3284 6 14.5 6C13.6716 6 13 6.67157 13 7.5C13 8.32843 13.6716 9 14.5 9ZM6 22C6 18.6863 8.68629 16 12 16C15.3137 16 18 18.6863 18 22H20C20 17.5817 16.4183 14 12 14C7.58172 14 4 17.5817 4 22H6Z"></path></svg>
                 </div>
@@ -245,7 +240,7 @@
                 </div>
             </div>
             <!-- Color Convertor -->
-            <div class="tool-card" data-aos="fade-up" data-aos-delay="700" onclick="window.location.href='/tools/color-converter'">
+            <div class="tool-card" data-aos="fade-up" data-aos-delay="800" onclick="window.location.href='/tools/color-converter'">
                 <div class="tool-icons bg9">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002ZM10.9999 16.0002H12.9999V18.0002H10.9999V16.0002ZM10.9999 9.00017H12.9999V14.0002H10.9999V9.00017Z"></path></svg>
                 </div>
@@ -256,6 +251,45 @@
                 </div>
             </div>
         </div>
+    
+    <div class="track">
+        <!-- USERCOUNTS ANALYTICS -->
+        <div class="analytics-card" id="trendCard" data-aos="fade-up" data-aos-delay="100">
+            <div style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase;" data-aos="zoom-up" data-aos-delay="100">Population Index</h3>
+                </div>
+                
+                <div class="chart-container">
+                    <svg class="live-chart-svg" viewBox="0 0 100 40" width="160" height="50">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="var(--chart-color)" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="var(--chart-color)" stop-opacity="0" />
+                             </linearGradient>
+                            </defs>
+                        <path id="trendFill" d="" fill="url(#lineGradient)" />
+                        <!-- Main Line -->
+            <path id="trendLine"
+                  class="trend-path-animate"
+                  d=""
+                  fill="none"
+                  stroke="var(--chart-color)"
+                  stroke-width="1"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  filter="url(#glow)" />
+                    </svg>
+                    
+                    <div class="trend-count" style="display: flex; flex-direction: column; justify-content: center;" data-aos="zoom-up" data-aos-delay="100">
+                        <span id="trendPercent" style="font-size: 30px; font-weight: 900; color: var(--chart-color); letter-spacing: -1px;">+0.00%</span>
+                        <span style="font-size: 10px; font-weight: 700; color: var(--text-dim); opacity: 0.6;" data-aos="zoom-up" data-aos-delay="200">VOLATILITY: LOW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- ================= -->
 
         <!-- Footer -->
         <footer class="footer">
@@ -301,11 +335,11 @@
     </div>
 
     <script src="/assets/js/app.js"></script>
-    <script src="/progress-loader/progress.js"></script>
+    <script src="/assets//js/analytics.js"></script>
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
         AOS.init({
-            duration: 600,
+            duration: 800,
             once: false
         });
     </script>

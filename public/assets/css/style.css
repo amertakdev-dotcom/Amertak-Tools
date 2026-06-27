@@ -10,7 +10,7 @@
     --bg-dark: #05070c;
     --bg-withe: #ffffff;
     --header-bg: rgba(0, 0, 0, 0.253);
-    --card-bg: rgba(16, 23, 41, 0.215);
+    --card-bg: linear-gradient(45deg, #acacac18, #1f1f1f0a);
     --border: rgba(255, 255, 255, 0.08);
     --shadow: #0000005c;
     --accent: #0b84f5;
@@ -55,13 +55,13 @@ body::before {
     background: #ff0037;
     top: -120px;
     left: -120px;
-    opacity: .25;
+    opacity: .35;
 }
 body::after {
     background: #ff0055;
     bottom: -120px;
     right: -120px;
-    opacity: .2;
+    opacity: .35;
 }
 
 .title {
@@ -81,10 +81,17 @@ body::after {
     font-weight: normal;
 }
 .title p {
-    color: var(--text-dim);
+    color: var(--danger);
     text-transform: uppercase;
     font-weight: 800;
 }
+
+.title p strong {
+    color: var(--bg-withe);
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
 @media (max-width: 760px) {
     .title h1 {
         font-size: 2.75rem;
@@ -262,7 +269,6 @@ a {
 /* DROP DOWN MENU */
 .drop {
     position: fixed;
-    display: block;
     padding: 5px;
     background: #000000;
     backdrop-filter: blur(50px);
@@ -272,10 +278,15 @@ a {
     width: auto;
     align-items: center;
     list-style: none;
-
-    z-index: 100000;
 }
 
+.drop:before {
+    backdrop-filter: blur(50px);
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #000;
+}
 .nav-item .drop {
     visibility: hidden;
     opacity: 0;
@@ -677,10 +688,10 @@ svg {
 
 .toggleMode {
     position: relative;
+    display: none;
     width: 40px;
     height: 40px;
     right: -25px;
-    display: flex;
     align-items: center;
     cursor: pointer;
     justify-content: center;
@@ -691,12 +702,18 @@ svg {
     transition: all 0.5s;
 }
 
+#toggleModeMobile {
+    display: none;
+}
+
 @media (max-width: 760px) {
    .toggleMode {
     position: fixed;
-    right: 10px;
-
+    right: 150px;
     z-index: 1000;
+   }
+   #toggleModeMobile {
+    display: none;
    }
 }
 .toggleMode:active {
@@ -708,7 +725,7 @@ svg {
     cursor: pointer;
 }
 
-.login-btn {
+.login-btn, .login-btn-mobile {
     position: relative;
     height: 40px;
     padding: 0 18px;
@@ -725,11 +742,14 @@ svg {
     transition: 0.3s ease;
     z-index: 300;
 }
+.login-btn-mobile {
+    display: none;
+}
 @media (max-width: 760px) {
-    .login-btn {
+    .login-btn-mobile {
         position: fixed;
         display: flex;
-        right: 135px;
+        right: 65px;
     }
 }
 
@@ -1054,9 +1074,11 @@ body.MODE h4 {
     padding: 18px;
     background: var(--card-bg);
     box-shadow: 0 0 10px #1616169a;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(50px);
     border-radius: 10px;
     border: 1px solid var(--border);
+    border-bottom: 1.5px solid #e7e7e71f;
+    border-left: 1.5px solid #e7e7e71f;
     overflow: hidden;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     transition: .2s ease;
