@@ -1,0 +1,16 @@
+# Amertak Tools - robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://amertak.tools/sitemap.xml
+
+# Block login/register from indexing
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+
+# Allow all tool pages
+Allow: /tools/
+Allow: /about/
+Allow: /share/

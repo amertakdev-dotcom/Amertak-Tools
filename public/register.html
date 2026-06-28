@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Amertak Tools</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .auth-page { max-width: 420px; margin: 4rem auto; padding: 2rem; border: 1px solid var(--border); background: var(--card-bg); border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.12); }
+    .auth-page h1 { font-size: 1.5rem; color: #fff;}
+    .auth-page form { display: grid; gap: 1rem; }
+    .auth-page input { width: 100%; padding: 0.95rem 1rem; border: 1px solid var(--border); border-radius: 15px; font-size: 1rem; outline: none; background: var(--card-bg); color: var(--danger); fill: var(--danger);}
+    .auth-page input:focus {
+      border: 1.5px solid var(--danger);
+    }
+    .auth-page button { padding: 0.95rem 1rem; border:none; border-radius: 10px; background: #0c5bff; color:#fff; font-weight:600; cursor:pointer; }
+    .auth-page .message { padding: 0.9rem 1rem; border-radius: 10px; background: #effffe; color: #0a3d7f; }
+    .auth-page p { margin-top: 1rem; text-align: center; }
+    .auth-page a { color: var(--danger); text-decoration: none; }
+
+    .auth-page .auth-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .auth-header .auth-icon {
+      background: var(--danger);
+      display: flex;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+    }
+    .auth-icon svg {
+      fill: #fff;
+      width: 35px;
+    }
+    .auth-button {
+      display: flex;
+      margin: auto;
+      gap: 20px;
+    }
+    .auth-button .auth-submit {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      background: var(--danger);
+      border-radius: 50px;
+    }
+    .auth-submit:nth-last-child(1) {
+      background: none;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+  </style>
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="50"><path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 7C10.8954 7 10 7.89543 10 9C10 9.74025 10.4022 10.3866 10.9999 10.7324L11 15H13L13.0011 10.7318C13.5983 10.3858 14 9.73984 14 9C14 7.89543 13.1046 7 12 7Z"></path></svg>
+      </div>
+      <h1>Register</h1>
+    </div>
+    <div id="status"></div>
+    <form id="registerForm">
+      <input type="text" id="name" name="name" placeholder="Full Name" required>
+      <input type="email" id="email" name="email" placeholder="Email" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <div class="auth-button">
+        <button class="auth-submit" type="submit">Register</button>
+        <button class="auth-submit" onclick="window.location.href='/login'">Login</button>
+      </div>
+    </form>
+    <p>Already have an account? <a href="/login">Login here</a></p>
+  </main>
+  <script src="/auth.js"></script>
+</body>
+</html>
