@@ -1,5 +1,8 @@
+const express = require('express');
 const { getDb } = require('../_lib/db');
 const { requireUser } = require('../_lib/require-user');
+
+const router = express.Router();
 
 function generateShortId() {
   return Math.random().toString(36).slice(2, 11);

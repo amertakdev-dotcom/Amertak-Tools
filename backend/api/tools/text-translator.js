@@ -1,11 +1,9 @@
+const express = require('express');
 const { requireUser } = require('../_lib/require-user');
 
-module.exports = async function textTranslatorHandler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
+const router = express.Router();
 
+router.post('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
 
@@ -42,4 +40,6 @@ module.exports = async function textTranslatorHandler(req, res) {
     console.error('Translator API error:', error);
     res.status(502).json({ message: 'Unable to connect to translation service.' });
   }
-};
+});
+
+module.exports = router;

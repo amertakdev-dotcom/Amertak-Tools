@@ -1,4 +1,7 @@
+const express = require('express');
 const { requireUser } = require('../_lib/require-user');
+
+const router = express.Router();
 
 function normalizeHex(value) {
   let hex = String(value || '').trim().replace(/^#/, '');
@@ -56,12 +59,7 @@ function rgbToHsv({ r, g, b }) {
   return { h, s: Math.round((max === 0 ? 0 : d / max) * 100), v: Math.round(max * 100) };
 }
 
-module.exports = async function colorConverterHandler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
-
+router.post('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
 
@@ -73,4 +71,6 @@ module.exports = async function colorConverterHandler(req, res) {
 
   const rgb = hexToRgb(hex);
   res.status(200).json({ success: true, hex, rgb, hsl: rgbToHsl(rgb), hsv: rgbToHsv(rgb) });
-};
+});
+
+module.exports = router;

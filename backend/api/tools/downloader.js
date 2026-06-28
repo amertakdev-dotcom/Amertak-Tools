@@ -1,7 +1,10 @@
+const express = require('express');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 const youtubedl = require('youtube-dl-exec');
 const { requireUser } = require('../_lib/require-user');
+
+const router = express.Router();
 
 const execFileAsync = promisify(execFile);
 const YTDLP_BINARY = process.env.YTDLP_PATH || 'yt-dlp';
@@ -86,17 +89,18 @@ function normalizePayload(payload) {
   };
 }
 
-async function handleDownloader(req, res) {
+router.get('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
-
-  if (req.method === 'GET') {
     res.status(200).json({
       success: true,
       supportedPlatforms: SUPPORTED_PLATFORMS
     });
-    return;
-  }
+});
+
+router.post('/', async (req, res) => {
+  const user = await requireUser(req, res);
+  if (!user) return;
 
   if (req.method !== 'POST') {
     res.status(405).json({ message: 'Method not allowed' });
@@ -160,7 +164,6 @@ async function handleDownloader(req, res) {
     res.status(502).json({
       message: 'Unable to fetch media from the provided URL. The site may block downloads or require login.'
     });
-  }
-}
+});
 
-module.exports = handleDownloader;
+module.exports = router;

@@ -1,4 +1,7 @@
+const express = require('express');
 const { requireUser } = require('../_lib/require-user');
+
+const router = express.Router();
 
 function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
@@ -6,12 +9,7 @@ function clampNumber(value, min, max, fallback) {
   return Math.min(Math.max(parsed, min), max);
 }
 
-module.exports = async function qrCodeHandler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
-
+router.post('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
 
@@ -52,4 +50,6 @@ module.exports = async function qrCodeHandler(req, res) {
     console.error('QR Code Generator error:', error);
     res.status(502).json({ message: 'Unable to generate QR code.' });
   }
-};
+});
+
+module.exports = router;

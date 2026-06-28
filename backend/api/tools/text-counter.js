@@ -1,4 +1,7 @@
+const express = require('express');
 const { requireUser } = require('../_lib/require-user');
+
+const router = express.Router();
 
 function countText(text) {
   const trimmed = text.trim();
@@ -12,15 +15,12 @@ function countText(text) {
   return { words, chars, sentences, paragraphs, lines, readingMinutes };
 }
 
-module.exports = async function textCounterHandler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
-
+router.post('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
 
   const text = String(req.body?.text || '');
   res.status(200).json({ success: true, counts: countText(text) });
-};
+});
+
+module.exports = router;
