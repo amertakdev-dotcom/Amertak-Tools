@@ -1,0 +1,282 @@
+.main {
+    top: 0;
+    margin: auto;
+    margin-bottom: 40px;
+    padding: 25px;
+    max-width: 450px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.input-section {
+    margin-bottom: 25px;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.url-input {
+    padding: 10px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background: var(--card-bg);
+}
+
+.url-input:focus {
+    border-color: #e60068;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.2);
+}
+
+.download-btn {
+    background: linear-gradient(to right, #e60068, #ff002b);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.download-btn svg {
+    fill: #fff;
+}
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 71, 113, 0.4);
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+.download-btn:disabled {
+    background: #b0b0b0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #ff0044;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.results-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .video-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .video-author {
+            color: var(--text);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thumbnail-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .video-thumbnail {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-options {
+            margin-top: 20px;
+        }
+
+        .download-options h3 {
+            margin-bottom: 15px;
+            color: var(--text);
+            border-bottom: 2px solid #e1e1e1;
+            padding-bottom: 8px;
+        }
+
+        .media-option {
+            background-color: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .media-option:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .media-details {
+            flex: 1;
+        }
+
+        .media-quality {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .media-type {
+            color: var(--text);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .media-size {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .download-link {
+            background-image: var(--lngrad);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .download-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(71, 118, 230, 0.3);
+        }
+
+        .error-message {
+            display: none;
+            background-color: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            color: #d63031;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            transition: .3s ease;
+        }
+
+        .showpg {
+            visibility: visible;
+        }
+        @keyframes errorPg {
+            to {
+                width: 0;
+            }
+        }
+
+        .supported-platforms {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .platforms-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            background-size: 100%;
+        }
+
+        .platform-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .platform-icon {
+            background-color: #ff0080;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .media-option {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .download-link {
+                align-self: stretch;
+                text-align: center;
+            }
+        }
