@@ -199,11 +199,15 @@
 
     <script src="/assets/js/app.js"></script>
     <script>
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:3001'
+            : 'https://amertak-tools-f3zb.onrender.com';
+
         const imageId = window.location.pathname.split('/').pop();
 
         async function loadImage() {
             try {
-                const response = await fetch(`/api/tools/image-to-url/image/${imageId}`);
+                const response = await fetch(`${API_BASE}/api/tools/image-to-url/image/${imageId}`);
                 
                 if (!response.ok) {
                     showError();

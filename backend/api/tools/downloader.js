@@ -89,23 +89,18 @@ function normalizePayload(payload) {
   };
 }
 
+// GET is public - returns supported platforms list (no auth needed)
 router.get('/', async (req, res) => {
-  const user = await requireUser(req, res);
-  if (!user) return;
-    res.status(200).json({
-      success: true,
-      supportedPlatforms: SUPPORTED_PLATFORMS
-    });
+  res.status(200).json({
+    success: true,
+    supportedPlatforms: SUPPORTED_PLATFORMS
+  });
 });
 
+// POST requires authentication
 router.post('/', async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
-
-  if (req.method !== 'POST') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
 
   const url = String(req.body?.url || '').trim();
   if (!url || !isValidUrl(url)) {

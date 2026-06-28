@@ -1,4 +1,4 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === 'https://amertak-tools-f3zb.onrender.com')
     ? 'http://localhost:3001'
     : 'https://amertak-tools-f3zb.onrender.com';
 
@@ -71,7 +71,7 @@ const navSections = [
         icon: navIcons.more,
         items: [
             { label: 'About Us', href: '/about', icon: navIcons.about },
-            { label: 'Contect', href: 'https://t.me/amertak_network', icon: navIcons.about },
+            { label: 'Contact', href: 'https://t.me/amertak_network', icon: navIcons.about },
         ]
     }
 ];
