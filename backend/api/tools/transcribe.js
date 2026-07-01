@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200 * 1024 * 1024 } });
 const router = express.Router();
 
