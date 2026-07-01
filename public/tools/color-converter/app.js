@@ -1,6 +1,4 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
 
 const hexInput = document.getElementById('hexInput');
 const colorInput = document.getElementById('colorInput');
@@ -86,6 +84,9 @@ async function updateColor(value) {
         return;
     }
 
+    const resultsCard = document.querySelector('.results-card');
+    if (resultsCard) resultsCard.style.opacity = '0.7';
+
     try {
         const response = await fetch(`${API_BASE}/api/tools/color-converter`, {
             method: 'POST',
@@ -109,6 +110,8 @@ async function updateColor(value) {
     } catch (error) {
         statusText.textContent = error.message || 'Color conversion failed.';
         statusText.style.color = '#ff5c7a';
+    } finally {
+        if (resultsCard) resultsCard.style.opacity = '1';
     }
 }
 

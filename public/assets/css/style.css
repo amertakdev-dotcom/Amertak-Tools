@@ -159,8 +159,7 @@ a {
 .desktop-profile {
     position: relative;
     display: flex;
-    margin-left: 12px;
-    margin-right: 0;
+    right: -30%;
     z-index: 350;
 }
 
@@ -351,6 +350,7 @@ svg {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
+    pointer-events: auto;
 
     z-index: 200;
     transform: translateX(-100%);
@@ -401,6 +401,7 @@ svg {
     font-weight: 600;
     cursor: pointer;
     min-width: 0;
+    pointer-events: auto;
 
     z-index: 100;
 }

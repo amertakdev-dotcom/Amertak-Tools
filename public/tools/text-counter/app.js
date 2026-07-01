@@ -1,6 +1,4 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
 
 const inputText = document.getElementById('inputText');
 const clearBtn = document.getElementById('clearBtn');
@@ -19,6 +17,9 @@ const fields = {
 async function countText() {
     const text = inputText.value;
     const trimmed = text.trim();
+
+    const countsContainer = document.querySelector('.counts-container');
+    if (countsContainer) countsContainer.style.opacity = '0.7';
 
     try {
         const response = await fetch(`${API_BASE}/api/tools/text-counter`, {
@@ -41,6 +42,8 @@ async function countText() {
         statusText.textContent = trimmed ? 'Counting live.' : 'Ready.';
     } catch (error) {
         statusText.textContent = error.message || 'Count failed.';
+    } finally {
+        if (countsContainer) countsContainer.style.opacity = '1';
     }
 }
 

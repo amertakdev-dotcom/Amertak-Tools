@@ -2,7 +2,7 @@
 
 Frontend application for Amertak Tools. Deployed on Vercel.
 
-**API:** Fetches from https://amertaktoolsapi.onrender.com
+**API:** Fetches from https://amertak-tools-f3zb.onrender.com
 
 ## Features
 
@@ -33,7 +33,7 @@ npm run build
 
 Create `.env` file:
 ```env
-REACT_APP_API_URL=https://amertaktoolsapi.onrender.com
+REACT_APP_API_URL=https://amertak-tools-f3zb.onrender.com
 ```
 
 ## Deploy to Vercel

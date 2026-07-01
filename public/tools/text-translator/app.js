@@ -1,9 +1,13 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+const TRANSLATE_URL = 'https://libretranslate.de/translate';
 
-// Use public Google Translate web endpoint (no API key required)
-// NOTE: This uses the unofficial `translate.googleapis.com` endpoint.
+function buildTranslatePayload(text, source, target) {
+    return {
+        q: text,
+        source: source === 'auto' ? 'auto' : source,
+        target,
+        format: 'text'
+    };
+}
 
 const inputText = document.getElementById('inputText');
 const outputText = document.getElementById('outputText');
@@ -77,6 +81,9 @@ function setCurrentText(t) {
 }
 
 async function translateText(text, source, target) {
+    const typingBox = document.getElementById('typingBox');
+    if (typingBox) typingBox.style.opacity = '0.7';
+
     if (!text.trim()) {
         setOutput('');
         if (detectedLangText) {
@@ -91,29 +98,22 @@ async function translateText(text, source, target) {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/tools/text-translator`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-                text,
-                source: source === 'auto' ? 'auto' : source,
-                target
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            setStatus(error.message || `Translation failed: ${response.status}`, true);
-            return;
+        if (!window.axios) {
+            throw new Error('Translation library is not available');
         }
 
-        const json = await response.json();
-        setOutput(json.translatedText || '');
+        const response = await window.axios.post(TRANSLATE_URL, buildTranslatePayload(text, source, target), {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const translatedText = response?.data?.translatedText || '';
+        setOutput(translatedText);
         setStatus('Translation complete.');
     } catch (error) {
         setStatus('Unable to connect to translation API.', true);
         console.error('Translation error:', error);
+    } finally {
+        if (typingBox) typingBox.style.opacity = '1';
     }
 }
 

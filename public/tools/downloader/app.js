@@ -1,6 +1,4 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === 'https://amertak-tools-f3zb.onrender.com')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.querySelector('.url-input');
@@ -58,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json().catch(() => ({}));
 
             if (!response.ok || data.error) {
-                throw new Error(data.message || `Request failed with status ${response.status}`);
+                throw new Error(data.error || data.message || `Request failed with status ${response.status}`);
             }
 
             displayVideoInfo(data);
@@ -73,7 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayVideoInfo(data) {
         videoTitle.textContent = data.title || 'Untitled Video';
-        videoAuthor.textContent = `By ${data.author || 'Unknown'}`;
+
+        const metaParts = [`By ${data.author || 'Unknown'}`];
+        if (data.durationFormatted) metaParts.push(data.durationFormatted);
+        if (data.viewCount) metaParts.push(`${Number(data.viewCount).toLocaleString()} views`);
+        if (data.uploadDate) {
+            const d = data.uploadDate;
+            if (d.length === 8) {
+                metaParts.push(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`);
+            }
+        }
+        videoAuthor.textContent = metaParts.join(' | ');
 
         if (data.thumbnail) {
             videoThumbnail.src = data.thumbnail;
@@ -86,7 +94,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         downloadOptions.innerHTML = '';
 
-        if (Array.isArray(data.medias) && data.medias.length > 0) {
+        // Unified format support
+        if (data.downloads) {
+            if (data.downloads.video) {
+                downloadOptions.appendChild(createMediaOption({
+                    url: data.downloads.video,
+                    quality: 'Best Video',
+                    type: 'video',
+                    extension: 'mp4',
+                    size: null
+                }));
+            }
+            if (data.downloads.audio) {
+                downloadOptions.appendChild(createMediaOption({
+                    url: data.downloads.audio,
+                    quality: 'Best Audio',
+                    type: 'audio',
+                    extension: 'mp3',
+                    size: null
+                }));
+            }
+            if (Array.isArray(data.downloads.images) && data.downloads.images.length > 0) {
+                data.downloads.images.forEach((imgUrl, index) => {
+                    downloadOptions.appendChild(createMediaOption({
+                        url: imgUrl,
+                        quality: `Image ${index + 1}`,
+                        type: 'image',
+                        extension: 'jpg',
+                        size: null
+                    }));
+                });
+            }
+        } else if (Array.isArray(data.medias) && data.medias.length > 0) {
             data.medias.forEach((media) => {
                 downloadOptions.appendChild(createMediaOption(media));
             });

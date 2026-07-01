@@ -1,20 +1,38 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === 'https://amertak-tools-f3zb.onrender.com')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+function getApiBase() {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+        return 'https://amertak-tools-f3zb.onrender.com';
+    }
+    return '';
+}
+
+const API_BASE = getApiBase();
 
 function getApiUrl(path) {
     return `${API_BASE}${path}`;
 }
 
-function toggleSidebar() {
-    document.getElementById('sidebar')
-        ?.classList.toggle('sidebar-open');
+function getStoredAuthToken() {
+    return localStorage.getItem('authToken') || '';
+}
 
-    document.getElementById('overlay')
-        ?.classList.toggle('hidden');
+function buildAuthHeaders(extra = {}) {
+    const headers = { ...extra };
+    const token = getStoredAuthToken();
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
+}
 
-    document.querySelector(".hamburger-btn")
-        ?.classList.toggle("rotate")
+function toggleSidebar(force) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const isOpen = typeof force === 'boolean' ? force : !sidebar?.classList.contains('sidebar-open');
+
+    sidebar?.classList.toggle('sidebar-open', isOpen);
+    overlay?.classList.toggle('hidden', !isOpen);
+    document.querySelector('.hamburger-btn')?.classList.toggle('rotate', isOpen);
 }
 
 const navIcons = {
@@ -92,6 +110,15 @@ function createNavLink(item) {
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
     }
+    link.addEventListener('click', (event) => {
+        event.preventDefault();
+        toggleSidebar(false);
+        if (item.external) {
+            window.open(item.href, '_blank', 'noopener,noreferrer');
+            return;
+        }
+        window.location.href = item.href;
+    });
     return link;
 }
 
@@ -190,7 +217,7 @@ function renderSidebar() {
         profileWrapper.appendChild(userActions);
         nav.appendChild(profileWrapper);
     } else {
-        nav.appendChild(createNavLink({ label: 'Login', href: '/login', icon: navIcons.login }));
+        nav.appendChild(createNavLink({ label: 'Login', href: '/login.html', icon: navIcons.login }));
     }
 
     sidebar.replaceChildren(nav);
@@ -200,6 +227,7 @@ async function logoutUser() {
     try {
         await fetch(getApiUrl('/api/auth/logout'), {
             method: 'POST',
+            headers: buildAuthHeaders(),
             credentials: 'include'
         });
     } catch (error) {
@@ -254,12 +282,18 @@ function renderDesktopProfile(user) {
 // Fetch user info on page load
 async function fetchUserInfo() {
     try {
-        const response = await fetch(getApiUrl('/api/auth/me'), { 
-            credentials: 'include' 
+        const response = await fetch(getApiUrl('/api/auth/me'), {
+            headers: buildAuthHeaders({ Accept: 'application/json' }),
+            credentials: 'include'
         });
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('user', JSON.stringify(data.user));
+            if (data?.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+            if (data?.token || data?.accessToken || data?.authToken) {
+                localStorage.setItem('authToken', data.token || data.accessToken || data.authToken);
+            }
             // Hide login buttons when user is logged in
             const loginBtn = document.getElementById('loginBtn');
             const loginBtnMobile = document.getElementById('loginBtnMobile');
@@ -362,10 +396,10 @@ function createAuthPopup() {
     popup.querySelector('.auth-popup-close')?.addEventListener('click', hideAuthPopup);
     popup.querySelector('.auth-popup-close-btn')?.addEventListener('click', hideAuthPopup);
     popup.querySelector('.auth-popup-register')?.addEventListener('click', () => {
-        window.location.href = '/register';
+        window.location.href = '/register.html';
     });
     popup.querySelector('.auth-popup-login')?.addEventListener('click', () => {
-        window.location.href = '/login';
+        window.location.href = '/login.html';
     });
     popup.addEventListener('click', (event) => {
         if (event.target === popup) {

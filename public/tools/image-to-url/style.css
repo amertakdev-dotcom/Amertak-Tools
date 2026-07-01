@@ -261,6 +261,25 @@
     cursor: not-allowed;
 }
 
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.loader-spin {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 0, 128, 0.25);
+    border-top-color: #ff0080;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
 .status-text {
     font-size: 12px;
     color: var(--text-main);

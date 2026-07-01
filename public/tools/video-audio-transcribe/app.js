@@ -1,6 +1,4 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
 
 const mediaInput = document.getElementById('mediaInput');
 const fileName = document.getElementById('fileName');
@@ -128,12 +126,28 @@ async function startTranscribe() {
 
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-            throw new Error(data.message || `Transcription failed with status ${response.status}`);
+            throw new Error(data.error || data.message || `Transcription failed with status ${response.status}`);
         }
 
         transcriptText.value = String(data.text || '').trim();
-        syncCaptionsFromText();
-        setStatus('Transcription completed successfully.');
+
+        if (Array.isArray(data.segments) && data.segments.length > 0) {
+            captions = data.segments.map((seg) => ({
+                start: seg.start,
+                end: seg.end,
+                text: seg.text.trim()
+            }));
+        } else {
+            syncCaptionsFromText();
+        }
+
+        renderCaptions();
+
+        const statusParts = ['Transcription completed'];
+        if (data.language) statusParts.push(`Language: ${data.language}`);
+        if (data.processingTimeSeconds) statusParts.push(`${data.processingTimeSeconds}s`);
+        setStatus(statusParts.join(' | '));
+
         activePlayer?.play().catch(() => {});
     } catch (error) {
         if (error.name === 'AbortError') {

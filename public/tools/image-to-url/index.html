@@ -49,7 +49,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
                 </button>
 
-                <button id="loginBtn" class="login-btn" onclick="window.location.href='/login'">Login</button>
+                <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">Login</button>
 
                 <button class="toggleMode" id="toggleMode" onclick="toggleMode()">
                     <img id="mode-btn" src="/svg/light-mode.svg">
@@ -136,6 +136,10 @@
                         <button id="createUrlBtn" class="primary-btn" type="button" disabled>Create URL</button>
                         <button id="clearBtn" class="ghost-btn" type="button" disabled>Clear</button>
                     </div>
+                    <div id="loader" class="loader" style="display:none;">
+                        <span class="loader-spin"></span>
+                        <span>Creating share link…</span>
+                    </div>
                     <p id="statusText" class="status-text">Waiting for image</p>
                 </article>
 
@@ -175,38 +179,17 @@
             </section>
         </main>
 
-        
-        <div class=-" id=-">
-            <div class="range" id="range">
-                <div class="range__label" id="range_label"></div>
-            </div>
-        </div>
-
         <!-- Back Button -->
         <button class="floating-btn" onclick="window.location.href=`/`">
             <img src="/svg/arrow-left-circle.svg" width="25px">
             back
         </button>
         
-        <footer class="footer">
-            <!-- Icons & Info -->
-            <div class="footer-info" style="margin: auto; position: relative;">
-                <div class="sub-footer">
-                    <div class="social-links">
-                       <a href="/" class="social-icon"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M8.52062 13.8458C7.48059 13.8458 6.63159 12.9014 6.63159 11.7446C6.63159 10.5879 7.45936 9.64331 8.52062 9.64331C9.57123 9.64331 10.4308 10.5879 10.4096 11.7446C10.4096 12.9014 9.57123 13.8458 8.52062 13.8458ZM15.4941 13.8458C14.454 13.8458 13.604 12.9014 13.604 11.7446C13.604 10.5879 14.4328 9.64331 15.4941 9.64331C16.5447 9.64331 17.4043 10.5879 17.3831 11.7446C17.3831 12.9014 16.5553 13.8458 15.4941 13.8458Z"></path></svg></a>
-                       <a href="https://tiktok.com/@amertak.tools" class="social-icon" target="_blank"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M16 8.24537V15.5C16 19.0899 13.0899 22 9.5 22C5.91015 22 3 19.0899 3 15.5C3 11.9101 5.91015 9 9.5 9C10.0163 9 10.5185 9.06019 11 9.17393V12.3368C10.5454 12.1208 10.0368 12 9.5 12C7.567 12 6 13.567 6 15.5C6 17.433 7.567 19 9.5 19C11.433 19 13 17.433 13 15.5V2H16C16 4.76142 18.2386 7 21 7V10C19.1081 10 17.3696 9.34328 16 8.24537Z"></path></svg></a>
-                       <a href="https://t.me/Amertak_Network" class="social-icon" target="_blank"><svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M17.0943 7.14643C17.6874 6.93123 17.9818 6.85378 18.1449 6.82608C18.1461 6.87823 18.1449 6.92051 18.1422 6.94825C17.9096 9.39217 16.8906 15.4048 16.3672 18.2026C16.2447 18.8578 16.1507 19.1697 15.5179 18.798C15.1014 18.5532 14.7245 18.2452 14.3207 17.9805C12.9961 17.1121 11.1 15.8189 11.2557 15.8967C9.95162 15.0373 10.4975 14.5111 11.2255 13.8093C11.3434 13.6957 11.466 13.5775 11.5863 13.4525C11.64 13.3967 11.9027 13.1524 12.2731 12.8081C13.4612 11.7035 15.7571 9.56903 15.8151 9.32202C15.8246 9.2815 15.8334 9.13045 15.7436 9.05068C15.6539 8.97092 15.5215 8.9982 15.4259 9.01989C15.2904 9.05064 13.1326 10.4769 8.95243 13.2986C8.33994 13.7192 7.78517 13.9242 7.28811 13.9134L7.29256 13.9156C6.63781 13.6847 5.9849 13.4859 5.32855 13.286C4.89736 13.1546 4.46469 13.0228 4.02904 12.8812C3.92249 12.8466 3.81853 12.8137 3.72083 12.783C8.24781 10.8109 11.263 9.51243 12.7739 8.884C14.9684 7.97124 16.2701 7.44551 17.0943 7.14643Z"></path></svg></a>
-                    </div>
-                    <div class="info">
-                        <p>&copy; 2024 Amertak Tools. All rights reserved.</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <div id="footer"></div>
     </div>
 
-    <script src="/tools/tool-auth.js"></script>
     <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/footer.js"></script>
     <script src="/tools/image-to-url/app.js"></script>
 </body>
 </html>

@@ -15,12 +15,9 @@ const scanPreview = document.getElementById('scanPreview');
 const copyScanBtn = document.getElementById('copyScanBtn');
 const openResultBtn = document.getElementById('openResultBtn');
 
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3001'
-    : 'https://amertak-tools-f3zb.onrender.com';
-
 const defaultText = '';
 const apiBaseUrl = 'https://api.qrserver.com/v1';
+const logoPath = '/assets/icons/qrlogo.svg';
 let generatedBlob = null;
 let generatedObjectUrl = '';
 
@@ -52,6 +49,15 @@ function revokeGeneratedUrl() {
     }
 }
 
+function loadLogoImage(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+    });
+}
+
 async function generateQrCode() {
     const text = qrText.value.trim();
     if (!text) {
@@ -65,22 +71,52 @@ async function generateQrCode() {
     qrSize.value = width;
     qrMargin.value = margin;
 
-    try {
-        setStatus(qrStatus, 'Fetching QR image...');
-        const response = await fetch(`${API_BASE}/api/tools/qr-code`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ text, size: width, margin })
-        });
+    const originalBtnText = generateBtn.textContent;
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
 
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || 'QR API request failed');
+    try {
+        if (!window.QRCode) {
+            throw new Error('QR library is not available');
         }
 
-        const payload = await response.json();
-        generatedBlob = await (await fetch(payload.dataUrl)).blob();
+        setStatus(qrStatus, 'Generating QR image...');
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = width;
+
+        await new Promise((resolve, reject) => {
+            window.QRCode.toCanvas(canvas, text, {
+                width,
+                margin,
+                color: { dark: '#111827', light: '#ffffff' },
+                errorCorrectionLevel: 'M'
+            }, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve();
+            });
+        });
+
+        const ctx = canvas.getContext('2d');
+        const logo = await loadLogoImage(logoPath);
+        if (logo) {
+            const logoSize = Math.max(42, Math.floor(width * 0.18));
+            const x = (width - logoSize) / 2;
+            const y = (width - logoSize) / 2;
+            const padding = Math.max(8, Math.floor(width * 0.04));
+
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x - padding, y - padding, logoSize + padding * 2, logoSize + padding * 2);
+            ctx.drawImage(logo, x, y, logoSize, logoSize);
+            ctx.restore();
+        }
+
+        const dataUrl = canvas.toDataURL('image/png');
+        generatedBlob = await (await fetch(dataUrl)).blob();
         revokeGeneratedUrl();
         generatedObjectUrl = URL.createObjectURL(generatedBlob);
         qrPreviewImage.src = generatedObjectUrl;
@@ -91,8 +127,11 @@ async function generateQrCode() {
         generatedBlob = null;
         downloadBtn.disabled = true;
         copyBtn.disabled = true;
-        setStatus(qrStatus, 'Could not generrate QR image', 'error');
+        setStatus(qrStatus, 'Could not generate QR image', 'error');
         console.error(error);
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = originalBtnText;
     }
 }
 

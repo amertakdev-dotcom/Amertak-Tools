@@ -1,13 +1,13 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "buildCommand": "exit 0",
   "rewrites": [
     { "source": "/share/:id", "destination": "/share.html" },
     { "source": "/about", "destination": "/about/index.html" },
     { "source": "/tools/:tool", "destination": "/tools/:tool/index.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" }
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/api/:path*", "destination": "https://amertak-tools-f3zb.onrender.com/api/:path*" }
   ],
   "redirects": [],
   "headers": [

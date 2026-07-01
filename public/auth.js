@@ -1,6 +1,36 @@
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:3001'
-  : 'https://amertak-tools-f3zb.onrender.com';
+function getApiBase() {
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+    return 'https://amertak-tools-f3zb.onrender.com';
+  }
+  return '';
+}
+
+const API_BASE = getApiBase();
+
+function getStoredAuthToken() {
+  return localStorage.getItem('authToken') || '';
+}
+
+function persistAuthSession(data) {
+  if (data?.user) {
+    localStorage.setItem('user', JSON.stringify(data.user));
+  }
+
+  const token = data?.token || data?.accessToken || data?.authToken || '';
+  if (token) {
+    localStorage.setItem('authToken', token);
+  }
+}
+
+function buildAuthHeaders(extra = {}) {
+  const headers = { ...extra };
+  const token = getStoredAuthToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 function showMessage(message, isError = false) {
   const status = document.getElementById('status');
@@ -36,7 +66,7 @@ async function handleLogin(event) {
   try {
     const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: buildAuthHeaders({ 'Content-Type': 'application/json' }),
       credentials: 'include',
       body: JSON.stringify({ email, password })
     });
@@ -46,8 +76,8 @@ async function handleLogin(event) {
       throw new Error(data.message || 'Login failed.');
     }
 
-    if (data.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+    if (data.user || data.token || data.accessToken || data.authToken) {
+      persistAuthSession(data);
       const next = new URLSearchParams(window.location.search).get('next') || '/';
       window.location.href = next;
       return;
@@ -81,7 +111,7 @@ async function handleRegister(event) {
   try {
     const response = await fetch(`${API_BASE}/api/auth/register`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: buildAuthHeaders({ 'Content-Type': 'application/json' }),
       credentials: 'include',
       body: JSON.stringify({ name, email, password })
     });
@@ -91,8 +121,8 @@ async function handleRegister(event) {
       throw new Error(data.message || 'Registration failed.');
     }
 
-    if (data.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+    if (data.user || data.token || data.accessToken || data.authToken) {
+      persistAuthSession(data);
       window.location.href = '/';
       return;
     }
