@@ -1,10 +1,6 @@
 document.documentElement.style.visibility = 'hidden';
 
 function getApiBase() {
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
-    return 'https://amertak-tools-f3zb.onrender.com';
-  }
   return '';
 }
 

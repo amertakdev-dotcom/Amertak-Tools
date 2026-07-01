@@ -1,0 +1,13 @@
+{
+  "name": "amertak-tools-monorepo",
+  "version": "1.0.0",
+  "description": "Unified repository for Amertak Tools - Railway Ready",
+  "scripts": {
+    "postinstall": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

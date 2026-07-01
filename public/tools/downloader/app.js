@@ -1,4 +1,4 @@
-const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.querySelector('.url-input');

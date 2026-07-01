@@ -13,7 +13,9 @@ function getBaseUrl(req) {
 
   const proto = req.headers?.['x-forwarded-proto'] || req.protocol || 'https';
   const host = req.headers?.['x-forwarded-host'] || req.headers?.host;
-  return host ? `${proto}://${host}` : 'https://amertak-tools.vercel.app';
+  // If host is available, use it. Fallback is an empty string to allow relative URLs if possible,
+  // but for share URLs we usually want absolute ones.
+  return host ? `${proto}://${host}` : '';
 }
 
 function getSubPath(req) {
