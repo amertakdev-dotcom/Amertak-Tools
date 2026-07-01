@@ -159,6 +159,7 @@ router.post('/', async (req, res) => {
     res.status(502).json({
       message: 'Unable to fetch media from the provided URL. The site may block downloads or require login.'
     });
+  }
 });
 
 module.exports = router;

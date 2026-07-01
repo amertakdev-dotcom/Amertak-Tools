@@ -272,7 +272,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // ចាប់យកឈ្មោះផ្លូវទំព័រនាពេលបច្ចុប្បន្ន (ឧទាហរណ៍៖ /tools/downloader/index.html)
     const currentPage = window.location.pathname; 
 
-    fetch('https://tools-amertak.vercel.app/api/track-page', {
+    fetch('/api/track-page', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

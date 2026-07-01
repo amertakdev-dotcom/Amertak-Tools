@@ -1,4 +1,4 @@
-const API_BASE = 'https://amertak-tools-f3zb.onrender.com';
+const API_BASE = '';
 
 const inputText = document.getElementById('inputText');
 const clearBtn = document.getElementById('clearBtn');

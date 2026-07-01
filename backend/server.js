@@ -15,6 +15,9 @@ const colorConverterRouter = require('./api/tools/color-converter');
 
 const app = express();
 
+// Trust proxy for Railway/Render/Vercel
+app.set('trust proxy', 1);
+
 // CORS configuration for frontend domains
 const configuredOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
@@ -65,9 +68,21 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, '../public')));
+
+// SPA Catch-all: serve index.html for non-API routes
+app.get('*', (req, res, next) => {
+  // Skip if it's an API route or has an extension (likely a missing asset)
+  if (req.path.startsWith('/api/') || req.path.includes('.')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 // Catch-all for undefined routes
 app.use((req, res) => {
-  res.status(404).json({ message: 'API endpoint not found' });
+  res.status(404).json({ message: 'Resource not found' });
 });
 
 // Error handler
