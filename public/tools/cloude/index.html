@@ -5,11 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CloudShare | Fast secure file sharing</title>
   <meta name="description" content="Upload files, generate a public share link, and download them securely with CloudShare." />
+  <link rel="stylesheet" href="/assets/css/style.css" />
   <link rel="stylesheet" href="/tools/cloude/style.css" />
 </head>
 <body>
-  <div class="page-shell">
-    <header class="hero-card">
+  <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
+  <aside id="sidebar" class="sidebar-mobile"></aside>
+  <div class="app-wrapper">
+    <header class="header">
+      <div class="header-container">
+        <div class="header-left">
+          <div class="brand">
+            <div class="brand-icon"><img src="/svg/logo.svg" alt="logo" width="150px"></div>
+          </div>
+        </div>
+
+        <button onclick="toggleSidebar()" class="hamburger-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
+        </button>
+
+        <button class="toggleMode" id="toggleMode" onclick="toggleMode()">
+          <img id="mode-btn" src="/svg/light-mode.svg">
+        </button>
+
+        <nav class="desktop-navbar">
+          <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">Login</button>
+        </nav>
+      </div>
+    </header>
+
+    <div class="page-shell">
+      <header class="hero-card">
       <div class="hero-copy">
         <p class="eyebrow">CloudShare • Vercel + MongoDB</p>
         <h1>Send files in seconds.</h1>
@@ -80,6 +106,8 @@
   </div>
 
   <div id="toast" class="toast"></div>
+  <script src="/assets/js/app.js"></script>
+  <script src="/assets/js/footer.js"></script>
   <script src="/tools/cloude/app.js"></script>
 </body>
 </html>
