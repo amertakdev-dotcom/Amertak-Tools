@@ -66,7 +66,7 @@ const navSections = [
             { label: 'Downloader', href: '/tools/downloader', icon: navIcons.downloader },
             { label: 'QR Code', href: '/tools/qr-code', icon: navIcons.qr },
             { label: 'Image PDF', href: '/tools/image-to-pdf', icon: navIcons.pdf },
-            { label: 'Image to URL', href: '/tools/image-to-url', icon: navIcons.pdf },
+            { label: 'Cloud Share', href: '/tools/cloude', icon: navIcons.pdf },
             { label: 'Text Translator', href: '/tools/text-translator', icon: navIcons.translate },
             { label: 'Text to Speech', href: '/tools/text-to-speech-khmer', icon: navIcons.speech },
             { label: 'Text Counter', href: '/tools/text-counter', icon: navIcons.count },

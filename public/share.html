@@ -93,7 +93,7 @@
         .file-icon-box svg {
             width: 64px;
             height: 64px;
-            fill: #ff0080;
+            fill: var(--accent, #ff0080);
             margin-bottom: 12px;
         }
 
@@ -147,19 +147,19 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #ff0080, #ff3366);
+            background: linear-gradient(135deg, var(--accent, #ff0080), var(--danger, #ff3366));
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 0, 128, 0.3);
+            box-shadow: 0 8px 24px color-mix(in srgb, var(--accent, #ff0080) 30%, transparent);
         }
 
         .btn-secondary {
             background: rgba(255, 0, 128, 0.1);
             border: 1px solid rgba(255, 0, 128, 0.3);
-            color: #ff0080;
+            color: var(--accent, #ff0080);
         }
 
         .btn-secondary:hover {
@@ -188,7 +188,7 @@
             width: 20px;
             height: 20px;
             border: 3px solid rgba(255, 0, 128, 0.2);
-            border-top-color: #ff0080;
+            border-top-color: var(--accent, #ff0080);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -245,7 +245,7 @@
             </div>
 
             <div id="errorState" style="display:none;">
-                <h1 style="color: #ff3366; margin-bottom: 16px;">File not found</h1>
+                <h1 style="color: var(--danger, #ff3366); margin-bottom: 16px;">File not found</h1>
                 <p style="margin-bottom: 24px;">This file may have been deleted, expired, or the link is incorrect.</p>
                 <button class="btn btn-primary" onclick="window.location.href='/'">Back to Home</button>
             </div>
@@ -453,7 +453,7 @@
         }
 
         function goToTool() {
-            window.location.href = '/tools/image-to-url';
+            window.location.href = '/tools/cloude';
         }
 
         document.addEventListener('DOMContentLoaded', loadFile);

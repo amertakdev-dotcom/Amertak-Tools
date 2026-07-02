@@ -14,7 +14,7 @@
     --border: rgba(255, 255, 255, 0.08);
     --shadow: #0000005c;
     --accent: #0b84f5;
-    --success: #ff0000;
+    --success: #12d59d;
     --danger: #ff3366;
     --low: #009dfe;
     --text-main: #818181;
@@ -103,6 +103,61 @@ body.MODE .title h1 {
 a {
     text-decoration: none;
     color: var(--text-dim);
+}
+
+.ai {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--card-bg);
+    border-radius: 15px 0px 15px 15px;
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
+    border-left: 2px solid var(--border);
+    bottom: 30px;
+    gap: 5px;
+    right: 20px;
+    width: 60px;
+    height: 40px;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    fill: var(--text-dim);
+    backdrop-filter: blur(10px);
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-weight: 600;
+    animation: ai 2s infinite alternate-reverse;
+    transition: .5s;
+    cursor: pointer;
+}
+
+.ai svg {
+    transition: .5s;
+}
+
+.ai:hover {
+    scale: 1.05;
+    width: 70px;
+    color: #fff;
+    filter: drop-shadow(0px 0px 0.4px var(--danger));
+}
+.ai:active {
+    scale: 0.95;
+}
+.ai:hover svg {
+    fill: #fff;
+}
+
+@keyframes ai {
+    from {
+        box-shadow: -1px 1px 2px #b300ff,
+        1px -1px 1px #0077ff;
+    }
+    to {
+        box-shadow: 0 -1px 1px #008cff,
+        1px -2px 2px #ff008c;
+    }
 }
 
 /* --- Navigation & Header --- */
@@ -1084,24 +1139,41 @@ body.MODE h4 {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     transition: .2s ease;
 }
-.tool-card.soon:before {
-    content: "soon";
+.tool-card:before {
+    content: '';
     position: fixed;
-    top: 5px;
-    right: -60px;
-    width: 150px;
-    height: 20px;
-    background: #c70000;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 0.6rem;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    transform: rotate(45deg);
+    left: 0;
+    width: 4px;
+    height: 150px;
 
-    z-index: 1;
+    z-index: 1000;
+}
+.tool-card:nth-child(1):before {
+    background: #c70000;
+}
+.tool-card:nth-child(2):before {
+    background: #6600fe;
+}
+.tool-card:nth-child(3):before {
+    background: #0071c7;
+}
+.tool-card:nth-child(4):before {
+    background: #c73f00;
+}
+.tool-card:nth-child(5):before {
+    background: #980243;
+}
+.tool-card:nth-child(6):before {
+    background: #7700c7;
+}
+.tool-card:nth-child(7):before {
+    background: #0046c7;
+}
+.tool-card:nth-child(8):before {
+    background: #127d01;
+}
+.tool-card:nth-child(9):before {
+    background: #c30000;
 }
 .tool-txt button svg {
     width: 25px;
@@ -1136,13 +1208,13 @@ body.MODE h4 {
     background: #c73f00;
 }
 .tool-icons.bg5 {
-    background: #c7009c;
+    background: #980243;
 }
 .tool-icons.bg6 {
     background: #7700c7;
 }
 .tool-icons.bg7 {
-    background: #c78100;
+    background: #0046c7;
 }
 .tool-icons.bg8 {
     background: #127d01;

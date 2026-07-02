@@ -8,7 +8,15 @@
     "build": "echo 'Frontend is static'",
     "start": "python -m http.server 8080 || npx http-server"
   },
-  "keywords": ["tools", "downloader", "transcriber", "qr-code"],
+  "keywords": [
+    "tools",
+    "downloader",
+    "transcriber",
+    "qr-code"
+  ],
   "author": "Amertak Network",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^7.4.0"
+  }
 }

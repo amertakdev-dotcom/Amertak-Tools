@@ -4,12 +4,17 @@
   "rewrites": [
     { "source": "/share/:id", "destination": "/share.html" },
     { "source": "/about", "destination": "/about/index.html" },
+    { "source": "/tools/cloude", "destination": "/tools/cloude/index.html" },
+    { "source": "/tools/cloude/share/:id", "destination": "/tools/cloude/share/[id].html" },
+    { "source": "/tools/file-converter", "destination": "/tools/file-converter/index.html" },
     { "source": "/tools/:tool", "destination": "/tools/:tool/index.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/register", "destination": "/register.html" },
-    { "source": "/api/:path*", "destination": "https://amertak-tools-f3zb.onrender.com/api/:path*" }
+    { "source": "/register", "destination": "/register.html" }
   ],
-  "redirects": [],
+  "redirects": [
+    { "source": "/tools/image-to-url", "destination": "/tools/cloude/", "statusCode": 301 },
+    { "source": "/tools/cloude", "destination": "/tools/cloude/", "statusCode": 301 }
+  ],
   "headers": [
     {
       "source": "/robots.txt",
