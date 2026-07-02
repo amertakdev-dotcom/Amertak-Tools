@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>អមតៈ - Amertak | AI Assistant</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="glass-panel border-b-0 h-16 flex items-center justify-between px-margin-mobile">
+        <div class="flex items-center gap-3">
+            <span class="font-headline-md font-headline-lg-mobile font-bold tracking-tight text-primary drop-shadow-sm">អមតៈ - Amertak</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Model Selector -->
+            <div class="model-selector-dropdown">
+                <button class="model-selector-btn" id="modelSelectorBtn" onclick="toggleModelDropdown()">
+                    <span class="material-symbols-outlined text-[16px]" id="modelIcon">tune</span>
+                    <span id="currentModelName">Loading...</span>
+                    <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                </button>
+                <div id="modelDropdown" class="model-dropdown-menu">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+            <a class="text-primary p-2 hover:bg-surface-container-high/50 rounded-full transition-all" href="https://t.me/ChinarDeveloper" target="_blank" title="Join Telegram">
+                <span class="material-symbols-outlined">send</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Chat Area -->
+    <main id="chatContainer" class="flex-1 overflow-y-auto chat-scroll px-margin-mobile md:px-8 lg:px-12 pt-stack-xl pb-[350px] space-y-6">
+        <!-- Welcome Message -->
+        <div class="flex flex-col items-center justify-center text-center space-y-6 mt-8">
+            <div class="w-24 h-24 rounded-[2rem] glass-bubble flex items-center justify-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/10 via-blue-500/10 to-pink-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <span class="material-symbols-outlined sparkle-gradient text-[56px] font-bold z-10">auto_awesome</span>
+            </div>
+            <div class="space-y-2">
+                <h1 class="text-font-headline-lg-mobile font-bold text-on-surface drop-shadow-sm tracking-tight">សួស្តី! ខ្ញុំគឺ អមតៈ - Amertak</h1>
+                <p class="text-on-surface-variant font-label-md text-sm opacity-80">អ្នកជំនួយ AI របស់អ្នក និងជាមិត្តភ្ញៀវរបស់អ្នក</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Input Area -->
+    <div class="fixed bottom-0 left-0 w-full z-40 px-4 pb-6 pt-8 bg-gradient-to-t from-surface via-surface/80 to-transparent backdrop-blur-sm">
+        <div class="max-w-4xl mx-auto space-y-3">
+            <!-- Mode Selector (Gemini Style) -->
+            <div class="mode-selector">
+                <button onclick="setMode('chat')" class="mode-badge active" id="mode-chat">
+                    <span class="material-symbols-outlined text-[16px]">chat_bubble</span>
+                    ជជែក
+                </button>
+                <button onclick="setMode('image')" class="mode-badge inactive" id="mode-image">
+                    <span class="material-symbols-outlined text-[16px]">image</span>
+                    រូបភាព
+                </button>
+                <button onclick="setMode('code')" class="mode-badge inactive" id="mode-code">
+                    <span class="material-symbols-outlined text-[16px]">code</span>
+                    កូដ
+                </button>
+            </div>
+
+            <!-- Suggested Prompts -->
+            <div id="suggestionsContainer" class="flex gap-2 overflow-x-auto pb-2">
+                <!-- Will be populated based on mode -->
+            </div>
+
+            <!-- File Preview -->
+            <div id="filePreviewContainer" class="file-preview hidden"></div>
+
+            <!-- Input Field -->
+            <div class="relative p-[2px] rounded-[2rem] group max-w-full">
+                <div class="absolute inset-0 rounded-[2rem] bg-[linear-gradient(115deg,#3b82f6,#a855f7,#06b6d4,#3b82f6)] bg-[length:300%_300%] animate-rgb-border opacity-40 group-focus-within:opacity-80 transition-opacity duration-500 pointer-events-none"></div>
+                <div class="glass-input relative rounded-[calc(2rem-2px)] p-2 sm:p-3 flex items-center gap-1 sm:gap-3 bg-white/80 w-full z-10 border-0">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-blue-400/5 to-cyan-400/0 opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 rounded-[calc(2rem-2px)] pointer-events-none"></div>
+                    
+                    <div class="flex items-center gap-1 z-10 relative">
+                        <button id="attachBtn" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-on-surface-variant hover:bg-black/5 rounded-full transition-all active:scale-90 flex-shrink-0">
+                            <span class="material-symbols-outlined text-[20px] sm:text-[24px]">attach_file</span>
+                        </button>
+                        
+                        <!-- Attachment Menu -->
+                        <div id="attachmentMenu" class="attachment-menu hidden">
+                            <button onclick="openFileImport()">
+                                <span class="material-symbols-outlined">folder_open</span>
+                                <span>ដាក់ឯកសារ</span>
+                            </button>
+                            <button onclick="openGallery()">
+                                <span class="material-symbols-outlined">image</span>
+                                <span>វិញ្ញាសារ</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <textarea class="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 font-body-md text-on-surface resize-none max-h-48 overflow-y-auto placeholder:text-outline/70 z-10" id="chatInput" oninput="autoResize(this)" placeholder="សរសេរសាររបស់អ្នក..." rows="1"></textarea>
+                    <button id="sendBtn" class="bg-gradient-to-tr from-primary to-blue-500 hover:shadow-lg hover:shadow-primary/30 text-white h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all flex-shrink-0 z-10 border border-white/20 mr-1">
+                        <span class="material-symbols-outlined font-bold text-[18px] sm:text-[20px]">arrow_upward</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Branding -->
+            <div class="text-center pb-2 pt-1">
+                <p class="text-[9px] text-outline/60 font-label-md uppercase tracking-[0.25em] drop-shadow-sm">អមតៈ - AMERTAK</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Inputs -->
+    <input type="file" id="fileInput" class="hidden" multiple>
+    <input type="file" id="galleryInput" class="hidden" accept="image/*">
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
+        // Language detection and enforcement
+        function enforceKhmerLanguage(text) {
+            // Check if text contains Khmer characters
+            const khmerRegex = /[\u1780-\u17FF]/;
+            const hasKhmer = khmerRegex.test(text);
+            
+            // If no Khmer characters detected, it's likely English or other language
+            // The system prompt will handle the translation requirement
+            return hasKhmer;
+        }
+
+        // Validate response is in Khmer
+        function validateKhmerResponse(response) {
+            const khmerRegex = /[\u1780-\u17FF]/;
+            const hasKhmer = khmerRegex.test(response);
+            
+            if (!hasKhmer) {
+                // Response doesn't contain Khmer - add correction note
+                return `[សំគាល់: ខ្ញុំត្រូវតែឆ្លើយតែភាសាខ្មែរប៉ុណ្ណោះ]\n\n${response}`;
+            }
+            return response;
+        }
+
+        // ===== END IDENTITY & LANGUAGE ENFORCEMENT =====
+
+        let currentMode = 'chat';
+        let selectedFiles = [];
+
+        const modePrompts = {
+            chat: [
+                'អ្នកអាចជួយខ្ញុំអ្វីបាន?',
+                'ពន្យល់អំពីការគណនា',
+                'វិធីសាស្ត្រអភិវឌ្ឍន៍វេប',
+                'អនាគតនៃ AI'
+            ],
+            image: [
+                'ទីក្រុងអនាគតនៅយប់',
+                'សិល្ប៍ឌីជីថលអ Abstraction',
+                'ទេសភាពភ្នំស្ងួត',
+                'តួអក្សរស៊ីប៊ែរប៊ុនក'
+            ],
+            code: [
+                'ឧទាហរណ៍គ្រោង React',
+                'កម្មវិធីរៀលខ្សែវីដេអូ Python',
+                'JavaScript async/await',
+                'ការធ្វើឱ្យ SQL ប្រសើរជាងមុន'
+            ]
+        };
+
+        function populateModelDropdown() {
+            const available = getAvailableModels();
+            const dropdown = document.getElementById('modelDropdown');
+            const btn = document.getElementById('modelSelectorBtn');
+            
+            if (available.length === 0) {
+                // No API keys configured
+                dropdown.innerHTML = `
+                    <div class="add-key-option">
+                        <span class="material-symbols-outlined">lock</span>
+                        <div>បន្ថែម API Key ជាមុនសិន</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.25rem; opacity: 0.8;">ពិនិត្យក្នុង script ក្នុង head</div>
+                    </div>
+                `;
+                btn.classList.add('disabled');
+                btn.disabled = true;
+                document.getElementById('currentModelName').textContent = 'គ្មាន API Key';
+                document.getElementById('modelIcon').textContent = 'lock';
+            } else {
+                // Show available models
+                dropdown.innerHTML = available.map(model => `
+                    <button onclick="switchModel('${model.key}')" class="model-option ${model.key === ACTIVE_MODEL ? 'selected' : ''}" data-model="${model.key}">
+                        <span class="material-symbols-outlined">${model.icon}</span>
+                        <span>${model.name}</span>
+                    </button>
+                `).join('');
+                btn.classList.remove('disabled');
+                btn.disabled = false;
+                
+                // Set current model display
+                if (ACTIVE_MODEL) {
+                    const activeConfig = API_CONFIG[ACTIVE_MODEL];
+                    document.getElementById('currentModelName').textContent = activeConfig.name.split(' ')[0];
+                    document.getElementById('modelIcon').textContent = activeConfig.icon;
+                }
+            }
+        }
+
+        function toggleModelDropdown() {
+            const available = getAvailableModels();
+            if (available.length === 0) return; // Don't open if no models available
+            
+            const dropdown = document.getElementById('modelDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function switchModel(model) {
+            ACTIVE_MODEL = model;
+            const config = API_CONFIG[model];
+            document.getElementById('currentModelName').textContent = config.name.split(' ')[0];
+            document.getElementById('modelIcon').textContent = config.icon;
+            
+            // Update dropdown UI
+            document.querySelectorAll('.model-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            const selectedBtn = document.querySelector(`[data-model="${model}"]`);
+            if (selectedBtn) selectedBtn.classList.add('selected');
+            
+            // Close dropdown
+            document.getElementById('modelDropdown').classList.remove('active');
+            
+            // Show confirmation
+            addMessage(`✅ បានប្តូរទៅ ${config.name}`, 'ai');
+        }
+
+        function updateSuggestions() {
+            const container = document.getElementById('suggestionsContainer');
+            const prompts = modePrompts[currentMode];
+            container.innerHTML = prompts.map(prompt => `
+                <button onclick="insertPrompt('${prompt}')" class="suggestion-pill">
+                    ${prompt}
+                </button>
+            `).join('');
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const modes = ['chat', 'image', 'code'];
+            modes.forEach(m => {
+                const badge = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    badge.classList.remove('inactive');
+                    badge.classList.add('active');
+                } else {
+                    badge.classList.remove('active');
+                    badge.classList.add('inactive');
+                }
+            });
+            
+            const placeholders = {
+                chat: 'សួរខ្ញុំអ្វីក៏បាន...',
+                image: 'ពណ៌នាអំពីរូបភាពដែលអ្នកចង់បង្កើត...',
+                code: 'អ្នកត្រូវកូដអ្វី?'
+            };
+            document.getElementById('chatInput').placeholder = placeholders[mode];
+            updateSuggestions();
+        }
+
+        function insertPrompt(prompt) {
+            const input = document.getElementById('chatInput');
+            input.value = prompt;
+            autoResize(input);
+            input.focus();
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 192) + 'px';
+        }
+
+        document.getElementById('attachBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const menu = document.getElementById('attachmentMenu');
+            menu.classList.toggle('hidden');
+        });
+
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function openFileImport() {
+            document.getElementById('fileInput').click();
+            document.getElementById('attachmentMenu').classList.add('hidden');
+        }
+
+        function openGallery() {
+            document.getElementById('galleryInput').click();
+            document.getElementById('attachmentMenu').classList.add('hidden');
+        }
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            selectedFiles = Array.from(e.target.files);
+            updateFilePreview();
+        });
+
+        document.getElementById('galleryInput').addEventListener('change', (e) => {
+            selectedFiles = Array.from(e.target.files);
+            updateFilePreview();
+        });
+
+        function updateFilePreview() {
+            const container = document.getElementById('filePreviewContainer');
+            if (selectedFiles.length > 0) {
+                container.classList.remove('hidden');
+                container.innerHTML = selectedFiles.map((file, idx) => `
+                    <div class="file-item">
+                        <span class="material-symbols-outlined text-[14px]">attach_file</span>
+                        <span>${file.name}</span>
+                        <button onclick="removeFile(${idx})" title="លុប">
+                            <span class="material-symbols-outlined text-[14px]">close</span>
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        window.removeFile = (idx) => {
+            selectedFiles.splice(idx, 1);
+            updateFilePreview();
+        };
+
+        async function sendMessage() {
+            if (!ACTIVE_MODEL) {
+                addMessage('⚠️ សូមបន្ថែម API Key ជាមុនសិន។', 'ai');
+                return;
+            }
+
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message && selectedFiles.length === 0) return;
+
+            // Add user message
+            addMessage(message, 'user', selectedFiles.length > 0);
+            input.value = '';
+            input.style.height = 'auto';
+            const filesToProcess = [...selectedFiles];
+            selectedFiles = [];
+            updateFilePreview();
+
+            // Show loading
+            const loadingId = addLoadingMessage();
+
+            try {
+                if (currentMode === 'chat') {
+                    await handleChat(message, filesToProcess, loadingId);
+                } else if (currentMode === 'code') {
+                    await handleCoding(message, filesToProcess, loadingId);
+                } else {
+                    removeMessage(loadingId);
+                    addMessage('រូបភាពមិនអាចប្រើប្រាស់បានជាមួយម៉ូដែលនេះទេ។', 'ai');
+                }
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage(`❌ កំហុស: ${error.message}`, 'ai');
+            }
+        }
+
+        function addMessage(content, role, hasFiles = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${role === 'user' ? 'flex-col items-end' : 'items-start gap-3 sm:gap-5'} message-bubble`;
+            
+            if (role === 'user') {
+                let fileInfo = '';
+                if (hasFiles) {
+                    fileInfo = `<div class="mt-2 text-xs text-gray-500">📎 ឯកសារភ្ជាប់</div>`;
+                }
+                messageDiv.innerHTML = `
+                    <div class="glass-bubble rounded-[2rem] rounded-tr-xl px-6 py-4 max-w-[90%] md:max-w-[80%] sm:px-8">
+                        <p class="font-body-md text-on-surface">${content}</p>
+                        ${fileInfo}
+                    </div>
+                    <span class="text-[10px] text-outline mt-2 mr-3 font-bold tracking-widest uppercase opacity-70">ឥឡូវនេះ</span>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
+                        <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">auto_awesome</span>
+                    </div>
+                    <div class="flex-1 max-w-[90%] md:max-w-[80%]">
+                        <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
+                            <p class="font-body-md text-on-surface leading-relaxed">${content}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            const id = 'msg-' + Date.now();
+            messageDiv.id = id;
+            return id;
+        }
+
+        function addLoadingMessage() {
+            const chatContainer = document.getElementById('chatContainer');
+            const loadingDiv = document.createElement('div');
+            const id = 'loading-' + Date.now();
+            loadingDiv.id = id;
+            loadingDiv.className = 'flex items-start gap-3 sm:gap-5';
+            loadingDiv.innerHTML = `
+                <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
+                    <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10 loading-pulse">auto_awesome</span>
+                </div>
+                <div class="flex-1 max-w-[90%] md:max-w-[80%]">
+                    <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
+                        <div class="flex gap-2 items-center">
+                            <div class="w-2 h-2 rounded-full bg-blue-400 animate-bounce"></div>
+                            <div class="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.4s"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return id;
+        }
+
+        function removeMessage(id) {
+            const msg = document.getElementById(id);
+            if (msg) msg.remove();
+        }
+
+        async function handleChat(message, files, loadingId) {
+            let fullMessage = message;
+            
+            if (files.length > 0) {
+                fullMessage += `\n\n[អ្នកបានភ្ជាប់ ${files.length} ឯកសារ៖ ${files.map(f => f.name).join(', ')}]`;
+            }
+
+            const config = API_CONFIG[ACTIVE_MODEL];
+
+            try {
+                const response = await fetch(`${config.baseUrl}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: config.chatModel,
+                        messages: [
+                            { role: 'system', content: AI_IDENTITY.systemPrompt },
+                            { role: 'user', content: fullMessage }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+
+                const data = await response.json();
+                removeMessage(loadingId);
+
+                if (data.error) {
+                    addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
+                } else if (data.choices && data.choices[0]) {
+                    const aiResponse = data.choices[0].message.content;
+                    // Validate and enforce Khmer language
+                    const validatedResponse = validateKhmerResponse(aiResponse);
+                    addMessage(validatedResponse, 'ai');
+                } else {
+                    addMessage('❌ ការឆ្លើយតបមិនប្រនិទ្ធពី API', 'ai');
+                }
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
+            }
+        }
+
+        async function handleCoding(prompt, files, loadingId) {
+            let fullPrompt = `You are an expert programmer. Provide clean, well-commented code for the following request:\n\n${prompt}`;
+            
+            if (files.length > 0) {
+                fullPrompt += `\n\n[User has attached ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
+            }
+            
+            fullPrompt += `\n\nProvide only the code with minimal explanation.`;
+            
+            const config = API_CONFIG[ACTIVE_MODEL];
+
+            try {
+                const response = await fetch(`${config.baseUrl}/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: config.codingModel,
+                        messages: [
+                            { role: 'system', content: AI_IDENTITY.systemPrompt },
+                            { role: 'user', content: fullPrompt }
+                        ],
+                        temperature: 0.2,
+                        max_tokens: 3000
+                    })
+                });
+
+                const data = await response.json();
+                removeMessage(loadingId);
+
+                if (data.error) {
+                    addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
+                } else if (data.choices && data.choices[0]) {
+                    const code = data.choices[0].message.content;
+                    const chatContainer = document.getElementById('chatContainer');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
+                    messageDiv.innerHTML = `
+                        <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
+                            <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">code</span>
+                        </div>
+                        <div class="flex-1 max-w-[90%] md:max-w-[80%]">
+                            <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
+                                <pre class="code-block"><code>${escapeHtml(code)}</code></pre>
+                                <button onclick="copyCode(this)" class="mt-3 px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold hover:opacity-90 transition-all">📋 ចម្លងកូដ</button>
+                            </div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(messageDiv);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                } else {
+                    addMessage('❌ បរាជ័យក្នុងការបង្កើតកូដ', 'ai');
+                }
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function copyCode(button) {
+            const code = button.previousElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '✅ បានចម្លង!';
+                setTimeout(() => button.textContent = '📋 ចម្លងកូដ', 2000);
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            const modelDropdown = document.getElementById('modelDropdown');
+            const modelBtn = document.querySelector('.model-selector-btn');
+            const attachmentMenu = document.getElementById('attachmentMenu');
+            const attachBtn = document.getElementById('attachBtn');
+            
+            if (modelDropdown && modelBtn && !modelDropdown.contains(e.target) && !modelBtn.contains(e.target)) {
+                modelDropdown.classList.remove('active');
+            }
+            if (attachmentMenu && attachBtn && !attachmentMenu.contains(e.target) && !attachBtn.contains(e.target)) {
+                attachmentMenu.classList.add('hidden');
+            }
+        });
+
+        // Initialize
+        window.onload = () => {
+            initializeActiveModel();
+            populateModelDropdown();
+            setMode('chat');
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="shareTitle">Shared File - Amertak Tools</title>
+    <meta name="description" id="shareDesc" content="Shared file from Amertak Tools">
+    
+    <!-- Dynamic Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="ogTitle" content="Shared File - Amertak Tools">
+    <meta property="og:description" id="ogDesc" content="Shared file from Amertak Tools">
+    <meta property="og:url" id="ogUrl" content="">
+    <meta property="og:image" id="ogImage" content="">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Amertak Tools">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitterTitle" content="Shared File - Amertak Tools">
+    <meta name="twitter:description" id="twitterDesc" content="Shared file from Amertak Tools">
+    <meta name="twitter:image" id="twitterImage" content="">
+    
+    <link rel="icon" type="image/png" href="/svg/logo.svg">
+    <link rel="shortcut icon" href="/svg/logo.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .app-wrapper {
+            padding: 72px 20px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .share-image {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .share-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .share-preview {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .share-preview video,
+        .share-preview audio {
+            width: 100%;
+            display: block;
+        }
+
+        .share-preview iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+
+        .file-icon-box {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto 24px;
+            padding: 40px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .file-icon-box svg {
+            width: 64px;
+            height: 64px;
+            fill: var(--accent, #ff0080);
+            margin-bottom: 12px;
+        }
+
+        .file-icon-box p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+        }
+
+        .share-info h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .share-info p {
+            font-size: 14px;
+            color: var(--text-main);
+            opacity: 0.8;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .share-meta {
+            font-size: 12px;
+            color: var(--text-main);
+            opacity: 0.6;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent, #ff0080), var(--danger, #ff3366));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px color-mix(in srgb, var(--accent, #ff0080) 30%, transparent);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid rgba(255, 0, 128, 0.3);
+            color: var(--accent, #ff0080);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 0, 128, 0.2);
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: var(--text-dim);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 0, 128, 0.2);
+            border-top-color: var(--accent, #ff0080);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
+    <aside id="sidebar" class="sidebar-mobile"></aside>
+
+    <div class="app-wrapper">
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="brand">
+                        <div class="brand-icon"><img src="/svg/logo.svg" alt="logo" width="150px"></div>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()" class="hamburger-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
+                </button>
+                <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">Login</button>
+                <button class="toggleMode" id="toggleMode" onclick="toggleMode()">
+                    <img id="mode-btn" src="/svg/light-mode.svg">
+                </button>
+            </div>
+        </header>
+
+        <div class="share-container">
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+
+            <div id="imageState" style="display:none;">
+                <div id="previewContainer"></div>
+                <div class="share-info">
+                    <h1 id="imageName"></h1>
+                    <p id="imageDesc"></p>
+                    <div class="share-meta">
+                        <span id="viewCount">Views: 0</span>
+                        <span id="fileSize"></span>
+                        <span id="uploadTime"></span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="downloadFile()">Download</button>
+                    <button class="btn btn-copy" onclick="copyShareLink()">Copy Link</button>
+                    <button class="btn btn-secondary" onclick="goToTool()">Try Tool</button>
+                </div>
+            </div>
+
+            <div id="errorState" style="display:none;">
+                <h1 style="color: var(--danger, #ff3366); margin-bottom: 16px;">File not found</h1>
+                <p style="margin-bottom: 24px;">This file may have been deleted, expired, or the link is incorrect.</p>
+                <button class="btn btn-primary" onclick="window.location.href='/'">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/app.js"></script>
+    <script>
+        function getApiBase() {
+            const hostname = window.location.hostname;
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+                return 'https://amertak-tools-f3zb.onrender.com';
+            }
+            return '';
+        }
+
+        const API_BASE = getApiBase();
+
+        function getApiUrl(path) {
+            return `${API_BASE}${path}`;
+        }
+
+        function getStoredAuthToken() {
+            return localStorage.getItem('authToken') || '';
+        }
+
+        function buildAuthHeaders(extra = {}) {
+            const headers = { ...extra };
+            const token = getStoredAuthToken();
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        const fileId = window.location.pathname.split('/').pop();
+
+        function getStoredShareRecord(id) {
+            try {
+                return JSON.parse(localStorage.getItem(`amertak-share:${id}`) || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function renderFallbackShareRecord(record) {
+            const pageUrl = window.location.href;
+            document.getElementById('ogTitle').content = `${record.name || 'Shared image'} - Amertak Tools`;
+            document.getElementById('ogDesc').content = record.description || 'Shared image';
+            document.getElementById('ogUrl').content = pageUrl;
+            document.getElementById('ogImage').content = record.downloadUrl || '';
+            document.getElementById('twitterTitle').content = `${record.name || 'Shared image'} - Amertak Tools`;
+            document.getElementById('twitterDesc').content = record.description || 'Shared image';
+            document.getElementById('twitterImage').content = record.downloadUrl || '';
+            document.getElementById('shareTitle').textContent = `${record.name || 'Shared image'} - Amertak Tools`;
+            document.getElementById('shareDesc').content = record.description || 'Shared image';
+
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = `<div class="share-image"><img id="sharedImage" src="${record.downloadUrl || ''}" alt="${record.name || 'Shared image'}"></div>`;
+            document.getElementById('imageName').textContent = record.name || 'Shared image';
+            document.getElementById('imageDesc').textContent = record.description || '';
+            document.getElementById('viewCount').textContent = `Size: ${formatFileSize(record.size || 0)}`;
+            document.getElementById('uploadTime').textContent = `Uploaded: ${new Date(record.uploadedAt || Date.now()).toLocaleDateString()}`;
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('imageState').style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            const value = Number(bytes);
+            if (!Number.isFinite(value) || value <= 0) return '';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let idx = 0;
+            let size = value;
+            while (size >= 1024 && idx < units.length - 1) { size /= 1024; idx++; }
+            return `${size.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
+        }
+
+        async function loadFile() {
+            const fallbackRecord = getStoredShareRecord(fileId);
+            if (fallbackRecord) {
+                renderFallbackShareRecord(fallbackRecord);
+                return;
+            }
+
+            // Try Cloud Share API first
+            try {
+                const shareResp = await fetch(getApiUrl(`/api/share/${fileId}`), {
+                    headers: buildAuthHeaders(),
+                    credentials: 'include'
+                });
+                if (shareResp.ok) {
+                    const shareData = await shareResp.json();
+                    if (shareData.success && shareData.file) {
+                        renderSharedFile(shareData.file);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Fall through to legacy image API
+            }
+
+            // Fall back to legacy image API
+            try {
+                const response = await fetch(getApiUrl(`/api/tools/image-to-url/image/${fileId}`), {
+                    headers: buildAuthHeaders(),
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    showError();
+                    return;
+                }
+
+                const data = await response.json();
+                const image = data.image;
+
+                const pageUrl = window.location.href;
+                document.getElementById('ogTitle').content = image.fileName;
+                document.getElementById('ogDesc').content = image.description;
+                document.getElementById('ogUrl').content = pageUrl;
+                document.getElementById('ogImage').content = image.imageData;
+                document.getElementById('twitterTitle').content = image.fileName;
+                document.getElementById('twitterDesc').content = image.description;
+                document.getElementById('twitterImage').content = image.imageData;
+                document.getElementById('shareTitle').textContent = `${image.fileName} - Amertak Tools`;
+                document.getElementById('shareDesc').content = image.description;
+
+                const container = document.getElementById('previewContainer');
+                container.innerHTML = `<div class="share-image"><img id="sharedImage" src="${image.imageData}" alt="Shared image"></div>`;
+                document.getElementById('imageName').textContent = image.fileName;
+                document.getElementById('imageDesc').textContent = image.description;
+                document.getElementById('viewCount').textContent = `Views: ${image.views}`;
+                
+                const uploadDate = new Date(image.uploadedAt);
+                document.getElementById('uploadTime').textContent = `Uploaded: ${uploadDate.toLocaleDateString()}`;
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('imageState').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showError();
+            }
+        }
+
+        function renderSharedFile(file) {
+            document.getElementById('shareTitle').textContent = `${file.name} - Amertak Tools`;
+            document.getElementById('imageName').textContent = file.name;
+            document.getElementById('imageDesc').textContent = file.description || '';
+            document.getElementById('viewCount').textContent = `Downloads: ${file.downloads || 0}`;
+
+            const sizeEl = document.getElementById('fileSize');
+            if (file.size) sizeEl.textContent = formatFileSize(file.size);
+
+            if (file.uploadedAt) {
+                document.getElementById('uploadTime').textContent = `Uploaded: ${new Date(file.uploadedAt).toLocaleDateString()}`;
+            }
+
+            const container = document.getElementById('previewContainer');
+            const category = file.category || 'other';
+            const downloadUrl = file.downloadUrl || getApiUrl(`/api/share/${fileId}/download`);
+
+            if (category === 'image') {
+                container.innerHTML = `<div class="share-image"><img src="${downloadUrl}" alt="${file.name}"></div>`;
+            } else if (category === 'video') {
+                container.innerHTML = `<div class="share-preview"><video controls src="${downloadUrl}"></video></div>`;
+            } else if (category === 'audio') {
+                container.innerHTML = `<div class="share-preview"><audio controls src="${downloadUrl}"></audio></div>`;
+            } else if (category === 'pdf') {
+                container.innerHTML = `<div class="share-preview"><iframe src="${downloadUrl}" title="PDF Preview"></iframe></div>`;
+            } else {
+                container.innerHTML = `<div class="file-icon-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4H15V8H19V20H5V4ZM3.9985 2C3.44749 2 3 2.44405 3 2.9918V21.0082C3 21.5447 3.44476 22 3.9934 22H20.0066C20.5551 22 21 21.5489 21 20.9925L20.9997 7L16 2H3.9985Z"></path></svg><p>${file.type || 'File'}</p></div>`;
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('imageState').style.display = 'block';
+        }
+
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function downloadFile() {
+            const sharedImage = document.querySelector('#previewContainer img');
+            if (sharedImage && sharedImage.src.startsWith('data:')) {
+                const link = document.createElement('a');
+                link.href = sharedImage.src;
+                link.download = document.getElementById('imageName').textContent;
+                link.click();
+                return;
+            }
+            window.open(getApiUrl(`/api/share/${fileId}/download`), '_blank');
+        }
+
+        function copyShareLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const btn = document.querySelector('.btn-copy');
+                if (btn) {
+                    const original = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => { btn.textContent = original; }, 2000);
+                }
+            });
+        }
+
+        function goToTool() {
+            window.location.href = '/tools/cloude';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFile);
+    </script>
+</body>
+</html>
