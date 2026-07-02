@@ -1,6 +1,6 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const mongoUrl = process.env.MONGOURL || process.env.MONGODB_URI || process.env.MONGODB_URL || '';
+const mongoUrl = process.env.MONGOURL || process.env.MONGO_URL || process.env.MONGODB_URI || process.env.MONGODB_URL || '';
 
 let client;
 let clientPromise;
@@ -28,7 +28,7 @@ function getClientPromise() {
 async function getDb() {
   const clientPromise = getClientPromise();
   if (!clientPromise) {
-    throw new Error('MONGOURL environment variable is required.');
+    throw new Error('MongoDB connection is not configured. Set MONGOURL, MONGO_URL, MONGODB_URI, or MONGODB_URL in the environment.');
   }
 
   const client = await clientPromise;

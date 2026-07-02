@@ -7,9 +7,9 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const EXPIRY_HOURS = 24;
 
 async function getDb() {
-  const uri = process.env.MONGO_URL;
+  const uri = process.env.MONGO_URL || process.env.MONGOURL || process.env.MONGODB_URI || process.env.MONGODB_URL || '';
   if (!uri) {
-    throw new Error('MONGO_URL is not configured');
+    throw new Error('MongoDB connection is not configured. Set MONGO_URL, MONGOURL, MONGODB_URI or MONGODB_URL in the environment.');
   }
 
   if (cachedDb) {
@@ -22,7 +22,7 @@ async function getDb() {
 
   await client.connect();
   cachedClient = client;
-  cachedDb = client.db(process.env.MONGO_DB || 'amertak_tools');
+  cachedDb = client.db(process.env.MONGO_DB || process.env.MONGO_DB_NAME || 'amertak_tools');
   return cachedDb;
 }
 
