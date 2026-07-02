@@ -1,9 +1,16 @@
 function getApiBase() {
   const hostname = window.location.hostname;
+  const configuredBase = window.__AUTH_API_BASE__ || '';
+
+  if (configuredBase) {
+    return configuredBase.replace(/\/$/, '');
+  }
+
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
     return 'https://amertak-tools-f3zb.onrender.com';
   }
-  return '';
+
+  return 'https://amertak-tools-f3zb.onrender.com';
 }
 
 const API_BASE = getApiBase();
