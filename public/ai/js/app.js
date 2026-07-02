@@ -107,6 +107,7 @@ function addMessage(content, role, hasFiles = false) {
     const chatContainer = document.getElementById('chatContainer');
     const messageDiv = document.createElement('div');
     messageDiv.className = `flex ${role === 'user' ? 'flex-col items-end' : 'items-start gap-3 sm:gap-5'} message-bubble`;
+    messageDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
 
     if (role === 'user') {
         let fileInfo = '';
@@ -114,7 +115,7 @@ function addMessage(content, role, hasFiles = false) {
             fileInfo = `<div class="mt-2 text-xs text-gray-500">📎 ឯកសារភ្ជាប់</div>`;
         }
         messageDiv.innerHTML = `
-            <div class="glass-bubble rounded-[2rem] rounded-tr-xl px-6 py-4 max-w-[90%] md:max-w-[80%] sm:px-8">
+            <div class="glass-bubble rounded-[2rem] rounded-tr-xl px-6 py-4 max-w-[90%] md:max-w-[80%] sm:px-8 hover:shadow-lg transition-all duration-300">
                 <p class="font-body-md text-on-surface">${content}</p>
                 ${fileInfo}
             </div>
@@ -122,12 +123,12 @@ function addMessage(content, role, hasFiles = false) {
         `;
     } else {
         messageDiv.innerHTML = `
-            <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
+            <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group hover:scale-110 transition-transform duration-300">
                 <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
                 <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">auto_awesome</span>
             </div>
             <div class="flex-1 max-w-[90%] md:max-w-[80%]">
-                <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
+                <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8 hover:shadow-lg transition-all duration-300">
                     <p class="font-body-md text-on-surface leading-relaxed">${content}</p>
                 </div>
             </div>
@@ -146,7 +147,8 @@ function addLoadingMessage() {
     const loadingDiv = document.createElement('div');
     const id = 'loading-' + Date.now();
     loadingDiv.id = id;
-    loadingDiv.className = 'flex items-start gap-3 sm:gap-5';
+    loadingDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
+    loadingDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
     loadingDiv.innerHTML = `
         <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
             <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
@@ -155,9 +157,9 @@ function addLoadingMessage() {
         <div class="flex-1 max-w-[90%] md:max-w-[80%]">
             <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
                 <div class="flex gap-2 items-center">
-                    <div class="w-2 h-2 rounded-full bg-blue-400 animate-bounce"></div>
-                    <div class="w-2 h-2 rounded-full bg-purple-400 animate-bounce" style="animation-delay: 0.2s"></div>
-                    <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.4s"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-400 loading-dot"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-purple-400 loading-dot" style="animation-delay: 0.2s"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 loading-dot" style="animation-delay: 0.4s"></div>
                 </div>
             </div>
         </div>
@@ -230,7 +232,27 @@ function switchModel(model) {
     if (selectedBtn) selectedBtn.classList.add('selected');
 
     document.getElementById('modelDropdown').classList.remove('active');
-    addMessage(`✅ បានប្តូរទៅ ${config.name}`, 'ai');
+    
+    // Add success message with animation
+    const successMsg = document.createElement('div');
+    successMsg.className = 'flex items-center justify-center py-4 message-bubble';
+    successMsg.style.animation = 'fadeInScale 0.4s ease';
+    successMsg.innerHTML = `
+        <div class="glass-bubble rounded-full px-6 py-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+            <span class="text-sm font-medium text-on-surface">បានប្តូរទៅ ${config.name}</span>
+        </div>
+    `;
+    
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.appendChild(successMsg);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    setTimeout(() => {
+        successMsg.style.opacity = '0';
+        successMsg.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => successMsg.remove(), 500);
+    }, 2000);
 }
 
 // ===== DROPDOWN HANDLERS =====

@@ -137,15 +137,16 @@ async function handleCoding(prompt, files, loadingId) {
             const chatContainer = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
+            messageDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
             messageDiv.innerHTML = `
-                <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
+                <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group hover:scale-110 transition-transform duration-300">
                     <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
                     <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">code</span>
                 </div>
                 <div class="flex-1 max-w-[90%] md:max-w-[80%]">
-                    <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
+                    <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8 hover:shadow-lg transition-all duration-300">
                         <pre class="code-block"><code>${escapeHtml(code)}</code></pre>
-                        <button onclick="copyCode(this)" class="mt-3 px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold hover:opacity-90 transition-all">📋 ចម្លងកូដ</button>
+                        <button onclick="copyCode(this)" class="mt-4 px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-300">📋 ចម្លងកូដ</button>
                     </div>
                 </div>
             `;
@@ -179,8 +180,22 @@ function escapeHtml(text) {
 function copyCode(button) {
     const code = button.previousElementSibling.textContent;
     navigator.clipboard.writeText(code).then(() => {
+        const originalText = button.textContent;
         button.textContent = '✅ បានចម្លង!';
-        setTimeout(() => button.textContent = '📋 ចម្លងកូដ', 2000);
+        button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        button.style.transform = 'scale(1.05)';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '';
+            button.style.transform = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        button.textContent = '❌ កំហុស';
+        setTimeout(() => {
+            button.textContent = '📋 ចម្លងកូដ';
+        }, 2000);
     });
 }
 
