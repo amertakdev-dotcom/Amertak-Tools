@@ -36,6 +36,19 @@ const AI_IDENTITY = {
     nameEn: "Amertak",
     language: "km", // Khmer
     developer: "គីន ថាវរ៉ាត់",
+    websiteDescription: `This is Amertak (អមតៈ), a modern web platform that provides various online tools and AI-powered services. Key features include:
+- AI Chat Assistant (me, Amertak AI) with multiple modes: chat, image generation, and code generation
+- Text Translator supporting multiple languages including Khmer
+- Text-to-Speech for Khmer language
+- Video/Audio Transcription tools
+- QR Code Generator
+- Color Converter
+- Image to PDF converter
+- File Downloader
+- Text Counter
+- Image to URL converter
+- Cloud storage integration
+The platform is built with modern web technologies, featuring a beautiful glass-morphism UI design, dark/light mode support, and responsive layout. It's designed to be user-friendly and accessible for Khmer speakers and international users.`,
     getSystemPrompt: function(includeCreatorInfo = false) {
         const creatorInfo = includeCreatorInfo 
             ? `Developer: "${this.developer}" - Kin Thavrath`
@@ -53,6 +66,26 @@ CRITICAL RULES - YOU MUST FOLLOW THESE ABSOLUTELY:
 7. Maintain consistent personality as "អមតៈ - Amertak"
 ${creatorInfo}
 
+WEBSITE INFORMATION - VERY IMPORTANT:
+When user asks ANY of these questions, you MUST describe this website:
+- "what is this website?" / "វេបសាយនេះជាអ្វី?"
+- "tell me about this website" / "ប្រាប់ខ្ញុំអំពីវេបសាយនេះ"
+- "what can you do?" / "អ្នកអាចធ្វើអ្វីបាន?"
+- "about this website" / "អំពីវេបសាយនេះ"
+- "features" / "មុខងារ"
+- "Amertak" / "អមតៈ"
+- ANY question about the platform, tools, or capabilities
+
+When describing the website, use this information EXACTLY:
+${this.websiteDescription}
+
+THAILAND DETECTION - CRITICAL:
+If user mentions Thailand in ANY way (including "thai", "thailand", "thai people", "thai language", etc.), you MUST respond with ONE of these responses:
+- "Don't Thai To Me! សួរសំនួរផ្សេងបានក្រៅពីប្រទេសថៃ។"
+- "You Know Me Little Go! សួរសំនួរផ្សេងបានក្រៅពីប្រទេសថៃ។"
+
+Be creative and vary your responses, but ALWAYS include the Khmer text.
+
 If user writes in English, you MUST still respond in Khmer.
 Translate the context and respond in Khmer language only.`;
     }
@@ -61,36 +94,31 @@ Translate the context and respond in Khmer language only.`;
 // Mode-specific prompts
 const MODE_PROMPTS = {
     chat: [
-        'អ្នកអាចជួយខ្ញុំអ្វីបាន?',
-        'ពន្យល់អំពីការគណនា',
-        'វិធីសាស្ត្រអភិវឌ្ឍន៍វេប',
-        'អនាគតនៃ AI'
+        'អ្វីទៅជា Amertak?',
+        'របៀបប្រើ Amertak',
+        'បង្កើតដើម្បីអ្វី?',
+        'មានមុខងារអ្វីខ្លះ?',
     ],
-    image: [
-        'ទីក្រុងអនាគតនៅយប់',
-        'សិល្ប៍ឌីជីថលអ Abstraction',
-        'ទេសភាពភ្នំស្ងួត',
-        'តួអក្សរស៊ីប៊ែរប៊ុនក'
-    ],
-    code: [
-        'ឧទាហរណ៍គ្រោង React',
-        'កម្មវិធីរៀលខ្សែវីដេអូ Python',
-        'JavaScript async/await',
-        'ការធ្វើឱ្យ SQL ប្រសើរជាងមុន'
+    
+    math: [
+        'ដោះស្រាយសមីការ x² + 5x + 6 = 0',
+        'គណិតវិទ្យាកម្រិតខ្ពស់',
+        'លំហាត់មេរៀន',
+        'ពន្យល់រូបមន្តស្តង់ដារ'
     ]
 };
 
-// Chat history management
+// Chat history management (session-based - clears when browser/tab closes)
 class ChatHistory {
     constructor() {
-        this.storageKey = 'amertak_chat_history';
+        this.storageKey = 'amertak_chat_history_session';
         this.maxHistoryItems = 50;
         this.loadHistory();
     }
 
     loadHistory() {
         try {
-            const data = localStorage.getItem(this.storageKey);
+            const data = sessionStorage.getItem(this.storageKey);
             this.history = data ? JSON.parse(data) : [];
         } catch (e) {
             console.error('Failed to load chat history:', e);
@@ -100,7 +128,7 @@ class ChatHistory {
 
     saveHistory() {
         try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.history));
+            sessionStorage.setItem(this.storageKey, JSON.stringify(this.history));
         } catch (e) {
             console.error('Failed to save chat history:', e);
         }
@@ -132,7 +160,7 @@ class ChatHistory {
 
     clearHistory() {
         this.history = [];
-        localStorage.removeItem(this.storageKey);
+        sessionStorage.removeItem(this.storageKey);
     }
 
     export() {

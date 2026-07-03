@@ -7,7 +7,7 @@ let selectedFiles = [];
 
 function setMode(mode) {
     currentMode = mode;
-    const modes = ['chat', 'image', 'code'];
+    const modes = ['chat', 'math'];
     modes.forEach(m => {
         const badge = document.getElementById(`mode-${m}`);
         if (m === mode) {
@@ -21,8 +21,7 @@ function setMode(mode) {
 
     const placeholders = {
         chat: 'សួរខ្ញុំអ្វីក៏បាន...',
-        image: 'ពណ៌នាអំពីរូបភាពដែលអ្នកចង់បង្កើត...',
-        code: 'អ្នកត្រូវកូដអ្វី?'
+        math: 'ដាក់លំហាត់គណិតវិទ្យា រឺ ថតរូបវាលបញ្ចាំ...'
     };
     document.getElementById('chatInput').placeholder = placeholders[mode];
     updateSuggestions();
@@ -112,14 +111,14 @@ function addMessage(content, role, hasFiles = false) {
     if (role === 'user') {
         let fileInfo = '';
         if (hasFiles) {
-            fileInfo = `<div class="mt-2 text-xs text-gray-500">📎 ឯកសារភ្ជាប់</div>`;
+            fileInfo = `<div class="material-symbols-outlined mt-2 text-xs text-gray-500">folder_open ឯកសារភ្ជាប់</div>`;
         }
         messageDiv.innerHTML = `
             <div class="glass-bubble rounded-[2rem] rounded-tr-xl px-6 py-4 max-w-[90%] md:max-w-[80%] sm:px-8 hover:shadow-lg transition-all duration-300">
                 <p class="font-body-md text-on-surface">${content}</p>
                 ${fileInfo}
             </div>
-            <span class="text-[10px] text-outline mt-2 mr-3 font-bold tracking-widest uppercase opacity-70">ឥឡូវនេះ</span>
+            <span class="now text-[10px] text-outline mt-2 mr-3 font-bold tracking-widest uppercase opacity-70">ឥឡូវនេះ</span>
         `;
     } else {
         messageDiv.innerHTML = `
@@ -127,7 +126,7 @@ function addMessage(content, role, hasFiles = false) {
                 <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
                 <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">auto_awesome</span>
             </div>
-            <div class="flex-1 max-w-[90%] md:max-w-[80%]">
+            <div class="flex-1 max-w-[90%] md:max-w-[80%] ai-message">
                 <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8 hover:shadow-lg transition-all duration-300">
                     <p class="font-body-md text-on-surface leading-relaxed">${content}</p>
                 </div>
@@ -147,19 +146,19 @@ function addLoadingMessage() {
     const loadingDiv = document.createElement('div');
     const id = 'loading-' + Date.now();
     loadingDiv.id = id;
-    loadingDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
+    loadingDiv.className = 'flex items-start gap-3 message-bubble';
     loadingDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
     loadingDiv.innerHTML = `
         <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group">
             <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
-            <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10 loading-pulse">auto_awesome</span>
+            <span class="material-symbols-outlined sparkle-gradient loading-pulse" style="font-size: 20px; position: relative; z-index: 10;">auto_awesome</span>
         </div>
-        <div class="flex-1 max-w-[90%] md:max-w-[80%]">
-            <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8">
-                <div class="flex gap-2 items-center">
-                    <div class="w-2.5 h-2.5 rounded-full bg-blue-400 loading-dot"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-purple-400 loading-dot" style="animation-delay: 0.2s"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 loading-dot" style="animation-delay: 0.4s"></div>
+        <div class="flex-1" style="max-width: 90%;">
+            <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4">
+                <div class="loading-container">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
                 </div>
             </div>
         </div>
@@ -282,11 +281,29 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Load and display chat history
     const history = chatHistory.getHistory();
-    history.forEach(msg => {
-        if (msg.role === 'user') {
-            addMessage(msg.content, 'user');
-        } else {
-            addMessage(msg.content, 'ai');
+    const welcomeContainer = document.querySelector('.welcome-container');
+    
+    if (history.length > 0) {
+        // Hide welcome message if there's chat history
+        if (welcomeContainer) {
+            welcomeContainer.style.display = 'none';
         }
-    });
+        
+        // Display all messages from history
+        history.forEach(msg => {
+            if (msg.role === 'user') {
+                addMessage(msg.content, 'user');
+            } else {
+                addMessage(msg.content, 'ai');
+            }
+        });
+        
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } else {
+        // Show welcome message if no history
+        if (welcomeContainer) {
+            welcomeContainer.style.display = 'flex';
+        }
+    }
 });

@@ -16,23 +16,23 @@
 <body class="h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="glass-panel border-b-0 h-16 flex items-center justify-between px-margin-mobile">
-        <div class="flex items-center gap-3">
-            <span class="font-headline-md font-headline-lg-mobile font-bold tracking-tight text-primary drop-shadow-sm">អមតៈ - Amertak</span>
+    <header class="header glass-panel">
+        <div class="logo">
+            <img src="/svg/logo.svg">
         </div>
         <div class="flex items-center gap-3">
             <!-- Model Selector -->
             <div class="model-selector-dropdown">
                 <button class="model-selector-btn" id="modelSelectorBtn" onclick="toggleModelDropdown()">
-                    <span class="material-symbols-outlined text-[16px]" id="modelIcon">tune</span>
+                    <span class="material-symbols-outlined" style="font-size: 16px;" id="modelIcon">tune</span>
                     <span id="currentModelName">Loading...</span>
-                    <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                    <span class="material-symbols-outlined" style="font-size: 14px;">expand_more</span>
                 </button>
                 <div id="modelDropdown" class="model-dropdown-menu">
                     <!-- Will be populated dynamically -->
                 </div>
             </div>
-            <a class="text-primary p-2 hover:bg-surface-container-high/50 rounded-full transition-all" href="https://t.me/ChinarDeveloper" target="_blank" title="Join Telegram">
+            <a class="text-primary p-2 hover:bg-surface-container-high/50 rounded-full transition-all" href="https://t.me/Amertak_Network" target="_blank" title="Join Telegram">
                 <span class="material-symbols-outlined">send</span>
             </a>
         </div>
@@ -41,27 +41,23 @@
     <!-- Chat Area -->
     <main id="chatContainer" class="flex-1 overflow-y-auto chat-scroll px-margin-mobile md:px-8 lg:px-12 pt-stack-xl pb-[350px] space-y-6">
         <!-- Welcome Message -->
-        <div class="welcome-container flex flex-col items-center justify-center text-center space-y-6 mt-8">
-            <div class="welcome-icon w-24 h-24 rounded-[2rem] glass-bubble flex items-center justify-center relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/10 via-blue-500/10 to-pink-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span class="material-symbols-outlined sparkle-gradient text-[56px] font-bold z-10">auto_awesome</span>
+        <div class="welcome-container">
+            <div class="welcome-icon glass-bubble flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/10 via-blue-500/10 to-pink-500/10 opacity-50" style="transition: opacity 0.5s;"></div>
+                <span class="material-symbols-outlined sparkle-gradient" style="font-size: 56px; font-weight: bold; position: relative; z-index: 10;">auto_awesome</span>
             </div>
             <div class="space-y-3">
-                <h1 class="text-font-headline-lg-mobile font-bold text-on-surface drop-shadow-sm tracking-tight">សួស្តី! ខ្ញុំគឺ អមតៈ - Amertak</h1>
-                <p class="text-on-surface-variant font-label-md text-sm opacity-80 max-w-md mx-auto">អ្នកជំនួយ AI របស់អ្នក និងជាមិត្តភ្ញៀវរបស់អ្នក</p>
+                <h1 class="font-headline-lg-mobile font-bold text-on-surface drop-shadow-sm tracking-tight">អមតៈ អេអាយ</h1>
+                <p class="text-on-surface-variant font-label-md text-sm opacity-80" style="max-width: 32rem; margin: 0 auto;">មានអ្វីសួរទៅ អមតៈ អេអាយ?</p>
             </div>
-            <div class="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto pt-4">
+            <div class="feature flex flex-wrap gap-2 justify-center" style="max-width: 42rem; margin: 0 auto; padding-top: 1rem;">
                 <div class="glass-bubble rounded-xl px-4 py-2 text-xs text-on-surface-variant">
-                    <span class="material-symbols-outlined text-[16px] text-primary">chat</span>
+                    <span class="material-symbols-outlined text-primary" style="font-size: 16px;">chat</span>
                     <span class="ml-1">ជជែកជាមួយ AI</span>
                 </div>
                 <div class="glass-bubble rounded-xl px-4 py-2 text-xs text-on-surface-variant">
-                    <span class="material-symbols-outlined text-[16px] text-secondary">image</span>
-                    <span class="ml-1">បង្កើតរូបភាព</span>
-                </div>
-                <div class="glass-bubble rounded-xl px-4 py-2 text-xs text-on-surface-variant">
-                    <span class="material-symbols-outlined text-[16px] text-accent">code</span>
-                    <span class="ml-1">សរសេរកូដ</span>
+                    <span class="material-symbols-outlined text-secondary" style="font-size: 16px;">calculate</span>
+                    <span class="ml-1">គណិតវិទ្យា</span>
                 </div>
             </div>
         </div>
@@ -69,25 +65,21 @@
 
     <!-- Bottom Input Area -->
     <div class="bottom-gradient">
-        <div class="max-w-4xl mx-auto space-y-3 px-4 pb-6 pt-8">
-            <!-- Mode Selector (Gemini Style) -->
+        <div class="max-w-4xl mx-auto space-y-3 px-4 pb-6">
+            <!-- Mode Selector -->
             <div class="mode-selector">
                 <button onclick="setMode('chat')" class="mode-badge active" id="mode-chat">
-                    <span class="material-symbols-outlined text-[16px] relative z-10">chat_bubble</span>
-                    <span class="relative z-10">ជជែក</span>
+                    <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">chat_bubble</span>
+                    <span class="mode">ជជែក</span>
                 </button>
-                <button onclick="setMode('image')" class="mode-badge inactive" id="mode-image">
-                    <span class="material-symbols-outlined text-[16px] relative z-10">image</span>
-                    <span class="relative z-10">រូបភាព</span>
-                </button>
-                <button onclick="setMode('code')" class="mode-badge inactive" id="mode-code">
-                    <span class="material-symbols-outlined text-[16px] relative z-10">code</span>
-                    <span class="relative z-10">កូដ</span>
+                <button onclick="setMode('math')" class="mode-badge inactive" id="mode-math">
+                    <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">calculate</span>
+                    <span class="mode">គណិតវិទ្យា</span>
                 </button>
             </div>
 
             <!-- Suggested Prompts -->
-            <div id="suggestionsContainer" class="flex gap-2 overflow-x-auto pb-2">
+            <div id="suggestionsContainer" class="suggestionsContainer">
                 <!-- Will be populated based on mode -->
             </div>
 
@@ -95,39 +87,34 @@
             <div id="filePreviewContainer" class="file-preview hidden"></div>
 
             <!-- Input Field -->
-            <div class="input-container group max-w-full">
-                <div class="absolute inset-0 rounded-[2rem] bg-[linear-gradient(115deg,#3b82f6,#a855f7,#06b6d4,#3b82f6)] bg-[length:300%_300%] animate-rgb-border opacity-40 group-focus-within:opacity-80 transition-opacity duration-500 pointer-events-none"></div>
-                <div class="input-wrapper relative rounded-[calc(2rem-2px)] p-2 sm:p-3 flex items-center gap-1 sm:gap-3 bg-white/80 w-full z-10 border-0">
-                    <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-blue-400/5 to-cyan-400/0 opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 rounded-[calc(2rem-2px)] pointer-events-none"></div>
+            <div class="input-container group" style="max-width: 100%;">
+                <div class="absolute inset-0 rounded-[2rem] bg-[length:300%_300%] animate-rgb-border opacity-40"></div>
+                <div class="input-wrapper relative rounded-[calc(2rem-2px)] p-2 sm:p-3 flex items-center gap-1 sm:gap-3" style="z-index: 10;">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-400/0 via-blue-400/5 to-cyan-400/0 opacity-0" style="transition: opacity 1s; pointer-events: none;"></div>
                     
                     <div class="flex items-center gap-1 z-10 relative">
-                        <button id="attachBtn" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-on-surface-variant hover:bg-black/5 rounded-full transition-all active:scale-90 flex-shrink-0">
-                            <span class="material-symbols-outlined text-[20px] sm:text-[24px]">attach_file</span>
+                        <button id="attachBtn" class="flex items-center justify-center rounded-full transition-all flex-shrink-0" style="width: 2.75rem; height: 2.75rem; color: var(--outline);">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">attach_file</span>
                         </button>
                         
                         <!-- Attachment Menu -->
                         <div id="attachmentMenu" class="attachment-menu hidden">
                             <button onclick="openFileImport()">
                                 <span class="material-symbols-outlined">folder_open</span>
-                                <span>ដាក់ឯកសារ</span>
+                                <span class="txt">ឯកសារ</span>
                             </button>
                             <button onclick="openGallery()">
                                 <span class="material-symbols-outlined">image</span>
-                                <span>វិញ្ញាសារ</span>
+                                <span class="txt">រូបថត</span>
                             </button>
                         </div>
                     </div>
                     
-                    <textarea class="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 font-body-md text-on-surface resize-none max-h-48 overflow-y-auto placeholder:text-outline/70 z-10" id="chatInput" oninput="autoResize(this)" placeholder="សរសេរសាររបស់អ្នក..." rows="1"></textarea>
-                    <button id="sendBtn" class="bg-gradient-to-tr from-primary to-blue-500 hover:shadow-lg hover:shadow-primary/30 text-white h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all flex-shrink-0 z-10 border border-white/20 mr-1">
-                        <span class="material-symbols-outlined font-bold text-[18px] sm:text-[20px]">arrow_upward</span>
+                    <textarea class="flex-1 bg-transparent border-none outline-none resize-none" id="chatInput" oninput="autoResize(this)" placeholder="សរសេរសាររបស់អ្នក..." rows="1"></textarea>
+                    <button id="sendBtn" class="flex items-center justify-center rounded-full shadow-md active:scale-90 transition-all flex-shrink-0 mr-1" style="color: white; height: 2.75rem; width: 2.75rem; border: 2px solid var(--border); position: relative; z-index: 10;">
+                        <span class="material-symbols-outlined" style="font-weight: bold; font-size: 18px; position: relative; z-index: 1;">arrow_upward</span>
                     </button>
                 </div>
-            </div>
-
-            <!-- Branding -->
-            <div class="branding text-center pb-2 pt-1">
-                <p class="text-[9px] text-outline/60 font-label-md uppercase tracking-[0.25em] drop-shadow-sm">អមតៈ - AMERTAK</p>
             </div>
         </div>
     </div>

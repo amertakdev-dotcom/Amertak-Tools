@@ -12,10 +12,17 @@ async function sendMessage() {
     const message = input.value.trim();
     if (!message && selectedFiles.length === 0) return;
 
+    // Hide welcome message if visible
+    const welcomeContainer = document.querySelector('.welcome-container');
+    if (welcomeContainer) {
+        welcomeContainer.style.display = 'none';
+    }
+
     // Add user message to history
     chatHistory.addMessage(message, 'user');
     addMessage(message, 'user', selectedFiles.length > 0);
     
+    // Clear input immediately
     input.value = '';
     input.style.height = 'auto';
     const filesToProcess = [...selectedFiles];
@@ -28,11 +35,11 @@ async function sendMessage() {
     try {
         if (currentMode === 'chat') {
             await handleChat(message, filesToProcess, loadingId);
-        } else if (currentMode === 'code') {
-            await handleCoding(message, filesToProcess, loadingId);
+        } else if (currentMode === 'math') {
+            await handleMath(message, filesToProcess, loadingId);
         } else {
             removeMessage(loadingId);
-            addMessage('រូបភាពមិនអាចប្រើប្រាស់បានជាមួយម៉ូដែលនេះទេ។', 'ai');
+            addMessage('ម៉ូដែលនេះមិនអាចប្រើប្រាស់បានទេ។', 'ai');
         }
     } catch (error) {
         removeMessage(loadingId);
@@ -52,7 +59,8 @@ async function handleChat(message, files, loadingId) {
     // Get recent chat history for context
     const recentHistory = chatHistory.getRecentContext(5);
     const contextMessages = recentHistory.map(msg => ({
-        role: msg.role,
+        // Map 'ai' role to 'assistant' for API compatibility
+        role: msg.role === 'ai' ? 'assistant' : msg.role,
         content: msg.content
     }));
 
@@ -90,7 +98,54 @@ async function handleChat(message, files, loadingId) {
             chatHistory.addMessage(aiResponse, 'ai');
             addMessage(aiResponse, 'ai');
         } else {
-            addMessage('❌ ការឆ្លើយតបមិនប្រនិទ្ធពី API', 'ai');
+            addMessage('❌ ការឆ្លើយតបមិនមានបញ្ហា', 'ai');
+        }
+    } catch (error) {
+        removeMessage(loadingId);
+        addMessage(`❌ សូមពិនិត្យមើលអ៊ីនធឺណិត៖ ${error.message}`, 'ai');
+    }
+}
+
+async function handleMath(prompt, files, loadingId) {
+    let fullPrompt = `You are an expert mathematics teacher and problem solver. Help the user with their math problem. Provide step-by-step solutions with clear explanations in Khmer language.\n\nProblem: ${prompt}`;
+
+    if (files.length > 0) {
+        fullPrompt += `\n\n[User has uploaded ${files.length} file(s) (images/documents) containing math problems: ${files.map(f => f.name).join(', ')}]`;
+        fullPrompt += `\n\nPlease analyze the content from these files and solve the math problems shown. If the files contain images of math equations, describe what you see and solve them step by step.`;
+    }
+
+    const config = API_CONFIG[ACTIVE_MODEL];
+
+    try {
+        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.apiKey}`
+            },
+            body: JSON.stringify({
+                model: config.chatModel,
+                messages: [
+                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
+                    { role: 'user', content: fullPrompt }
+                ],
+                temperature: 0.3,
+                max_tokens: 3000
+            })
+        });
+
+        const data = await response.json();
+        removeMessage(loadingId);
+
+        if (data.error) {
+            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
+        } else if (data.choices && data.choices[0]) {
+            const solution = data.choices[0].message.content;
+            // Save to history
+            chatHistory.addMessage(solution, 'ai');
+            addMessage(solution, 'ai');
+        } else {
+            addMessage('❌ បរាជ័យក្នុងការដោះស្រាយលំហាត់គណិតវិទ្យា', 'ai');
         }
     } catch (error) {
         removeMessage(loadingId);
