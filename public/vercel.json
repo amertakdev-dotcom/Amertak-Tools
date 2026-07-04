@@ -2,6 +2,7 @@
   "version": 2,
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/api/gemini", "destination": "/api/gemini.js" },
     { "source": "/share/:id", "destination": "/share.html" },
     { "source": "/about", "destination": "/about/index.html" },
     { "source": "/tools/cloude", "destination": "/tools/cloude/index.html" },
