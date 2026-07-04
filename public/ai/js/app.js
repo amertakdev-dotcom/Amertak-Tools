@@ -274,7 +274,11 @@ document.addEventListener('click', (e) => {
 
 // ===== INITIALIZATION =====
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+    // Load environment variables from .env file
+    // ផ្ទុកអថេរបរិស្ថានពីឯកសារ .env
+    await loadEnvConfig();
+    
     initializeActiveModel();
     populateModelDropdown();
     setMode('chat');

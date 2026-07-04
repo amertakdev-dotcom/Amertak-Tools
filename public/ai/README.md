@@ -50,10 +50,10 @@ public/ai/
 
 The API configuration is in `js/config.js`:
 ```javascript
-const GROQ_API_KEY = "your_api_key_here";
+const GEMINI_API_KEY = "your_api_key_here";
 ```
 
-Add your Groq API key to enable the AI assistant.
+Add your Google Gemini API key to enable the AI assistant.
 
 ### 💾 Chat History API
 
@@ -67,18 +67,19 @@ The `ChatHistory` class provides:
 
 ### 🚀 Usage
 
-1. Add your Groq API key to `js/config.js`
+1. Add your Google Gemini API key to `js/config.js` or `.env` file
 2. Open `index.html` in a browser
 3. Start chatting - history is saved automatically
-4. Switch between Chat, Image, and Code modes
+4. Switch between Chat, Math, History, and Contact modes
 5. Attach files with the attachment button
 
 ### 📝 Mode Prompts
 
-Three modes available:
+Four modes available:
 - **ជជែក (Chat)**: General conversation
-- **រូបភាព (Image)**: Image generation prompts
-- **កូដ (Code)**: Programming assistance
+- **គណិតវិទ្យា (Math)**: Mathematics problem solving
+- **ប្រវត្តិវិទ្យា (History)**: Historical information
+- **ទាក់ទង (Contact)**: Contact and support
 
 Each mode has pre-filled prompt suggestions for quick access.
 

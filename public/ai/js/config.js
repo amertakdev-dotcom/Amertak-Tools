@@ -1,17 +1,32 @@
 // API Configuration and AI Identity
+// ការកំណត់រចនាសម្ព័ន្ធ API និង កំណត់ភាពជា AI
 
-const GROQ_API_KEY = "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";
+// Load environment variables
+// ផ្ទុកអថេរបរិស្ថានពី .env សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន
+let GEMINI_API_KEY = '';
 
-let ACTIVE_MODEL = 'groq';
+// For Vercel/production: use process.env (injected at runtime)
+// សម្រាប់ Vercel/ផលិតផល: ប្រើ process.env (បញ្ចូលដោយស្វ័យប្រវត្តិពេលរត់)
+if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
+    GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+} 
+// For local development: fetch from .env file
+// សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន: យកពីឯកសារ .env
+else if (typeof window !== 'undefined') {
+    // This will be populated by the loadEnvConfig function
+    GEMINI_API_KEY = window.__ENV_CONFIG__?.GEMINI_API_KEY || '';
+}
+
+let ACTIVE_MODEL = 'gemini';
 
 const API_CONFIG = {
-    groq: {
-        baseUrl: 'https://api.groq.com/openai/v1',
-        chatModel: 'llama-3.3-70b-versatile',
-        codingModel: 'llama-3.3-70b-versatile',
-        apiKey: GROQ_API_KEY,
-        name: 'Groq (Llama 3.3)',
-        icon: 'bolt'
+    gemini: {
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+        chatModel: 'gemini-2.0-flash-exp',
+        codingModel: 'gemini-2.0-flash-exp',
+        apiKey: GEMINI_API_KEY,
+        name: 'Google Gemini 2.0 Flash',
+        icon: 'psychology'
     }
 };
 
@@ -180,6 +195,39 @@ class ChatHistory {
     export() {
         return JSON.stringify(this.history, null, 2);
     }
+}
+
+// Load environment variables from .env file (for local development)
+// ផ្ទុកអថេរបរិស្ថានពីឯកសារ .env (សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន)
+async function loadEnvConfig() {
+    try {
+        const response = await fetch('/ai/.env');
+        if (response.ok) {
+            const text = await response.text();
+            const envVars = {};
+            
+            text.split('\n').forEach(line => {
+                line = line.trim();
+                if (line && !line.startsWith('#')) {
+                    const [key, ...valueParts] = line.split('=');
+                    if (key && valueParts.length > 0) {
+                        const value = valueParts.join('=').trim();
+                        envVars[key.trim()] = value;
+                    }
+                }
+            });
+            
+            // Store in window object for access
+            if (typeof window !== 'undefined') {
+                window.__ENV_CONFIG__ = envVars;
+            }
+            
+            return envVars;
+        }
+    } catch (error) {
+        console.warn('Could not load .env file:', error);
+    }
+    return {};
 }
 
 // Initialize chat history

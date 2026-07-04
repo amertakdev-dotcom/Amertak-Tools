@@ -74,20 +74,26 @@ async function handleChat(message, files, loadingId) {
     const config = API_CONFIG[ACTIVE_MODEL];
 
     try {
-        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        // Convert messages to Gemini format
+        const geminiMessages = [
+            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
+            ...contextMessages.map(msg => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }))
+        ];
+
+        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: config.chatModel,
-                messages: [
-                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
-                    ...contextMessages
-                ],
-                temperature: 0.7,
-                max_tokens: 2000
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2000
+                }
             })
         });
 
@@ -96,8 +102,8 @@ async function handleChat(message, files, loadingId) {
 
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.choices && data.choices[0]) {
-            const aiResponse = data.choices[0].message.content;
+        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const aiResponse = data.candidates[0].content.parts[0].text;
             // Save to history
             chatHistory.addMessage(aiResponse, 'ai');
             addMessage(aiResponse, 'ai');
@@ -121,20 +127,22 @@ async function handleMath(prompt, files, loadingId) {
     const config = API_CONFIG[ACTIVE_MODEL];
 
     try {
-        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        const geminiMessages = [
+            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
+            { role: 'user', parts: [{ text: fullPrompt }] }
+        ];
+
+        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: config.chatModel,
-                messages: [
-                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
-                    { role: 'user', content: fullPrompt }
-                ],
-                temperature: 0.3,
-                max_tokens: 3000
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: 0.3,
+                    maxOutputTokens: 3000
+                }
             })
         });
 
@@ -143,8 +151,8 @@ async function handleMath(prompt, files, loadingId) {
 
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.choices && data.choices[0]) {
-            const solution = data.choices[0].message.content;
+        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const solution = data.candidates[0].content.parts[0].text;
             // Save to history
             chatHistory.addMessage(solution, 'ai');
             addMessage(solution, 'ai');
@@ -168,20 +176,22 @@ async function handleHistory(prompt, files, loadingId) {
     const config = API_CONFIG[ACTIVE_MODEL];
 
     try {
-        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        const geminiMessages = [
+            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
+            { role: 'user', parts: [{ text: fullPrompt }] }
+        ];
+
+        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: config.chatModel,
-                messages: [
-                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
-                    { role: 'user', content: fullPrompt }
-                ],
-                temperature: 0.7,
-                max_tokens: 3000
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 3000
+                }
             })
         });
 
@@ -190,8 +200,8 @@ async function handleHistory(prompt, files, loadingId) {
 
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.choices && data.choices[0]) {
-            const historicalInfo = data.choices[0].message.content;
+        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const historicalInfo = data.candidates[0].content.parts[0].text;
             // Save to history
             chatHistory.addMessage(historicalInfo, 'ai');
             addMessage(historicalInfo, 'ai');
@@ -216,20 +226,22 @@ async function handleCoding(prompt, files, loadingId) {
     const config = API_CONFIG[ACTIVE_MODEL];
 
     try {
-        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        const geminiMessages = [
+            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
+            { role: 'user', parts: [{ text: fullPrompt }] }
+        ];
+
+        const response = await fetch(`${config.baseUrl}/models/${config.codingModel}:generateContent?key=${config.apiKey}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: config.codingModel,
-                messages: [
-                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
-                    { role: 'user', content: fullPrompt }
-                ],
-                temperature: 0.2,
-                max_tokens: 3000
+                contents: geminiMessages,
+                generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 3000
+                }
             })
         });
 
@@ -238,8 +250,8 @@ async function handleCoding(prompt, files, loadingId) {
 
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.choices && data.choices[0]) {
-            const code = data.choices[0].message.content;
+        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            const code = data.candidates[0].content.parts[0].text;
             const chatContainer = document.getElementById('chatContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
