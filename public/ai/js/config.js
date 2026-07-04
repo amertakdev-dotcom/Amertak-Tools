@@ -4,17 +4,22 @@
 // Load environment variables
 // ផ្ទុកអថេរបរិស្ថានពី .env សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន
 let GEMINI_API_KEY = '';
+let GEMINI_CONFIGURED = false;
 
 // For Vercel/production: use process.env (injected at runtime)
-// សម្រាប់ Vercel/ផលិតផល: ប្រើ process.env (បញ្ចូលដោយស្វ័យប្រវត្តិពេលរត់)
+// សម្រាប់ Vercel/ផលិតផល: ប្រើ process.env (បញ្ចូលដោយស្វ័យប្រវត្តពេលរត់)
 if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
     GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    GEMINI_CONFIGURED = true;
 } 
 // For local development: fetch from .env file
 // សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន: យកពីឯកសារ .env
 else if (typeof window !== 'undefined') {
     // This will be populated by the loadEnvConfig function
     GEMINI_API_KEY = window.__ENV_CONFIG__?.GEMINI_API_KEY || '';
+    if (GEMINI_API_KEY) {
+        GEMINI_CONFIGURED = true;
+    }
 }
 
 let ACTIVE_MODEL = 'gemini';
@@ -30,10 +35,38 @@ const API_CONFIG = {
     }
 };
 
+// Check Gemini API configuration status from backend
+// ពិនិត្យស្ថានភាពការកំណត់រចនាសម្ព័ន្ធ Gemini API ពី backend
+async function checkGeminiConfig() {
+    try {
+        const response = await fetch('/api/gemini', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            GEMINI_CONFIGURED = data.configured || false;
+            if (data.hasKey && !GEMINI_API_KEY) {
+                // Backend has key but frontend doesn't - update config
+                console.log('Gemini API configured on backend');
+            }
+            return data;
+        }
+    } catch (error) {
+        console.warn('Could not check Gemini config:', error);
+    }
+    return null;
+}
+
 // Get available models (only those with API keys)
 function getAvailableModels() {
+    // Check if configured either locally or on backend
+    const hasKey = GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '';
     return Object.entries(API_CONFIG)
-        .filter(([key, config]) => config.apiKey && config.apiKey.trim() !== '')
+        .filter(([key, config]) => hasKey)
         .map(([key, config]) => ({ key, ...config }));
 }
 
@@ -43,6 +76,11 @@ function initializeActiveModel() {
     if (available.length > 0) {
         ACTIVE_MODEL = available[0].key;
     }
+}
+
+// Check if Gemini is configured (either locally or on backend)
+function isGeminiConfigured() {
+    return GEMINI_CONFIGURED || (GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '');
 }
 
 // AI Identity with conditional creator mention
@@ -242,6 +280,8 @@ if (typeof module !== 'undefined' && module.exports) {
         ChatHistory,
         chatHistory,
         getAvailableModels,
-        initializeActiveModel
+        initializeActiveModel,
+        checkGeminiConfig,
+        isGeminiConfigured
     };
 }

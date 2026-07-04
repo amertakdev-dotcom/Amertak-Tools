@@ -279,6 +279,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     // ផ្ទុកអថេរបរិស្ថានពីឯកសារ .env
     await loadEnvConfig();
     
+    // Check Gemini API configuration from backend
+    // ពិនិត្យការកំណត់រចនាសម្ព័ន្ធ Gemini API ពី backend
+    await checkGeminiConfig();
+    
     initializeActiveModel();
     populateModelDropdown();
     setMode('chat');

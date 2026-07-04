@@ -1,11 +1,12 @@
 // Gemini API Configuration Endpoint
 // ចំណុចបញ្ចប់ការកំណត់រចនាសម្ព័ន្ធ Gemini API
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-
 module.exports = async function handler(req, res) {
+  // Read environment variable inside handler function
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+  
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -13,10 +14,29 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  // Handle GET requests - return configuration status
+  if (req.method === 'GET') {
+    res.status(200).json({
+      success: true,
+      configured: GEMINI_API_KEY ? true : false,
+      hasKey: !!GEMINI_API_KEY,
+      model: 'gemini-2.0-flash-exp',
+      features: {
+        chat: GEMINI_API_KEY ? true : false,
+        coding: GEMINI_API_KEY ? true : false,
+        translation: GEMINI_API_KEY ? true : false
+      },
+      message: GEMINI_API_KEY 
+        ? 'Gemini API configured' 
+        : 'Gemini API key not configured'
+    });
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ 
       success: false, 
-      message: 'Method not allowed. Use POST to configure Gemini API.' 
+      message: 'Method not allowed. Use GET or POST.' 
     });
     return;
   }

@@ -37,8 +37,12 @@ vercel --prod
 ### Step 3: Verify Configuration
 
 Test your API endpoint:
+
 ```bash
-# Check API status
+# Check API status using GET (simpler)
+curl https://your-domain.com/api/gemini
+
+# Or using POST with action
 curl -X POST https://your-domain.com/api/gemini \
   -H "Content-Type: application/json" \
   -d '{"action": "status"}'
@@ -47,7 +51,14 @@ curl -X POST https://your-domain.com/api/gemini \
 # {
 #   "success": true,
 #   "configured": true,
-#   "message": "Gemini API is configured"
+#   "hasKey": true,
+#   "model": "gemini-2.0-flash-exp",
+#   "features": {
+#     "chat": true,
+#     "coding": true,
+#     "translation": true
+#   },
+#   "message": "Gemini API configured"
 # }
 ```
 
@@ -129,21 +140,26 @@ Content-Type: application/json
 
 ## Frontend Integration
 
-The frontend automatically detects the API configuration:
+The frontend automatically detects the API configuration on page load:
 
 ```javascript
-// Check if Gemini API is configured
+// The frontend automatically calls this on initialization
+// Using GET request (simpler, no body needed)
 const response = await fetch('/api/gemini', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ action: 'status' })
+  method: 'GET',
+  headers: { 'Accept': 'application/json' }
 });
 
 const data = await response.json();
 if (data.configured) {
   console.log('Gemini API is ready!');
+  console.log('Available features:', data.features);
 }
 ```
+
+**Note**: The frontend now supports both GET and POST requests:
+- `GET /api/gemini` - Returns configuration status (no body needed)
+- `POST /api/gemini` with `{ "action": "status" }` - Returns detailed status with setup instructions
 
 ## Troubleshooting
 
