@@ -3,6 +3,10 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/api/gemini", "destination": "/api/gemini.js" },
+    { "source": "/api/upload", "destination": "/api/upload.js" },
+    { "source": "/api/download", "destination": "/api/download.js" },
+    { "source": "/api/file", "destination": "/api/file.js" },
+    { "source": "/api/share/:id", "destination": "/api/share/[id].js" },
     { "source": "/share/:id", "destination": "/share.html" },
     { "source": "/about", "destination": "/about/index.html" },
     { "source": "/tools/cloude", "destination": "/tools/cloude/index.html" },
