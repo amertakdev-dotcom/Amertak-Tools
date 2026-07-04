@@ -7,6 +7,8 @@
     { "source": "/api/download", "destination": "/api/download.js" },
     { "source": "/api/file", "destination": "/api/file.js" },
     { "source": "/api/share/:id", "destination": "/api/share/[id].js" },
+    { "source": "/api/share/banner", "destination": "/api/share/banner.js" },
+    { "source": "/api/share/download", "destination": "/api/share/download.js" },
     { "source": "/share/:id", "destination": "/share.html" },
     { "source": "/about", "destination": "/about/index.html" },
     { "source": "/tools/cloude", "destination": "/tools/cloude/index.html" },

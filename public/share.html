@@ -14,6 +14,7 @@
     <meta property="og:image" id="ogImage" content="">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/svg+xml">
     <meta property="og:site_name" content="Amertak Tools">
     
     <!-- Twitter Card -->
@@ -21,6 +22,7 @@
     <meta name="twitter:title" id="twitterTitle" content="Shared File - Amertak Tools">
     <meta name="twitter:description" id="twitterDesc" content="Shared file from Amertak Tools">
     <meta name="twitter:image" id="twitterImage" content="">
+    <meta name="twitter:card" content="summary_large_image">
     
     <link rel="icon" type="image/png" href="/svg/logo.svg">
     <link rel="shortcut icon" href="/svg/logo.svg">
@@ -296,10 +298,14 @@
             document.getElementById('ogTitle').content = `${record.name || 'Shared image'} - Amertak Tools`;
             document.getElementById('ogDesc').content = record.description || 'Shared image';
             document.getElementById('ogUrl').content = pageUrl;
-            document.getElementById('ogImage').content = record.downloadUrl || '';
+            
+            // Set banner preview for social media
+            const bannerUrl = getApiUrl(`/api/share/banner?id=${encodeURIComponent(fileId)}`);
+            document.getElementById('ogImage').content = bannerUrl;
+            document.getElementById('twitterImage').content = bannerUrl;
+            
             document.getElementById('twitterTitle').content = `${record.name || 'Shared image'} - Amertak Tools`;
             document.getElementById('twitterDesc').content = record.description || 'Shared image';
-            document.getElementById('twitterImage').content = record.downloadUrl || '';
             document.getElementById('shareTitle').textContent = `${record.name || 'Shared image'} - Amertak Tools`;
             document.getElementById('shareDesc').content = record.description || 'Shared image';
 
@@ -404,9 +410,14 @@
                 document.getElementById('uploadTime').textContent = `Uploaded: ${new Date(file.uploadedAt).toLocaleDateString()}`;
             }
 
+            // Set banner preview for social media
+            const bannerUrl = getApiUrl(`/api/share/banner?id=${encodeURIComponent(fileId)}`);
+            document.getElementById('ogImage').content = bannerUrl;
+            document.getElementById('twitterImage').content = bannerUrl;
+
             const container = document.getElementById('previewContainer');
             const category = file.category || 'other';
-            const downloadUrl = file.downloadUrl || getApiUrl(`/api/share/${fileId}/download`);
+            const downloadUrl = file.downloadUrl || getApiUrl(`/api/share/download?id=${encodeURIComponent(fileId)}`);
 
             if (category === 'image') {
                 container.innerHTML = `<div class="share-image"><img src="${downloadUrl}" alt="${file.name}"></div>`;
@@ -438,7 +449,7 @@
                 link.click();
                 return;
             }
-            window.open(getApiUrl(`/api/share/${fileId}/download`), '_blank');
+            window.open(getApiUrl(`/api/download?id=${encodeURIComponent(fileId)}`), '_blank');
         }
 
         function copyShareLink() {

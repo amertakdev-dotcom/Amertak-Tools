@@ -74,12 +74,6 @@ function validatePayload(payload) {
     throw new Error('File size exceeds 100MB limit.');
   }
 
-  const blocked = ['javascript', 'html', 'svg', 'xml'];
-  const lowered = `${fileName}.${mimeType}`.toLowerCase();
-  if (blocked.some((token) => lowered.includes(token))) {
-    throw new Error('Unsupported or unsafe file type.');
-  }
-
   return { fileName, mimeType, size };
 }
 
