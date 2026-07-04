@@ -7,7 +7,7 @@ let selectedFiles = [];
 
 function setMode(mode) {
     currentMode = mode;
-    const modes = ['chat', 'math'];
+    const modes = ['chat', 'math', 'history', 'contact'];
     modes.forEach(m => {
         const badge = document.getElementById(`mode-${m}`);
         if (m === mode) {
@@ -21,7 +21,9 @@ function setMode(mode) {
 
     const placeholders = {
         chat: 'សួរខ្ញុំអ្វីក៏បាន...',
-        math: 'ដាក់លំហាត់គណិតវិទ្យា រឺ ថតរូបវាលបញ្ចាំ...'
+        math: 'សរសេរលំហាត់គណិតវិទ្យា ឬរូបភាពលំហាត់...',
+        history: 'មានសំនួរអ្វីពីប្រវត្តិវិទ្យា...',
+        contact: 'មានបញ្ហាអ្វីឬ? ទាក់ទងខ្ញុំ...'
     };
     document.getElementById('chatInput').placeholder = placeholders[mode];
     updateSuggestions();
@@ -281,12 +283,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Load and display chat history
     const history = chatHistory.getHistory();
-    const welcomeContainer = document.querySelector('.welcome-container');
+    const welcomeContainer = document.querySelector('.welcome-container---');
     
     if (history.length > 0) {
         // Hide welcome message if there's chat history
         if (welcomeContainer) {
-            welcomeContainer.style.display = 'none';
+            welcomeContainer.style.display = 'nones';
         }
         
         // Display all messages from history
@@ -307,3 +309,16 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+
+// ==================================
+// SHOW & HIDE DESCRIBE MODE SELECTOR
+// ==================================
+
+function mode_dropdown() {
+    const modedrop = document.querySelector('.drop');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+
+    suggestionsContainer.classList.toggle('show');
+    modedrop.classList.toggle('rotate');
+}

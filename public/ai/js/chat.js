@@ -37,6 +37,10 @@ async function sendMessage() {
             await handleChat(message, filesToProcess, loadingId);
         } else if (currentMode === 'math') {
             await handleMath(message, filesToProcess, loadingId);
+        } else if (currentMode === 'history') {
+            await handleMath(message, filesToProcess, loadingId);
+        } else if (currentMode === 'contact') {
+            await handleMath(message, filesToProcess, loadingId);
         } else {
             removeMessage(loadingId);
             addMessage('ម៉ូដែលនេះមិនអាចប្រើប្រាស់បានទេ។', 'ai');

@@ -100,20 +100,21 @@ body::after {
 }
 
 .glass-bubble {
-    background: rgba(255, 255, 255, 0.95);
+    background: #fff;
+    color: var(--on-surface-variant);
     backdrop-filter: blur(16px) saturate(200%);
     -webkit-backdrop-filter: blur(16px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.034);
     transition: all 0.3s ease;
 }
 
 /* AI Message Styling */
 .ai-message .glass-bubble {
     background: var(--card);
-    color: var(--outline-variant);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+    color: var(--outline);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.034);
 }
 
 .ai-message .glass-bubble:hover {
@@ -427,9 +428,8 @@ p {
 
 /* Mode Badge */
 .mode-selector {
-    display: flex;
+    display: inline-flex;
     gap: 0.75rem;
-    overflow-x: auto;
     padding: 0.75rem 0;
     -webkit-overflow-scrolling: touch;
 }
@@ -509,6 +509,25 @@ p {
     font-family: 'Poppins', 'amertak';
 }
 
+.drop {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(-90deg);
+    background: var(--card);
+    color: var(--on-surface-variant);
+    border: 1.5px solid var(--border);
+    border-left: 2px solid var(--border-light);
+    backdrop-filter: blur(8px);
+    height: 40px;
+    width: 40px;
+    flex-shrink: 0;
+    transition: .5s ease;
+}
+
+.rotate {
+    transform: rotate(0deg);
+}
 /* Message Animations */
 .message-bubble {
     animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -620,13 +639,21 @@ p {
 
 /* Suggestion Pills */
 .suggestionsContainer {
+    position: fixed;
+    visibility: hidden;
+    opacity: 0;
     display: flex;
     overflow: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    transition: .5s ease;
     gap: 20px;
 }
-
+.show {
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+}
 .suggestionsContainer::-webkit-scrollbar {
     width: 10px;
     height: 5px;
@@ -862,8 +889,9 @@ p {
     font-family: 'Poppins', 'amertak';
     resize: none;
     max-height: 192px;
-    overflow-y: auto;
+    overflow-y: hidden;
     line-height: 1.5;
+
 }
 
 #chatInput::placeholder {
@@ -1280,8 +1308,8 @@ button {
 
 .ml-1 {
     margin-left: 0.25rem;
+    font-family: 'Poppins', 'amertak';
 }
-
 .mx-auto {
     margin-left: auto;
     margin-right: auto;
@@ -2352,4 +2380,5 @@ button {
 
 .now {
     font-family: 'Poppins', 'amertak';
+    font-size: 0.7rem;
 }

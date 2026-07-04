@@ -37,7 +37,7 @@ const AI_IDENTITY = {
     language: "km", // Khmer
     developer: "គីន ថាវរ៉ាត់",
     websiteDescription: `This is Amertak (អមតៈ), a modern web platform that provides various online tools and AI-powered services. Key features include:
-- AI Chat Assistant (me, Amertak AI) with multiple modes: chat, image generation, and code generation
+- AI Chat Assistant (me, Amertak AI)
 - Text Translator supporting multiple languages including Khmer
 - Text-to-Speech for Khmer language
 - Video/Audio Transcription tools
@@ -105,6 +105,20 @@ const MODE_PROMPTS = {
         'គណិតវិទ្យាកម្រិតខ្ពស់',
         'លំហាត់មេរៀន',
         'ពន្យល់រូបមន្តស្តង់ដារ'
+    ],
+
+    history: [
+        'ប្រវត្តិសាស្ត្រខ្មែរ',
+        'អំពីប្រាសាទអង្គរវត្ត',
+        'ព្រះមហាក្សត្រខ្មែរ',
+        'ដើមកំណើតប្រទេសខ្មែរ'
+    ],
+
+    contact: [
+        'តេលេក្រាម',
+        'តេលេក្រាម ឆានែល',
+        'Tiktok',
+        'Discord',
     ]
 };
 

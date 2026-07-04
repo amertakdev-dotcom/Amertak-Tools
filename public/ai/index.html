@@ -59,6 +59,14 @@
                     <span class="material-symbols-outlined text-secondary" style="font-size: 16px;">calculate</span>
                     <span class="ml-1">គណិតវិទ្យា</span>
                 </div>
+                <div class="glass-bubble rounded-xl px-4 py-2 text-xs text-on-surface-variant">
+                    <span class="material-symbols-outlined text-primary" style="font-size: 16px;">book</span>
+                    <span class="ml-1">ប្រវត្តិវិទ្យា</span>
+                </div>
+                <div class="glass-bubble rounded-xl px-4 py-2 text-xs text-on-surface-variant" style="display: none;">
+                    <span class="material-symbols-outlined text-secondary" style="font-size: 16px;">info</span>
+                    <span class="ml-1">ទាក់ទងខ្ញុំ</span>
+                </div>
             </div>
         </div>
     </main>
@@ -68,6 +76,9 @@
         <div class="max-w-4xl mx-auto space-y-3 px-4 pb-6">
             <!-- Mode Selector -->
             <div class="mode-selector">
+                <button onclick="mode_dropdown()" class="mode-badge drop" id="mode-drop">
+                    <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">arrow_downward</span>
+                </button>
                 <button onclick="setMode('chat')" class="mode-badge active" id="mode-chat">
                     <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">chat_bubble</span>
                     <span class="mode">ជជែក</span>
@@ -75,6 +86,14 @@
                 <button onclick="setMode('math')" class="mode-badge inactive" id="mode-math">
                     <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">calculate</span>
                     <span class="mode">គណិតវិទ្យា</span>
+                </button>
+                <button onclick="setMode('history')" class="mode-badge inactive" id="mode-history">
+                    <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">book</span>
+                    <span class="mode">ប្រវត្តិវិទ្យា</span>
+                </button>
+                <button onclick="setMode('contact')" class="mode-badge inactive" id="mode-contact" style="display: none;">
+                    <span class="material-symbols-outlined" style="font-size: 16px; position: relative; z-index: 10;">info</span>
+                    <span class="mode">ទាក់ទងខ្ញុំ</span>
                 </button>
             </div>
 
