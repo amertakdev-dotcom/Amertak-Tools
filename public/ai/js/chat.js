@@ -38,7 +38,7 @@ async function sendMessage() {
         } else if (currentMode === 'math') {
             await handleMath(message, filesToProcess, loadingId);
         } else if (currentMode === 'history') {
-            await handleMath(message, filesToProcess, loadingId);
+            await handleHistory(message, filesToProcess, loadingId);
         } else if (currentMode === 'contact') {
             await handleMath(message, filesToProcess, loadingId);
         } else {
@@ -150,6 +150,53 @@ async function handleMath(prompt, files, loadingId) {
             addMessage(solution, 'ai');
         } else {
             addMessage('❌ បរាជ័យក្នុងការដោះស្រាយលំហាត់គណិតវិទ្យា', 'ai');
+        }
+    } catch (error) {
+        removeMessage(loadingId);
+        addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
+    }
+}
+
+async function handleHistory(prompt, files, loadingId) {
+    let fullPrompt = `You are an expert historian specializing in Cambodian and world history. Provide detailed, accurate, and engaging historical information. Always respond in Khmer language.\n\nUser's question about history: ${prompt}`;
+
+    if (files.length > 0) {
+        fullPrompt += `\n\n[User has uploaded ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
+        fullPrompt += `\n\nIf the files contain historical documents or images, analyze them and provide historical context.`;
+    }
+
+    const config = API_CONFIG[ACTIVE_MODEL];
+
+    try {
+        const response = await fetch(`${config.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.apiKey}`
+            },
+            body: JSON.stringify({
+                model: config.chatModel,
+                messages: [
+                    { role: 'system', content: AI_IDENTITY.getSystemPrompt(false) },
+                    { role: 'user', content: fullPrompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 3000
+            })
+        });
+
+        const data = await response.json();
+        removeMessage(loadingId);
+
+        if (data.error) {
+            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
+        } else if (data.choices && data.choices[0]) {
+            const historicalInfo = data.choices[0].message.content;
+            // Save to history
+            chatHistory.addMessage(historicalInfo, 'ai');
+            addMessage(historicalInfo, 'ai');
+        } else {
+            addMessage('❌ បរាជ័យក្នុងការទាញយកព័ត៌មានប្រវត្តិសាស្ត្រ', 'ai');
         }
     } catch (error) {
         removeMessage(loadingId);

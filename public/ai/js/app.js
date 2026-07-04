@@ -283,12 +283,12 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Load and display chat history
     const history = chatHistory.getHistory();
-    const welcomeContainer = document.querySelector('.welcome-container---');
+    const welcomeContainer = document.querySelector('.welcome-container');
     
     if (history.length > 0) {
         // Hide welcome message if there's chat history
         if (welcomeContainer) {
-            welcomeContainer.style.display = 'nones';
+            welcomeContainer.style.display = 'none';
         }
         
         // Display all messages from history
