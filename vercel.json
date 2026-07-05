@@ -1,6 +1,9 @@
 {
   "version": 2,
+  "rootDirectory": "public",
   "cleanUrls": true,
+  "buildCommand": "echo 'Static site - no build needed'",
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/api/gemini", "destination": "/api/gemini.js" },
     { "source": "/api/upload", "destination": "/api/upload.js" },

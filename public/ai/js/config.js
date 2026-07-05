@@ -5,33 +5,34 @@
 const GROQ_API_KEY = "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";
 
 // Current active model
-let ACTIVE_MODEL = 'groq';
-
-const API_CONFIG = {
-    groq: {
-        baseUrl: 'https://api.groq.com/openai/v1',
-        chatModel: 'llama-3.3-70b-versatile',
-        codingModel: 'llama-3.3-70b-versatile',
-        apiKey: GROQ_API_KEY,
-        name: 'Groq (Llama 3.3)',
-        icon: 'bolt'
-    }
-};
-
-// Get available models (only those with API keys)
-function getAvailableModels() {
-    return Object.entries(API_CONFIG)
-        .filter(([key, config]) => config.apiKey && config.apiKey.trim() !== '')
-        .map(([key, config]) => ({ key, ...config }));
-}
-
-// Initialize active model
-function initializeActiveModel() {
-    const available = getAvailableModels();
-    if (available.length > 0) {
-        ACTIVE_MODEL = available[0].key;
-    }
-}
+// Current active model
+        let ACTIVE_MODEL = 'groq';
+        
+        const API_CONFIG = {
+            groq: {
+                baseUrl: 'https://api.groq.com/openai/v1',
+                chatModel: 'llama-3.3-70b-versatile',
+                codingModel: 'llama-3.3-70b-versatile',
+                apiKey: GROQ_API_KEY,
+                name: 'Groq (Llama 3.3)',
+                icon: 'bolt'
+            }
+        };
+        
+        // Get available models (only those with API keys)
+        function getAvailableModels() {
+            return Object.entries(API_CONFIG)
+                .filter(([key, config]) => config.apiKey && config.apiKey.trim() !== '')
+                .map(([key, config]) => ({ key, ...config }));
+        }
+        
+        // Initialize active model
+        function initializeActiveModel() {
+            const available = getAvailableModels();
+            if (available.length > 0) {
+                ACTIVE_MODEL = available[0].key;
+            }
+        }
 
 // Check if Groq is configured
 function isGroqConfigured() {
