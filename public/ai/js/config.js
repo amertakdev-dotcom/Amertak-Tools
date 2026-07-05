@@ -1,31 +1,40 @@
 // UI Configuration and AI Identity - SECURED
 // ការកំណត់ចំណុចប្រទាក់អ្នកប្រើ និង កំណត់ភាពជា AI
 
+// ===============================
+// ❌ REMOVED API KEY (SECURITY FIX)
+// ===============================
+// const GROQ_API_KEY = "REMOVED_FOR_SECURITY";
+
+// ===============================
 // API Configuration
-const GROQ_API_KEY = "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";
-
-// Current active model
-let ACTIVE_MODEL = 'groq';
-
+// ===============================
 const API_CONFIG = {
     groq: {
-        baseUrl: 'https://api.groq.com/openai/v1',
-        chatModel: 'llama-3.3-70b-versatile',
-        codingModel: 'llama-3.3-70b-versatile',
-        apiKey: GROQ_API_KEY,
-        name: 'Groq (Llama 3.3)',
-        icon: 'bolt'
+        baseUrl: "/api/groq",
+        chatModel: "llama-3.1-70b-versatile",
+        codingModel: "llama-3.1-70b-versatile",
+        name: "Groq (Secure Mode)",
+        icon: "bolt"
     }
 };
 
+// ===============================
+// Current active model
+// ===============================
+let ACTIVE_MODEL = 'groq';
+
+// ===============================
 // Get available models (only those with API keys)
+// ===============================
 function getAvailableModels() {
     return Object.entries(API_CONFIG)
-        .filter(([key, config]) => config.apiKey && config.apiKey.trim() !== '')
         .map(([key, config]) => ({ key, ...config }));
 }
 
+// ===============================
 // Initialize active model
+// ===============================
 function initializeActiveModel() {
     const available = getAvailableModels();
     if (available.length > 0) {
@@ -33,17 +42,22 @@ function initializeActiveModel() {
     }
 }
 
+// ===============================
 // Check if Groq is configured
+// ===============================
 function isGroqConfigured() {
-    return GROQ_API_KEY && GROQ_API_KEY.trim() !== '';
+    return true;
 }
 
-// AI Identity with conditional creator mention
+// ===============================
+// AI IDENTITY (UNCHANGED PROMPT)
+// ===============================
 const AI_IDENTITY = {
     name: "អមតៈ - Amertak",
     nameEn: "Amertak",
     language: "km", // Khmer
     developer: "គីន ថាវរ៉ាត់",
+
     websiteDescription: `This is Amertak (អមតៈ), a modern web platform that provides various online tools and AI-powered services. Key features include:
 - AI Chat Assistant (me, Amertak AI)
 - Text Translator supporting multiple languages including Khmer
@@ -57,6 +71,7 @@ const AI_IDENTITY = {
 - Image to URL converter
 - Cloud storage integration
 The platform is built with modern web technologies, featuring a beautiful glass-morphism UI design, dark/light mode support, and responsive layout. It's designed to be user-friendly and accessible for Khmer speakers and international users.`,
+
     getSystemPrompt: function(includeCreatorInfo = false) {
         const creatorInfo = includeCreatorInfo 
             ? `Developer: "${this.developer}" - Kin Thavrath`
@@ -99,7 +114,9 @@ Translate the context and respond in Khmer language only.`;
     }
 };
 
-// Mode-specific prompts
+// ===============================
+// Mode-specific prompts (UNCHANGED)
+// ===============================
 const MODE_PROMPTS = {
     chat: [
         'អ្វីទៅជា Amertak?',
@@ -130,7 +147,9 @@ const MODE_PROMPTS = {
     ]
 };
 
-// Chat history management (session-based - clears when browser/tab closes)
+// ===============================
+// Chat history (UNCHANGED)
+// ===============================
 class ChatHistory {
     constructor() {
         this.storageKey = 'amertak_chat_history_session';
@@ -164,7 +183,6 @@ class ChatHistory {
             timestamp
         });
         
-        // Keep only recent history
         if (this.history.length > this.maxHistoryItems) {
             this.history = this.history.slice(-this.maxHistoryItems);
         }
@@ -190,10 +208,14 @@ class ChatHistory {
     }
 }
 
-// Initialize chat history
+// ===============================
+// INIT
+// ===============================
 const chatHistory = new ChatHistory();
 
-// Export for use in other files
+// ===============================
+// EXPORT
+// ===============================
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         API_CONFIG,
@@ -205,4 +227,4 @@ if (typeof module !== 'undefined' && module.exports) {
         initializeActiveModel,
         isGroqConfigured
     };
-}
+    }
