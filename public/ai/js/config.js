@@ -3,7 +3,7 @@
 
 // Load environment variables
 // ផ្ទុកអថេរបរិស្ថានពី .env សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន
-let GEMINI_API_KEY = '';
+let GEMINI_API_KEY = 'AQ.Ab8RN6I2Q3FAfB5GOos7fS0Axs-EivGU0D509lM98AF-F6zsuw';
 let GEMINI_CONFIGURED = false;
 
 // For Vercel/production: use process.env (injected at runtime)
