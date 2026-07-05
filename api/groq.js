@@ -1,7 +1,25 @@
+
 export default async function handler(req, res) {
-  // ONLY POST allowed
+  res.setHeader("Content-Type", "application/json");
+
+  // ===============================
+  // TEST MODE (GET allowed)
+  // ===============================
+  if (req.method === "GET") {
+    return res.status(200).json({
+      status: "OK",
+      message: "Groq API working. Use POST."
+    });
+  }
+
+  // ===============================
+  // ONLY POST ALLOWED
+  // ===============================
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Hey bro! Method Not Allowed" });
+    return res.status(405).json({
+      error: "Method Not Allowed",
+      allowed: ["GET", "POST"]
+    });
   }
 
   try {
@@ -14,7 +32,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: "Missing API Key" });
+      return res.status(500).json({ error: "Missing API key" });
     }
 
     const response = await fetch(
@@ -28,14 +46,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: "llama-3.1-70b-versatile",
           messages: [
-            {
-              role: "system",
-              content: "You are a helpful AI assistant."
-            },
-            {
-              role: "user",
-              content: message
-            }
+            { role: "user", content: message }
           ],
           temperature: 0.7,
           max_tokens: 1024
@@ -45,16 +56,13 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    const reply =
-      data?.choices?.[0]?.message?.content || "No response";
-
     return res.status(200).json({
-      reply
+      reply: data?.choices?.[0]?.message?.content || "No response"
     });
 
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
-      error: error.message || "Server error"
+      error: err.message || "Server error"
     });
   }
 }
