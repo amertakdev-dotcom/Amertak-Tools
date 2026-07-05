@@ -19,9 +19,9 @@ async function sendMessage() {
     }
 
     // Add user message to history
-    chatHistory.addMessage(message, 'user');
+    chatHistory.add(message, 'user');
     addMessage(message, 'user', selectedFiles.length > 0);
-    
+
     // Clear input immediately
     input.value = '';
     input.style.height = 'auto';
@@ -94,9 +94,10 @@ async function callGroqAPI(fullMessage, loadingId) {
 async function handleChat(message, files, loadingId) {
     let fullMessage = AI_IDENTITY.getSystemPrompt(false) + '\n\n';
 
-    // Get recent chat history for context
-    const recentHistory = chatHistory.getRecentContext(5);
-    if (recentHistory && recentHistory.length > 0) {
+    // Get recent chat history for context (last 5 messages)
+    const allHistory = chatHistory.get();
+    const recentHistory = allHistory.slice(-5);
+    if (recentHistory.length > 0) {
         recentHistory.forEach(msg => {
             const label = msg.role === 'ai' ? 'Assistant' : 'User';
             fullMessage += `${label}: ${msg.content}\n`;
@@ -115,7 +116,7 @@ async function handleChat(message, files, loadingId) {
 
     removeMessage(loadingId);
     const aiResponse = result.reply || result.choices?.[0]?.message?.content || '❌ ការឆ្លើយតបទទេ';
-    chatHistory.addMessage(aiResponse, 'ai');
+    chatHistory.add(aiResponse, 'ai');
     addMessage(aiResponse, 'ai');
 }
 
@@ -133,7 +134,7 @@ async function handleMath(prompt, files, loadingId) {
 
     removeMessage(loadingId);
     const solution = result.reply || result.choices?.[0]?.message?.content || '❌ បរាជ័យក្នុងការដោះស្រាយលំហាត់គណិតវិទ្យា';
-    chatHistory.addMessage(solution, 'ai');
+    chatHistory.add(solution, 'ai');
     addMessage(solution, 'ai');
 }
 
@@ -151,7 +152,7 @@ async function handleHistory(prompt, files, loadingId) {
 
     removeMessage(loadingId);
     const historicalInfo = result.reply || result.choices?.[0]?.message?.content || '❌ បរាជ័យក្នុងការទាញយកព័ត៌មានប្រវត្តិសាស្ត្រ';
-    chatHistory.addMessage(historicalInfo, 'ai');
+    chatHistory.add(historicalInfo, 'ai');
     addMessage(historicalInfo, 'ai');
 }
 
@@ -190,7 +191,7 @@ async function handleCoding(prompt, files, loadingId) {
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    chatHistory.addMessage(code, 'ai');
+    chatHistory.add(code, 'ai');
 }
 
 // ===== UTILITY FUNCTIONS =====
@@ -213,7 +214,7 @@ function copyCode(button) {
         button.textContent = '✅ បានចម្លង!';
         button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
         button.style.transform = 'scale(1.05)';
-        
+
         setTimeout(() => {
             button.textContent = originalText;
             button.style.background = '';
