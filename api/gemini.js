@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
   try {
     // Read request body
     const body = await readBody(req);
-    const { apiKey, action = 'validate' } = body || {};
+    const { action = 'validate', apiKey, messages, model, temperature, maxOutputTokens } = body || {};
 
     // Handle different actions
     switch (action) {
@@ -110,10 +110,72 @@ module.exports = async function handler(req, res) {
         });
         break;
 
+      case 'generate':
+        // Proxy request to Gemini API
+        if (!GEMINI_API_KEY) {
+          res.status(500).json({
+            success: false,
+            message: 'Gemini API key not configured on server',
+            configured: false
+          });
+          return;
+        }
+
+        if (!messages || !Array.isArray(messages)) {
+          res.status(400).json({
+            success: false,
+            message: 'Messages array is required'
+          });
+          return;
+        }
+
+        try {
+          const geminiResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-2.0-flash-exp'}:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                contents: messages,
+                generationConfig: {
+                  temperature: temperature || 0.7,
+                  maxOutputTokens: maxOutputTokens || 2000
+                }
+              })
+            }
+          );
+
+          const data = await geminiResponse.json();
+
+          if (!geminiResponse.ok) {
+            res.status(geminiResponse.status).json({
+              success: false,
+              message: data.error?.message || 'Gemini API request failed',
+              error: data.error
+            });
+            return;
+          }
+
+          res.status(200).json({
+            success: true,
+            data: data
+          });
+        } catch (error) {
+          console.error('Gemini proxy error:', error);
+          res.status(500).json({
+            success: false,
+            message: 'Failed to connect to Gemini API',
+            error: error.message
+          });
+        }
+        break;
+
       default:
         res.status(400).json({
           success: false,
-          message: 'Invalid action. Use: validate, status, or config'
+          message: 'Invalid action. Use: validate, status, config, or generate'
         });
     }
 

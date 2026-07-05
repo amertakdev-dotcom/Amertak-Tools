@@ -49,9 +49,18 @@ async function checkGeminiConfig() {
         if (response.ok) {
             const data = await response.json();
             GEMINI_CONFIGURED = data.configured || false;
-            if (data.hasKey && !GEMINI_API_KEY) {
-                // Backend has key but frontend doesn't - update config
-                console.log('Gemini API configured on backend');
+            // If backend has the key, enable models even if frontend doesn't have key
+            if (data.configured) {
+                console.log('✅ Gemini API configured on backend');
+                // Update API_CONFIG to mark models as available
+                Object.keys(API_CONFIG).forEach(key => {
+                    API_CONFIG[key].available = true;
+                });
+            } else {
+                console.warn('⚠️ Gemini API not configured on backend');
+                Object.keys(API_CONFIG).forEach(key => {
+                    API_CONFIG[key].available = false;
+                });
             }
             return data;
         }
@@ -65,8 +74,13 @@ async function checkGeminiConfig() {
 function getAvailableModels() {
     // Check if configured either locally or on backend
     const hasKey = GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '';
+    const backendConfigured = GEMINI_CONFIGURED;
+    
     return Object.entries(API_CONFIG)
-        .filter(([key, config]) => hasKey)
+        .filter(([key, config]) => {
+            // Include model if either frontend has key OR backend is configured
+            return hasKey || backendConfigured || config.available;
+        })
         .map(([key, config]) => ({ key, ...config }));
 }
 
@@ -80,7 +94,8 @@ function initializeActiveModel() {
 
 // Check if Gemini is configured (either locally or on backend)
 function isGeminiConfigured() {
-    return GEMINI_CONFIGURED || (GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '');
+    const hasKey = GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '';
+    return GEMINI_CONFIGURED || hasKey;
 }
 
 // AI Identity with conditional creator mention

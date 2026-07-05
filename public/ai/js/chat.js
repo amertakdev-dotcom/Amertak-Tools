@@ -83,23 +83,30 @@ async function handleChat(message, files, loadingId) {
             }))
         ];
 
-        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
+        // Call backend API instead of Gemini directly
+        const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: geminiMessages,
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 2000
-                }
+                action: 'generate',
+                messages: geminiMessages,
+                model: config.chatModel,
+                temperature: 0.7,
+                maxOutputTokens: 2000
             })
         });
 
-        const data = await response.json();
+        const result = await response.json();
         removeMessage(loadingId);
 
+        if (!response.ok || !result.success) {
+            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
+            return;
+        }
+
+        const data = result.data;
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
         } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
@@ -132,23 +139,30 @@ async function handleMath(prompt, files, loadingId) {
             { role: 'user', parts: [{ text: fullPrompt }] }
         ];
 
-        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
+        // Call backend API instead of Gemini directly
+        const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: geminiMessages,
-                generationConfig: {
-                    temperature: 0.3,
-                    maxOutputTokens: 3000
-                }
+                action: 'generate',
+                messages: geminiMessages,
+                model: config.chatModel,
+                temperature: 0.3,
+                maxOutputTokens: 3000
             })
         });
 
-        const data = await response.json();
+        const result = await response.json();
         removeMessage(loadingId);
 
+        if (!response.ok || !result.success) {
+            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
+            return;
+        }
+
+        const data = result.data;
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
         } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
@@ -181,23 +195,30 @@ async function handleHistory(prompt, files, loadingId) {
             { role: 'user', parts: [{ text: fullPrompt }] }
         ];
 
-        const response = await fetch(`${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`, {
+        // Call backend API instead of Gemini directly
+        const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: geminiMessages,
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 3000
-                }
+                action: 'generate',
+                messages: geminiMessages,
+                model: config.chatModel,
+                temperature: 0.7,
+                maxOutputTokens: 3000
             })
         });
 
-        const data = await response.json();
+        const result = await response.json();
         removeMessage(loadingId);
 
+        if (!response.ok || !result.success) {
+            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
+            return;
+        }
+
+        const data = result.data;
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
         } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
@@ -231,23 +252,30 @@ async function handleCoding(prompt, files, loadingId) {
             { role: 'user', parts: [{ text: fullPrompt }] }
         ];
 
-        const response = await fetch(`${config.baseUrl}/models/${config.codingModel}:generateContent?key=${config.apiKey}`, {
+        // Call backend API instead of Gemini directly
+        const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: geminiMessages,
-                generationConfig: {
-                    temperature: 0.2,
-                    maxOutputTokens: 3000
-                }
+                action: 'generate',
+                messages: geminiMessages,
+                model: config.codingModel,
+                temperature: 0.2,
+                maxOutputTokens: 3000
             })
         });
 
-        const data = await response.json();
+        const result = await response.json();
         removeMessage(loadingId);
 
+        if (!response.ok || !result.success) {
+            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
+            return;
+        }
+
+        const data = result.data;
         if (data.error) {
             addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
         } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
