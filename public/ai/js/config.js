@@ -1,41 +1,25 @@
-// API Configuration and AI Identity
-// ការកំណត់រចនាសម្ព័ន្ធ API និង កំណត់ភាពជា AI
+// UI Configuration and AI Identity - SECURED
+// ការកំណត់ចំណុចប្រទាក់អ្នកប្រើ និង កំណត់ភាពជា AI
+// 🔒 API key is NEVER stored here - backend proxy handles all API calls
 
-// Load environment variables
-// ផ្ទុកអថេរបរិស្ថានពី .env សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន
-let GEMINI_API_KEY = 'AQ.Ab8RN6I2Q3FAfB5GOos7fS0Axs-EivGU0D509lM98AF-F6zsuw';
+// Gemini is configured via backend (api/gemini.js) using process.env.GEMINI_API_KEY
+// Never hardcode API key in frontend code!
 let GEMINI_CONFIGURED = false;
-
-// For Vercel/production: use process.env (injected at runtime)
-// សម្រាប់ Vercel/ផលិតផល: ប្រើ process.env (បញ្ចូលដោយស្វ័យប្រវត្តពេលរត់)
-if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
-    GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    GEMINI_CONFIGURED = true;
-} 
-// For local development: fetch from .env file
-// សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន: យកពីឯកសារ .env
-else if (typeof window !== 'undefined') {
-    // This will be populated by the loadEnvConfig function
-    GEMINI_API_KEY = window.__ENV_CONFIG__?.GEMINI_API_KEY || '';
-    if (GEMINI_API_KEY) {
-        GEMINI_CONFIGURED = true;
-    }
-}
 
 let ACTIVE_MODEL = 'gemini';
 
 const API_CONFIG = {
     gemini: {
-        baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+        // Backend proxy endpoint - never call Gemini directly from frontend
+        baseUrl: '/api/gemini',
         chatModel: 'gemini-2.0-flash-exp',
         codingModel: 'gemini-2.0-flash-exp',
-        apiKey: GEMINI_API_KEY,
         name: 'Google Gemini 2.0 Flash',
         icon: 'psychology'
     }
 };
 
-// Check Gemini API configuration status from backend
+// Check Gemini API configuration status from backend only
 // ពិនិត្យស្ថានភាពការកំណត់រចនាសម្ព័ន្ធ Gemini API ពី backend
 async function checkGeminiConfig() {
     try {
@@ -49,10 +33,8 @@ async function checkGeminiConfig() {
         if (response.ok) {
             const data = await response.json();
             GEMINI_CONFIGURED = data.configured || false;
-            // If backend has the key, enable models even if frontend doesn't have key
             if (data.configured) {
                 console.log('✅ Gemini API configured on backend');
-                // Update API_CONFIG to mark models as available
                 Object.keys(API_CONFIG).forEach(key => {
                     API_CONFIG[key].available = true;
                 });
@@ -70,16 +52,11 @@ async function checkGeminiConfig() {
     return null;
 }
 
-// Get available models (only those with API keys)
+// Get available models (only those configured on backend)
 function getAvailableModels() {
-    // Check if configured either locally or on backend
-    const hasKey = GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '';
-    const backendConfigured = GEMINI_CONFIGURED;
-    
     return Object.entries(API_CONFIG)
         .filter(([key, config]) => {
-            // Include model if either frontend has key OR backend is configured
-            return hasKey || backendConfigured || config.available;
+            return GEMINI_CONFIGURED || config.available;
         })
         .map(([key, config]) => ({ key, ...config }));
 }
@@ -92,10 +69,9 @@ function initializeActiveModel() {
     }
 }
 
-// Check if Gemini is configured (either locally or on backend)
+// Check if Gemini is configured on backend
 function isGeminiConfigured() {
-    const hasKey = GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '';
-    return GEMINI_CONFIGURED || hasKey;
+    return GEMINI_CONFIGURED;
 }
 
 // AI Identity with conditional creator mention
@@ -250,38 +226,10 @@ class ChatHistory {
     }
 }
 
-// Load environment variables from .env file (for local development)
-// ផ្ទុកអថេរបរិស្ថានពីឯកសារ .env (សម្រាប់ការអភិវឌ្ឍន៍មូលដ្ឋាន)
-async function loadEnvConfig() {
-    try {
-        const response = await fetch('/ai/.env');
-        if (response.ok) {
-            const text = await response.text();
-            const envVars = {};
-            
-            text.split('\n').forEach(line => {
-                line = line.trim();
-                if (line && !line.startsWith('#')) {
-                    const [key, ...valueParts] = line.split('=');
-                    if (key && valueParts.length > 0) {
-                        const value = valueParts.join('=').trim();
-                        envVars[key.trim()] = value;
-                    }
-                }
-            });
-            
-            // Store in window object for access
-            if (typeof window !== 'undefined') {
-                window.__ENV_CONFIG__ = envVars;
-            }
-            
-            return envVars;
-        }
-    } catch (error) {
-        console.warn('Could not load .env file:', error);
-    }
-    return {};
-}
+// ===== REMOVED: loadEnvConfig() - No longer needed ====
+// API keys are NEVER loaded from .env files on the frontend
+// All API calls are proxied through backend (api/gemini.js)
+// 🔒 This prevents API key leakage in browser DevTools Network tab
 
 // Initialize chat history
 const chatHistory = new ChatHistory();

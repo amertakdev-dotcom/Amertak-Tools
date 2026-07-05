@@ -275,12 +275,9 @@ document.addEventListener('click', (e) => {
 // ===== INITIALIZATION =====
 
 window.addEventListener('DOMContentLoaded', async () => {
-    // Load environment variables from .env file
-    // ផ្ទុកអថេរបរិស្ថានពីឯកសារ .env
-    await loadEnvConfig();
-    
     // Check Gemini API configuration from backend
-    // ពិនិត្យការកំណត់រចនាសម្ព័ន្ធ Gemini API ពី backend
+    // 🔒 API key is NEVER fetched from .env file on frontend
+    // All API calls are proxied through backend api/gemini.js
     await checkGeminiConfig();
     
     initializeActiveModel();

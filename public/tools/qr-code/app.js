@@ -17,7 +17,7 @@ const openResultBtn = document.getElementById('openResultBtn');
 
 const defaultText = '';
 const apiBaseUrl = 'https://api.qrserver.com/v1';
-const logoPath = '/assets/icons/qrlogo.svg';
+const logoPath = '/assets/icons/logo.svg';
 let generatedBlob = null;
 let generatedObjectUrl = '';
 
