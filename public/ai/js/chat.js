@@ -51,273 +51,156 @@ async function sendMessage() {
     }
 }
 
+// ===== SHARED API CALLER =====
+
+async function callGroqAPI(fullMessage, loadingId) {
+    const config = API_CONFIG[ACTIVE_MODEL];
+    const endpoint = config.endpoint || '/api/groq';
+
+    let rawRes;
+    try {
+        rawRes = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: fullMessage })
+        });
+    } catch (netErr) {
+        removeMessage(loadingId);
+        addMessage(`❌ សូមពិនិត្យមើលអ៊ីនធឺណិត៖ ${netErr.message}`, 'ai');
+        return null;
+    }
+
+    const text = await rawRes.text();
+    let result;
+    try {
+        result = JSON.parse(text);
+    } catch {
+        removeMessage(loadingId);
+        addMessage('❌ Server មិន return JSON ត្រឹមត្រូវ។', 'ai');
+        return null;
+    }
+
+    if (!rawRes.ok || result.error) {
+        removeMessage(loadingId);
+        addMessage(`❌ កំហុស API៖ ${result.error || result.message || 'Failed to get response'}`, 'ai');
+        return null;
+    }
+
+    return result;
+}
+
 // ===== API HANDLERS =====
 
 async function handleChat(message, files, loadingId) {
-    let fullMessage = message;
+    let fullMessage = AI_IDENTITY.getSystemPrompt(false) + '\n\n';
+
+    // Get recent chat history for context
+    const recentHistory = chatHistory.getRecentContext(5);
+    if (recentHistory && recentHistory.length > 0) {
+        recentHistory.forEach(msg => {
+            const label = msg.role === 'ai' ? 'Assistant' : 'User';
+            fullMessage += `${label}: ${msg.content}\n`;
+        });
+        fullMessage += '\n';
+    }
+
+    fullMessage += `User: ${message}`;
 
     if (files.length > 0) {
         fullMessage += `\n\n[អ្នកបានភ្ជាប់ ${files.length} ឯកសារ៖ ${files.map(f => f.name).join(', ')}]`;
     }
 
-    // Get recent chat history for context
-    const recentHistory = chatHistory.getRecentContext(5);
-    const contextMessages = recentHistory.map(msg => ({
-        // Map 'ai' role to 'assistant' for API compatibility
-        role: msg.role === 'ai' ? 'assistant' : msg.role,
-        content: msg.content
-    }));
+    const result = await callGroqAPI(fullMessage, loadingId);
+    if (!result) return;
 
-    // Add current message
-    contextMessages.push({ role: 'user', content: fullMessage });
-
-    const config = API_CONFIG[ACTIVE_MODEL];
-
-    try {
-        // Convert messages to Gemini format
-        const geminiMessages = [
-            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
-            ...contextMessages.map(msg => ({
-                role: msg.role === 'assistant' ? 'model' : 'user',
-                parts: [{ text: msg.content }]
-            }))
-        ];
-
-        // Call backend API instead of Gemini directly
-        const response = await fetch('/api/gemini', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: 'generate',
-                messages: geminiMessages,
-                model: config.chatModel,
-                temperature: 0.7,
-                maxOutputTokens: 2000
-            })
-        });
-
-        const result = await response.json();
-        removeMessage(loadingId);
-
-        if (!response.ok || !result.success) {
-            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
-            return;
-        }
-
-        const data = result.data;
-        if (data.error) {
-            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const aiResponse = data.candidates[0].content.parts[0].text;
-            // Save to history
-            chatHistory.addMessage(aiResponse, 'ai');
-            addMessage(aiResponse, 'ai');
-        } else {
-            addMessage('❌ ការឆ្លើយតបមិនមានបញ្ហា', 'ai');
-        }
-    } catch (error) {
-        removeMessage(loadingId);
-        addMessage(`❌ សូមពិនិត្យមើលអ៊ីនធឺណិត៖ ${error.message}`, 'ai');
-    }
+    removeMessage(loadingId);
+    const aiResponse = result.reply || result.choices?.[0]?.message?.content || '❌ ការឆ្លើយតបទទេ';
+    chatHistory.addMessage(aiResponse, 'ai');
+    addMessage(aiResponse, 'ai');
 }
 
 async function handleMath(prompt, files, loadingId) {
-    let fullPrompt = `You are an expert mathematics teacher and problem solver. Help the user with their math problem. Provide step-by-step solutions with clear explanations in Khmer language.\n\nProblem: ${prompt}`;
+    let fullMessage = AI_IDENTITY.getSystemPrompt(false) + '\n\n';
+    fullMessage += `You are an expert mathematics teacher and problem solver. Help the user with their math problem. Provide step-by-step solutions with clear explanations in Khmer language.\n\nProblem: ${prompt}`;
 
     if (files.length > 0) {
-        fullPrompt += `\n\n[User has uploaded ${files.length} file(s) (images/documents) containing math problems: ${files.map(f => f.name).join(', ')}]`;
-        fullPrompt += `\n\nPlease analyze the content from these files and solve the math problems shown. If the files contain images of math equations, describe what you see and solve them step by step.`;
+        fullMessage += `\n\n[User has uploaded ${files.length} file(s) (images/documents) containing math problems: ${files.map(f => f.name).join(', ')}]`;
+        fullMessage += `\n\nPlease analyze the content from these files and solve the math problems shown. If the files contain images of math equations, describe what you see and solve them step by step.`;
     }
 
-    const config = API_CONFIG[ACTIVE_MODEL];
+    const result = await callGroqAPI(fullMessage, loadingId);
+    if (!result) return;
 
-    try {
-        const geminiMessages = [
-            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
-            { role: 'user', parts: [{ text: fullPrompt }] }
-        ];
-
-        // Call backend API instead of Gemini directly
-        const response = await fetch('/api/gemini', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: 'generate',
-                messages: geminiMessages,
-                model: config.chatModel,
-                temperature: 0.3,
-                maxOutputTokens: 3000
-            })
-        });
-
-        const result = await response.json();
-        removeMessage(loadingId);
-
-        if (!response.ok || !result.success) {
-            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
-            return;
-        }
-
-        const data = result.data;
-        if (data.error) {
-            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const solution = data.candidates[0].content.parts[0].text;
-            // Save to history
-            chatHistory.addMessage(solution, 'ai');
-            addMessage(solution, 'ai');
-        } else {
-            addMessage('❌ បរាជ័យក្នុងការដោះស្រាយលំហាត់គណិតវិទ្យា', 'ai');
-        }
-    } catch (error) {
-        removeMessage(loadingId);
-        addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
-    }
+    removeMessage(loadingId);
+    const solution = result.reply || result.choices?.[0]?.message?.content || '❌ បរាជ័យក្នុងការដោះស្រាយលំហាត់គណិតវិទ្យា';
+    chatHistory.addMessage(solution, 'ai');
+    addMessage(solution, 'ai');
 }
 
 async function handleHistory(prompt, files, loadingId) {
-    let fullPrompt = `You are an expert historian specializing in Cambodian and world history. Provide detailed, accurate, and engaging historical information. Always respond in Khmer language.\n\nUser's question about history: ${prompt}`;
+    let fullMessage = AI_IDENTITY.getSystemPrompt(false) + '\n\n';
+    fullMessage += `You are an expert historian specializing in Cambodian and world history. Provide detailed, accurate, and engaging historical information. Always respond in Khmer language.\n\nUser's question about history: ${prompt}`;
 
     if (files.length > 0) {
-        fullPrompt += `\n\n[User has uploaded ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
-        fullPrompt += `\n\nIf the files contain historical documents or images, analyze them and provide historical context.`;
+        fullMessage += `\n\n[User has uploaded ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
+        fullMessage += `\n\nIf the files contain historical documents or images, analyze them and provide historical context.`;
     }
 
-    const config = API_CONFIG[ACTIVE_MODEL];
+    const result = await callGroqAPI(fullMessage, loadingId);
+    if (!result) return;
 
-    try {
-        const geminiMessages = [
-            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
-            { role: 'user', parts: [{ text: fullPrompt }] }
-        ];
-
-        // Call backend API instead of Gemini directly
-        const response = await fetch('/api/gemini', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: 'generate',
-                messages: geminiMessages,
-                model: config.chatModel,
-                temperature: 0.7,
-                maxOutputTokens: 3000
-            })
-        });
-
-        const result = await response.json();
-        removeMessage(loadingId);
-
-        if (!response.ok || !result.success) {
-            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
-            return;
-        }
-
-        const data = result.data;
-        if (data.error) {
-            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const historicalInfo = data.candidates[0].content.parts[0].text;
-            // Save to history
-            chatHistory.addMessage(historicalInfo, 'ai');
-            addMessage(historicalInfo, 'ai');
-        } else {
-            addMessage('❌ បរាជ័យក្នុងការទាញយកព័ត៌មានប្រវត្តិសាស្ត្រ', 'ai');
-        }
-    } catch (error) {
-        removeMessage(loadingId);
-        addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
-    }
+    removeMessage(loadingId);
+    const historicalInfo = result.reply || result.choices?.[0]?.message?.content || '❌ បរាជ័យក្នុងការទាញយកព័ត៌មានប្រវត្តិសាស្ត្រ';
+    chatHistory.addMessage(historicalInfo, 'ai');
+    addMessage(historicalInfo, 'ai');
 }
 
 async function handleCoding(prompt, files, loadingId) {
-    let fullPrompt = `You are an expert programmer. Provide clean, well-commented code for the following request:\n\n${prompt}`;
+    let fullMessage = AI_IDENTITY.getSystemPrompt(false) + '\n\n';
+    fullMessage += `You are an expert programmer. Provide clean, well-commented code for the following request:\n\n${prompt}`;
 
     if (files.length > 0) {
-        fullPrompt += `\n\n[User has attached ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
+        fullMessage += `\n\n[User has attached ${files.length} file(s): ${files.map(f => f.name).join(', ')}]`;
     }
 
-    fullPrompt += `\n\nProvide only the code with minimal explanation.`;
+    fullMessage += `\n\nProvide only the code with minimal explanation.`;
 
-    const config = API_CONFIG[ACTIVE_MODEL];
+    const result = await callGroqAPI(fullMessage, loadingId);
+    if (!result) return;
 
-    try {
-        const geminiMessages = [
-            { role: 'user', parts: [{ text: AI_IDENTITY.getSystemPrompt(false) }] },
-            { role: 'user', parts: [{ text: fullPrompt }] }
-        ];
+    removeMessage(loadingId);
+    const code = result.reply || result.choices?.[0]?.message?.content || '❌ បរាជ័យក្នុងការបង្កើតកូដ';
 
-        // Call backend API instead of Gemini directly
-        const response = await fetch('/api/gemini', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: 'generate',
-                messages: geminiMessages,
-                model: config.codingModel,
-                temperature: 0.2,
-                maxOutputTokens: 3000
-            })
-        });
+    const chatContainer = document.getElementById('chatContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
+    messageDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    messageDiv.innerHTML = `
+        <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group hover:scale-110 transition-transform duration-300">
+            <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
+            <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">code</span>
+        </div>
+        <div class="flex-1 max-w-[90%] md:max-w-[80%]">
+            <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8 hover:shadow-lg transition-all duration-300">
+                <pre class="code-block"><code>${escapeHtml(code)}</code></pre>
+                <button onclick="copyCode(this)" class="mt-4 px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-300">📋 ចម្លងកូដ</button>
+            </div>
+        </div>
+    `;
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 
-        const result = await response.json();
-        removeMessage(loadingId);
-
-        if (!response.ok || !result.success) {
-            addMessage(`❌ កំហុស API៖ ${result.message || 'Failed to get response'}`, 'ai');
-            return;
-        }
-
-        const data = result.data;
-        if (data.error) {
-            addMessage(`❌ កំហុស API៖ ${data.error.message || JSON.stringify(data.error)}`, 'ai');
-        } else if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            const code = data.candidates[0].content.parts[0].text;
-            const chatContainer = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'flex items-start gap-3 sm:gap-5 message-bubble';
-            messageDiv.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            messageDiv.innerHTML = `
-                <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-bubble flex items-center justify-center flex-shrink-0 relative overflow-hidden group hover:scale-110 transition-transform duration-300">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-blue-500/5 to-pink-500/5"></div>
-                    <span class="material-symbols-outlined sparkle-gradient text-[20px] sm:text-[26px] z-10">code</span>
-                </div>
-                <div class="flex-1 max-w-[90%] md:max-w-[80%]">
-                    <div class="glass-bubble rounded-[2rem] rounded-tl-xl px-6 py-4 sm:px-8 hover:shadow-lg transition-all duration-300">
-                        <pre class="code-block"><code>${escapeHtml(code)}</code></pre>
-                        <button onclick="copyCode(this)" class="mt-4 px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-300">📋 ចម្លងកូដ</button>
-                    </div>
-                </div>
-            `;
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            // Save to history
-            chatHistory.addMessage(code, 'ai');
-        } else {
-            addMessage('❌ បរាជ័យក្នុងការបង្កើតកូដ', 'ai');
-        }
-    } catch (error) {
-        removeMessage(loadingId);
-        addMessage(`❌ កំហុសបណ្ដាញ៖ ${error.message}`, 'ai');
-    }
+    chatHistory.addMessage(code, 'ai');
 }
 
 // ===== UTILITY FUNCTIONS =====
 
 function escapeHtml(text) {
     const map = {
-        '&': '&',
-        '<': '<',
-        '>': '>',
-        '"': '"',
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
