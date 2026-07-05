@@ -1,25 +1,22 @@
 export default async function handler(req, res) {
-  // Allow only POST request
+  // ONLY POST allowed
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   try {
-    const { message } = req.body;
+    const { message } = req.body || {};
 
-    // Check input
     if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+      return res.status(400).json({ error: "Message required" });
     }
 
-    // Get API key from Vercel env
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: "Missing GROQ_API_KEY in env" });
+      return res.status(500).json({ error: "Missing API Key" });
     }
 
-    // Call Groq API (OpenAI format)
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -48,11 +45,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Extract reply
     const reply =
-      data?.choices?.[0]?.message?.content || "No response from AI";
+      data?.choices?.[0]?.message?.content || "No response";
 
-    // Return result
     return res.status(200).json({
       reply
     });
@@ -62,4 +57,4 @@ export default async function handler(req, res) {
       error: error.message || "Server error"
     });
   }
-            }
+}
