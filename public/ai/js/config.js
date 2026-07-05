@@ -1,61 +1,42 @@
 // UI Configuration and AI Identity - SECURED
-// ការកំណត់ចំណុចប្រទាក់អ្នកប្រើ និង កំណត់ភាពជា AI
 
 // ===============================
-// ❌ REMOVED API KEY (SECURITY FIX)
-// ===============================
-// const GROQ_API_KEY = "REMOVED_FOR_SECURITY";
-
-// ===============================
-// API Configuration
+// API CONFIG (NO KEY - FRONTEND SAFE)
 // ===============================
 const API_CONFIG = {
     groq: {
-        baseUrl: "/api/groq",
-        chatModel: "llama-3.1-70b-versatile",
-        codingModel: "llama-3.1-70b-versatile",
-        name: "Groq (Secure Mode)",
+        endpoint: "/api/groq",
+        name: "Groq AI",
         icon: "bolt"
     }
 };
 
 // ===============================
-// Current active model
-// ===============================
-let ACTIVE_MODEL = 'groq';
+let ACTIVE_MODEL = "groq";
 
-// ===============================
-// Get available models (only those with API keys)
 // ===============================
 function getAvailableModels() {
-    return Object.entries(API_CONFIG)
-        .map(([key, config]) => ({ key, ...config }));
+    return Object.entries(API_CONFIG).map(([key, config]) => ({
+        key,
+        ...config
+    }));
 }
 
-// ===============================
-// Initialize active model
-// ===============================
 function initializeActiveModel() {
-    const available = getAvailableModels();
-    if (available.length > 0) {
-        ACTIVE_MODEL = available[0].key;
-    }
+    ACTIVE_MODEL = "groq";
 }
 
-// ===============================
-// Check if Groq is configured
-// ===============================
 function isGroqConfigured() {
     return true;
 }
 
 // ===============================
-// AI IDENTITY (UNCHANGED PROMPT)
+// AI IDENTITY (PROMPT 100% UNCHANGED)
 // ===============================
 const AI_IDENTITY = {
     name: "អមតៈ - Amertak",
     nameEn: "Amertak",
-    language: "km", // Khmer
+    language: "km",
     developer: "គីន ថាវរ៉ាត់",
 
     websiteDescription: `This is Amertak (អមតៈ), a modern web platform that provides various online tools and AI-powered services. Key features include:
@@ -73,10 +54,10 @@ const AI_IDENTITY = {
 The platform is built with modern web technologies, featuring a beautiful glass-morphism UI design, dark/light mode support, and responsive layout. It's designed to be user-friendly and accessible for Khmer speakers and international users.`,
 
     getSystemPrompt: function(includeCreatorInfo = false) {
-        const creatorInfo = includeCreatorInfo 
+        const creatorInfo = includeCreatorInfo
             ? `Developer: "${this.developer}" - Kin Thavrath`
             : '';
-        
+
         return `You are "អមតៈ - Amertak", a professional AI assistant.
 
 CRITICAL RULES - YOU MUST FOLLOW THESE ABSOLUTELY:
@@ -115,7 +96,7 @@ Translate the context and respond in Khmer language only.`;
 };
 
 // ===============================
-// Mode-specific prompts (UNCHANGED)
+// MODE PROMPTS (UNCHANGED 100%)
 // ===============================
 const MODE_PROMPTS = {
     chat: [
@@ -148,11 +129,9 @@ const MODE_PROMPTS = {
 };
 
 // ===============================
-// Chat history (UNCHANGED)
-// ===============================
 class ChatHistory {
     constructor() {
-        this.storageKey = 'amertak_chat_history_session';
+        this.storageKey = "amertak_chat_history_session";
         this.maxHistoryItems = 50;
         this.loadHistory();
     }
@@ -162,7 +141,6 @@ class ChatHistory {
             const data = sessionStorage.getItem(this.storageKey);
             this.history = data ? JSON.parse(data) : [];
         } catch (e) {
-            console.error('Failed to load chat history:', e);
             this.history = [];
         }
     }
@@ -170,23 +148,16 @@ class ChatHistory {
     saveHistory() {
         try {
             sessionStorage.setItem(this.storageKey, JSON.stringify(this.history));
-        } catch (e) {
-            console.error('Failed to save chat history:', e);
-        }
+        } catch (e) {}
     }
 
     addMessage(content, role, timestamp = Date.now()) {
-        this.history.push({
-            id: `msg-${timestamp}`,
-            content,
-            role,
-            timestamp
-        });
-        
+        this.history.push({ id: `msg-${timestamp}`, content, role, timestamp });
+
         if (this.history.length > this.maxHistoryItems) {
             this.history = this.history.slice(-this.maxHistoryItems);
         }
-        
+
         this.saveHistory();
     }
 
@@ -194,37 +165,10 @@ class ChatHistory {
         return this.history;
     }
 
-    getRecentContext(count = 10) {
-        return this.history.slice(-count);
-    }
-
     clearHistory() {
         this.history = [];
         sessionStorage.removeItem(this.storageKey);
     }
-
-    export() {
-        return JSON.stringify(this.history, null, 2);
-    }
 }
 
-// ===============================
-// INIT
-// ===============================
 const chatHistory = new ChatHistory();
-
-// ===============================
-// EXPORT
-// ===============================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        API_CONFIG,
-        AI_IDENTITY,
-        MODE_PROMPTS,
-        ChatHistory,
-        chatHistory,
-        getAvailableModels,
-        initializeActiveModel,
-        isGroqConfigured
-    };
-    }
