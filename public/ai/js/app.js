@@ -277,9 +277,6 @@ document.addEventListener('click', (e) => {
 window.addEventListener('DOMContentLoaded', async () => {
     // Check Gemini API configuration from backend
     // 🔒 API key is NEVER fetched from .env file on frontend
-    // All API calls are proxied through backend api/gemini.js
-    await checkGeminiConfig();
-    
     initializeActiveModel();
     populateModelDropdown();
     setMode('chat');

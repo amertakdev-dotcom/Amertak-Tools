@@ -1,63 +1,27 @@
 // UI Configuration and AI Identity - SECURED
 // ការកំណត់ចំណុចប្រទាក់អ្នកប្រើ និង កំណត់ភាពជា AI
-// 🔒 API key is NEVER stored here - backend proxy handles all API calls
 
-// Gemini is configured via backend (api/gemini.js) using process.env.GEMINI_API_KEY
-// Never hardcode API key in frontend code!
-let GEMINI_CONFIGURED = false;
+// API Configuration
+const GROQ_API_KEY = "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";
 
-let ACTIVE_MODEL = 'gemini';
+// Current active model
+let ACTIVE_MODEL = 'groq';
 
 const API_CONFIG = {
-    gemini: {
-        // Backend proxy endpoint - never call Gemini directly from frontend
-        baseUrl: '/api/gemini',
-        chatModel: 'gemini-2.0-flash-exp',
-        codingModel: 'gemini-2.0-flash-exp',
-        name: 'Google Gemini 2.0 Flash',
-        icon: 'psychology'
+    groq: {
+        baseUrl: 'https://api.groq.com/openai/v1',
+        chatModel: 'llama-3.3-70b-versatile',
+        codingModel: 'llama-3.3-70b-versatile',
+        apiKey: GROQ_API_KEY,
+        name: 'Groq (Llama 3.3)',
+        icon: 'bolt'
     }
 };
 
-// Check Gemini API configuration status from backend only
-// ពិនិត្យស្ថានភាពការកំណត់រចនាសម្ព័ន្ធ Gemini API ពី backend
-async function checkGeminiConfig() {
-    try {
-        const response = await fetch('/api/gemini', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            GEMINI_CONFIGURED = data.configured || false;
-            if (data.configured) {
-                console.log('✅ Gemini API configured on backend');
-                Object.keys(API_CONFIG).forEach(key => {
-                    API_CONFIG[key].available = true;
-                });
-            } else {
-                console.warn('⚠️ Gemini API not configured on backend');
-                Object.keys(API_CONFIG).forEach(key => {
-                    API_CONFIG[key].available = false;
-                });
-            }
-            return data;
-        }
-    } catch (error) {
-        console.warn('Could not check Gemini config:', error);
-    }
-    return null;
-}
-
-// Get available models (only those configured on backend)
+// Get available models (only those with API keys)
 function getAvailableModels() {
     return Object.entries(API_CONFIG)
-        .filter(([key, config]) => {
-            return GEMINI_CONFIGURED || config.available;
-        })
+        .filter(([key, config]) => config.apiKey && config.apiKey.trim() !== '')
         .map(([key, config]) => ({ key, ...config }));
 }
 
@@ -69,9 +33,9 @@ function initializeActiveModel() {
     }
 }
 
-// Check if Gemini is configured on backend
-function isGeminiConfigured() {
-    return GEMINI_CONFIGURED;
+// Check if Groq is configured
+function isGroqConfigured() {
+    return GROQ_API_KEY && GROQ_API_KEY.trim() !== '';
 }
 
 // AI Identity with conditional creator mention
@@ -226,11 +190,6 @@ class ChatHistory {
     }
 }
 
-// ===== REMOVED: loadEnvConfig() - No longer needed ====
-// API keys are NEVER loaded from .env files on the frontend
-// All API calls are proxied through backend (api/gemini.js)
-// 🔒 This prevents API key leakage in browser DevTools Network tab
-
 // Initialize chat history
 const chatHistory = new ChatHistory();
 
@@ -244,7 +203,6 @@ if (typeof module !== 'undefined' && module.exports) {
         chatHistory,
         getAvailableModels,
         initializeActiveModel,
-        checkGeminiConfig,
-        isGeminiConfigured
+        isGroqConfigured
     };
 }
