@@ -1,4 +1,4 @@
-const { getShareById, deleteShare, cleanupExpired } = require('./_lib/cloud-share');
+const { getShareById, deleteShare } = require('./_lib/cloud-share');
 
 function getQueryValue(req, key) {
   if (req.query && req.query[key]) {
@@ -20,7 +20,6 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    await cleanupExpired();
     const id = getQueryValue(req, 'id');
 
     if (!id) {

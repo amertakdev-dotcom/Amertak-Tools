@@ -4,7 +4,6 @@ let cachedClient = null;
 let cachedDb = null;
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
-const EXPIRY_HOURS = 24;
 
 async function getDb() {
   const uri = process.env.MONGO_URL || process.env.MONGOURL || process.env.MONGODB_URI || process.env.MONGODB_URL || '';
@@ -74,10 +73,15 @@ function validatePayload(payload) {
     throw new Error('File size exceeds 100MB limit.');
   }
 
+  if (/[<>:"/\\|?*\x00-\x1f]/.test(fileName)) {
+    throw new Error('Invalid filename. Contains restricted characters.');
+  }
+
   return { fileName, mimeType, size };
 }
 
-async function saveShare(req, payload) {
+// Step 1: Upload file and store it without a share token
+async function saveFile(req, payload) {
   const collection = await getCollection();
   const { fileName, mimeType, size } = validatePayload(payload);
   const parsed = extractBase64Payload(payload.fileData || payload.data || payload.base64);
@@ -97,7 +101,6 @@ async function saveShare(req, payload) {
     fileType: mimeType,
     fileSize: size,
     createdAt: now,
-    expiresAt: new Date(now.getTime() + EXPIRY_HOURS * 60 * 60 * 1000),
     uploadedAt: now,
     downloads: 0,
     views: 0
@@ -107,32 +110,83 @@ async function saveShare(req, payload) {
 
   return {
     success: true,
-    shareId: id,
-    shareUrl: getShareUrl(req, id),
+    id,
+    fileName: doc.fileName,
+    name: doc.name,
+    description: doc.description,
+    mimeType: doc.mimeType,
+    size: doc.size,
+    category: doc.category,
+    createdAt: doc.createdAt
+  };
+}
+
+// Step 2: Generate share link for an already-uploaded file
+async function generateShare(req, fileId) {
+  const collection = await getCollection();
+  const document = await collection.findOne({ id: fileId });
+  if (!document) {
+    throw new Error('File not found.');
+  }
+
+  // Check if share token already exists (no expiry anymore)
+  if (document.shareToken) {
+    return {
+      success: true,
+      shareId: fileId,
+      shareUrl: getShareUrl(req, fileId),
+      file: {
+        id: fileId,
+        fileName: document.fileName || document.name,
+        name: document.name,
+        description: document.description,
+        mimeType: document.mimeType,
+        size: document.size,
+        category: document.category,
+        createdAt: document.createdAt || document.uploadedAt,
+        downloads: document.downloads || 0,
+        shareUrl: getShareUrl(req, fileId)
+      }
+    };
+  }
+
+  // Generate share token
+  const shareToken = createId();
+  await collection.updateOne(
+    { id: fileId },
+    { $set: { shareToken, sharedAt: new Date() } }
+  );
+
+  return {
+    success: true,
+    shareId: fileId,
+    shareUrl: getShareUrl(req, fileId),
     file: {
-      id,
-      fileName: doc.fileName,
-      name: doc.name,
-      description: doc.description,
-      mimeType: doc.mimeType,
-      size: doc.size,
-      category: doc.category,
-      createdAt: doc.createdAt,
-      expiresAt: doc.expiresAt,
-      downloads: doc.downloads,
-      shareUrl: getShareUrl(req, id)
+      id: fileId,
+      fileName: document.fileName || document.name,
+      name: document.name,
+      description: document.description,
+      mimeType: document.mimeType,
+      size: document.size,
+      category: document.category,
+      createdAt: document.createdAt || document.uploadedAt,
+      downloads: document.downloads || 0,
+      shareUrl: getShareUrl(req, fileId)
     }
   };
+}
+
+// Legacy function for backward compatibility
+async function saveShare(req, payload) {
+  const result = await saveFile(req, payload);
+  const shareResult = await generateShare(req, result.id);
+  return shareResult;
 }
 
 async function getShareById(shareId) {
   const collection = await getCollection();
   const document = await collection.findOne({ id: shareId });
   if (!document) return null;
-  if (document.expiresAt && new Date(document.expiresAt) < new Date()) {
-    await collection.deleteOne({ id: shareId });
-    return null;
-  }
   return {
     id: document.id,
     fileName: document.fileName || document.name,
@@ -142,7 +196,6 @@ async function getShareById(shareId) {
     size: document.size,
     category: document.category,
     createdAt: document.createdAt || document.uploadedAt,
-    expiresAt: document.expiresAt,
     downloads: document.downloads || 0,
     shareUrl: `/tools/cloude/share/${document.id}`
   };
@@ -152,10 +205,6 @@ async function getShareFileById(shareId) {
   const collection = await getCollection();
   const document = await collection.findOne({ id: shareId });
   if (!document) return null;
-  if (document.expiresAt && new Date(document.expiresAt) < new Date()) {
-    await collection.deleteOne({ id: shareId });
-    return null;
-  }
   return document;
 }
 
@@ -170,16 +219,12 @@ async function deleteShare(shareId) {
   return result.deletedCount > 0;
 }
 
-async function cleanupExpired() {
-  const collection = await getCollection();
-  await collection.deleteMany({ expiresAt: { $lt: new Date() } });
-}
-
 module.exports = {
   saveShare,
+  saveFile,
+  generateShare,
   getShareById,
   getShareFileById,
   incrementDownload,
-  deleteShare,
-  cleanupExpired
+  deleteShare
 };

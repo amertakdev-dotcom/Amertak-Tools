@@ -1,4 +1,4 @@
-const { saveShare, extractBase64Payload } = require('../_lib/cloud-share');
+const { saveFile, extractBase64Payload } = require('../_lib/cloud-share');
 
 function bufferToBase64(buffer) {
   return buffer.toString('base64');
@@ -82,7 +82,7 @@ module.exports = async function handler(req, res) {
 
     const base64Data = bufferToBase64(fileBuffer);
 
-    const result = await saveShare(req, {
+    const result = await saveFile(req, {
       fileName,
       name: fileName,
       description,

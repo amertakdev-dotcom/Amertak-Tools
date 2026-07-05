@@ -58,6 +58,17 @@ body {
 .share-card strong { display: block; font-size: 0.94rem; }
 .share-card p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; word-break: break-all; }
 .share-card button { border: none; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; padding: 8px 12px; cursor: pointer; }
+.share-card button:disabled { opacity: 0.5; cursor: not-allowed; }
+.file-info { flex: 1; }
+.file-meta { margin: 2px 0; color: var(--muted); font-size: 0.85rem; }
+.file-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-generate-link { background: linear-gradient(135deg, #3ee28f, #1abc9c) !important; }
+.share-link-card { flex-direction: column; align-items: stretch; }
+.share-url-box { margin-top: 8px; }
+.share-url-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: rgba(4,7,16,0.72); color: var(--text); font-size: 0.85rem; cursor: text; }
+.btn-copy-link { background: linear-gradient(135deg, var(--accent), #5b3cc4) !important; }
+.btn-open-link { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
+.btn-delete-file { background: linear-gradient(135deg, var(--accent-2), #c0392b) !important; }
 .toast { position: fixed; right: 18px; bottom: 18px; padding: 12px 14px; border-radius: 999px; background: rgba(6,8,22,0.95); color: white; opacity: 0; transform: translateY(8px); pointer-events: none; transition: all 0.25s ease; z-index: 1000; border: 1px solid var(--border); }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { border-color: #3ee28f; }

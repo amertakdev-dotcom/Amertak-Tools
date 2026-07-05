@@ -30,7 +30,7 @@ module.exports = async function handler(req, res) {
 
     await incrementDownload(shareId);
 
-    const buffer = Buffer.from(file.data || '', 'base64');
+    const buffer = Buffer.from(file.fileData || file.data || '', 'base64');
     res.setHeader('Content-Type', file.mimeType || 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.name || 'shared-file')}"`);
     res.status(200).send(buffer);

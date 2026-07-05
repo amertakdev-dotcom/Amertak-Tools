@@ -47,17 +47,54 @@ function createUploadCard(file, progress, state) {
   return row;
 }
 
+function createFileInfoCard(uploadedFile, rawFile) {
+  const card = document.createElement('div');
+  card.className = 'share-card';
+  card.dataset.fileId = uploadedFile.id;
+  card.innerHTML = `
+    <div class="file-info">
+      <strong>${uploadedFile.fileName || rawFile.name}</strong>
+      <p class="file-meta">Size: ${formatBytes(uploadedFile.size || rawFile.size)}</p>
+      <p class="file-meta">Type: ${uploadedFile.mimeType || rawFile.type || 'Unknown'}</p>
+      <p class="file-meta">Uploaded: ${new Date(uploadedFile.createdAt || Date.now()).toLocaleString()}</p>
+    </div>
+    <div class="file-actions">
+      <button type="button" class="btn-generate-link">Generate Share Link</button>
+    </div>
+  `;
+  return card;
+}
+
+function createShareLinkCard(shareUrl, shareId, fileName) {
+  const card = document.createElement('div');
+  card.className = 'share-card share-link-card';
+  card.innerHTML = `
+    <div class="file-info">
+      <strong>${fileName}</strong>
+      <p class="file-meta">Share Link Ready</p>
+      <div class="share-url-box">
+        <input type="text" class="share-url-input" value="${shareUrl}" readonly>
+      </div>
+    </div>
+    <div class="file-actions">
+      <button type="button" class="btn-copy-link" data-link="${shareUrl}">Copy Link</button>
+      <button type="button" class="btn-open-link" data-link="${shareUrl}">Open Link</button>
+      <button type="button" class="btn-delete-file" data-id="${shareId}">Delete</button>
+    </div>
+  `;
+  return card;
+}
+
 async function uploadFiles(files) {
   if (!files.length) return;
 
   const pending = Array.from(files);
-  const cards = [];
 
   uploadList.innerHTML = '';
   resultArea.innerHTML = '';
   resultArea.className = 'result-area';
 
-  for (const [index, file] of pending.entries()) {
+  for (const file of pending) {
     if (file.size > MAX_FILE_SIZE) {
       showToast(`${file.name} exceeds 100MB limit.`, 'error');
       continue;
@@ -65,7 +102,6 @@ async function uploadFiles(files) {
 
     const card = createUploadCard(file, 0, 'Preparing');
     uploadList.appendChild(card);
-    cards.push(card);
 
     try {
       const base64 = await filesToBase64(file);
@@ -89,26 +125,76 @@ async function uploadFiles(files) {
         throw new Error(data.message || 'Upload failed.');
       }
 
-      const uploaded = data.files?.[0] || data;
+      const uploadedFile = data.files?.[0] || data;
       card.querySelector('.upload-status').textContent = 'Done';
       card.querySelector('.upload-progress span').style.width = '100%';
 
-      const linkCard = document.createElement('div');
-      linkCard.className = 'share-card';
-      linkCard.innerHTML = `
-        <div>
-          <strong>${uploaded.fileName || file.name}</strong>
-          <p>${uploaded.shareUrl || uploaded.file?.shareUrl || ''}</p>
-        </div>
-        <button type="button" data-link="${uploaded.shareUrl || uploaded.file?.shareUrl || ''}">Copy</button>
-      `;
-      resultArea.appendChild(linkCard);
+      // Show file info card with Generate Share Link button
+      const fileInfoCard = createFileInfoCard(uploadedFile, file);
+      resultArea.appendChild(fileInfoCard);
       showToast(`Uploaded ${file.name}.`, 'success');
 
-      linkCard.querySelector('button').addEventListener('click', async () => {
-        const url = linkCard.querySelector('button').dataset.link;
-        await navigator.clipboard.writeText(url);
-        showToast('Share link copied.', 'success');
+      // Generate Share Link button handler
+      fileInfoCard.querySelector('.btn-generate-link').addEventListener('click', async () => {
+        const btn = fileInfoCard.querySelector('.btn-generate-link');
+        btn.disabled = true;
+        btn.textContent = 'Generating...';
+
+        try {
+          const genResponse = await fetch('/api/share/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileId: uploadedFile.id
+            })
+          });
+
+          const genData = await genResponse.json();
+          if (!genResponse.ok) {
+            throw new Error(genData.message || 'Failed to generate share link.');
+          }
+
+          const shareUrl = genData.shareUrl;
+          const shareId = genData.shareId;
+
+          // Replace file info card with share link card
+          const shareLinkCard = createShareLinkCard(shareUrl, shareId, file.name);
+          fileInfoCard.replaceWith(shareLinkCard);
+
+          // Copy Link button handler
+          shareLinkCard.querySelector('.btn-copy-link').addEventListener('click', async () => {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast('Share link copied to clipboard.', 'success');
+          });
+
+          // Open Link button handler
+          shareLinkCard.querySelector('.btn-open-link').addEventListener('click', () => {
+            window.open(shareUrl, '_blank');
+          });
+
+          // Delete button handler
+          shareLinkCard.querySelector('.btn-delete-file').addEventListener('click', async () => {
+            try {
+              const delResponse = await fetch(`/api/file?id=${encodeURIComponent(shareId)}`, {
+                method: 'DELETE'
+              });
+              if (delResponse.ok) {
+                shareLinkCard.remove();
+                showToast('File deleted successfully.', 'success');
+              } else {
+                showToast('Failed to delete file.', 'error');
+              }
+            } catch (err) {
+              showToast('Failed to delete file.', 'error');
+            }
+          });
+
+          showToast('Share link generated successfully.', 'success');
+        } catch (error) {
+          btn.disabled = false;
+          btn.textContent = 'Generate Share Link';
+          showToast(error.message || 'Failed to generate share link.', 'error');
+        }
       });
     } catch (error) {
       card.querySelector('.upload-status').textContent = 'Failed';

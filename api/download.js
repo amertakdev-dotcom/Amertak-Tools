@@ -1,4 +1,4 @@
-const { getShareFileById, incrementDownload, cleanupExpired } = require('./_lib/cloud-share');
+const { getShareFileById, incrementDownload } = require('./_lib/cloud-share');
 
 function getQueryValue(req, key) {
   if (req.query && req.query[key]) {
@@ -25,7 +25,6 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    await cleanupExpired();
     const id = getQueryValue(req, 'id');
     if (!id) {
       res.status(400).json({ success: false, message: 'Missing file id.' });
@@ -34,14 +33,14 @@ module.exports = async function handler(req, res) {
 
     const file = await getShareFileById(id);
     if (!file) {
-      res.status(404).json({ success: false, message: 'File not found or expired.' });
+      res.status(404).json({ success: false, message: 'File not found.' });
       return;
     }
 
     await incrementDownload(id);
-    const buffer = Buffer.from(file.data || '', 'base64');
-    res.setHeader('Content-Type', file.fileType || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.fileName || 'download')}"`);
+    const buffer = Buffer.from(file.fileData || file.data || '', 'base64');
+    res.setHeader('Content-Type', file.mimeType || file.fileType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.fileName || file.name || 'download')}"`);
     res.setHeader('Cache-Control', 'no-store');
     res.status(200).send(buffer);
   } catch (error) {

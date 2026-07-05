@@ -1,4 +1,4 @@
-const { saveShare } = require('./_lib/cloud-share');
+const { saveFile } = require('./_lib/cloud-share');
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -38,11 +38,26 @@ function readBody(req) {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.status(204).end();
+    return;
+  }
+
+  if (req.method === 'GET') {
+    res.status(200).json({
+      success: true,
+      service: 'Cloud Upload API',
+      status: 'online',
+      methods: ['POST'],
+      message: 'Use POST to upload files.',
+      limits: {
+        maxFileSize: '100MB',
+        supportedFormats: ['image/*', 'video/*', 'audio/*', 'application/pdf', 'application/zip', '*/*']
+      }
+    });
     return;
   }
 
@@ -63,7 +78,7 @@ module.exports = async function handler(req, res) {
 
     const uploadedFiles = [];
     for (const item of files) {
-      const share = await saveShare(req, {
+      const file = await saveFile(req, {
         fileName: item.fileName || item.name || 'shared-file',
         name: item.fileName || item.name || 'shared-file',
         description: item.description || '',
@@ -72,7 +87,7 @@ module.exports = async function handler(req, res) {
         fileData: item.fileData || item.data || item.base64,
         category: item.category || ''
       });
-      uploadedFiles.push(share);
+      uploadedFiles.push(file);
     }
 
     res.status(200).json({ success: true, count: uploadedFiles.length, files: uploadedFiles });
