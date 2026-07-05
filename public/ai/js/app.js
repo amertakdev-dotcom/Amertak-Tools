@@ -284,7 +284,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     chatContainer.scrollTop = chatContainer.scrollHeight;
     
     // Load and display chat history
-    const history = chatHistory.getHistory();
+    const history = chatHistory.get();
     const welcomeContainer = document.querySelector('.welcome-container');
     
     if (history.length > 0) {

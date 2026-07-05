@@ -1,85 +1,141 @@
-// Gemini API Configuration Endpoint
-// ចំណុចបញ្ចប់ការកំណត់រចនាសម្ព័ន្ធ Gemini API
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 module.exports = async function handler(req, res) {
-  // Read environment variable inside handler function
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-  
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
     res.status(204).end();
     return;
   }
 
-  // Handle GET requests - return configuration status
   if (req.method === 'GET') {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      configured: GEMINI_API_KEY ? true : false,
+      configured: !!GEMINI_API_KEY,
       hasKey: !!GEMINI_API_KEY,
       model: 'gemini-2.0-flash-exp',
       features: {
-        chat: GEMINI_API_KEY ? true : false,
-        coding: GEMINI_API_KEY ? true : false,
-        translation: GEMINI_API_KEY ? true : false
+        chat: !!GEMINI_API_KEY,
+        coding: !!GEMINI_API_KEY,
+        translation: !!GEMINI_API_KEY
       },
-      message: GEMINI_API_KEY 
-        ? 'Gemini API configured' 
-        : 'Gemini API key not configured'
+      message: GEMINI_API_KEY ? 'Gemini API configured' : 'Gemini API key not configured'
     });
-    return;
   }
 
   if (req.method !== 'POST') {
-    res.status(405).json({ 
-      success: false, 
-      message: 'Method not allowed. Use GET or POST.' 
+    return res.status(405).json({
+      success: false,
+      message: 'Method not allowed. Use GET or POST.'
     });
-    return;
   }
 
   try {
-    // Read request body
     const body = await readBody(req);
-    const { apiKey, action = 'validate' } = body || {};
+    const { apiKey, action = 'validate', messages, model, temperature, maxOutputTokens } = body || {};
 
-    // Handle different actions
     switch (action) {
-      case 'validate':
-        // Validate the provided API key
-        if (!apiKey || apiKey.trim() === '') {
-          res.status(400).json({ 
-            success: false, 
-            message: 'API key is required',
-            configured: GEMINI_API_KEY ? true : false
+
+      case 'generate': {
+        const keyToUse = GEMINI_API_KEY;
+
+        if (!keyToUse) {
+          return res.status(500).json({
+            success: false,
+            message: 'GEMINI_API_KEY is not configured on the server.'
           });
-          return;
         }
 
-        // Test the API key with a simple request to Gemini
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'messages array is required for generate action.'
+          });
+        }
+
+        const targetModel = model || 'gemini-2.0-flash-exp';
+        const url = `${GEMINI_BASE_URL}/models/${targetModel}:generateContent?key=${keyToUse}`;
+
+        const geminiBody = {
+          contents: messages,
+          generationConfig: {
+            temperature: typeof temperature === 'number' ? temperature : 0.7,
+            maxOutputTokens: typeof maxOutputTokens === 'number' ? maxOutputTokens : 2000
+          }
+        };
+
+        let geminiResponse;
+        try {
+          geminiResponse = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(geminiBody)
+          });
+        } catch (fetchErr) {
+          return res.status(502).json({
+            success: false,
+            message: 'Failed to reach Gemini API: ' + (fetchErr.message || 'Network error')
+          });
+        }
+
+        const rawText = await geminiResponse.text();
+
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch (parseErr) {
+          return res.status(502).json({
+            success: false,
+            message: 'Gemini API returned invalid JSON.',
+            raw: rawText.slice(0, 300)
+          });
+        }
+
+        if (!geminiResponse.ok) {
+          return res.status(geminiResponse.status).json({
+            success: false,
+            message: data?.error?.message || 'Gemini API error',
+            data
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          data
+        });
+      }
+
+      case 'validate': {
+        if (!apiKey || apiKey.trim() === '') {
+          return res.status(400).json({
+            success: false,
+            message: 'API key is required',
+            configured: !!GEMINI_API_KEY
+          });
+        }
+
         const isValid = await validateGeminiApiKey(apiKey);
-        
-        res.status(200).json({
+        return res.status(200).json({
           success: true,
           valid: isValid,
-          message: isValid 
-            ? 'Gemini API key is valid and working!' 
+          message: isValid
+            ? 'Gemini API key is valid and working!'
             : 'Invalid API key. Please check your key at https://aistudio.google.com/app/apikey',
-          configured: GEMINI_API_KEY ? true : false
+          configured: !!GEMINI_API_KEY
         });
-        break;
+      }
 
-      case 'status':
-        // Return current configuration status
-        res.status(200).json({
+      case 'status': {
+        return res.status(200).json({
           success: true,
-          configured: GEMINI_API_KEY ? true : false,
+          configured: !!GEMINI_API_KEY,
           hasKey: !!GEMINI_API_KEY,
-          message: GEMINI_API_KEY 
-            ? 'Gemini API is configured' 
+          message: GEMINI_API_KEY
+            ? 'Gemini API is configured'
             : 'Gemini API key not configured. Please add GEMINI_API_KEY to your Vercel environment variables.',
           setupInstructions: {
             vercel: [
@@ -93,40 +149,39 @@ module.exports = async function handler(req, res) {
             getApiKey: 'https://aistudio.google.com/app/apikey'
           }
         });
-        break;
+      }
 
-      case 'config':
-        // Return configuration (without exposing the actual key)
-        res.status(200).json({
+      case 'config': {
+        return res.status(200).json({
           success: true,
-          configured: GEMINI_API_KEY ? true : false,
+          configured: !!GEMINI_API_KEY,
           model: 'gemini-2.0-flash-exp',
-          baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+          baseUrl: GEMINI_BASE_URL,
           features: {
-            chat: GEMINI_API_KEY ? true : false,
-            coding: GEMINI_API_KEY ? true : false,
-            translation: GEMINI_API_KEY ? true : false
+            chat: !!GEMINI_API_KEY,
+            coding: !!GEMINI_API_KEY,
+            translation: !!GEMINI_API_KEY
           }
         });
-        break;
+      }
 
-      default:
-        res.status(400).json({
+      default: {
+        return res.status(400).json({
           success: false,
-          message: 'Invalid action. Use: validate, status, or config'
+          message: 'Invalid action. Use: generate, validate, status, or config'
         });
+      }
     }
 
   } catch (error) {
-    console.error('Gemini API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Internal server error' 
+    console.error('Gemini API handler error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Internal server error'
     });
   }
 };
 
-// Helper function to read request body
 function readBody(req) {
   return new Promise((resolve, reject) => {
     if (req.body && typeof req.body === 'object') {
@@ -137,25 +192,22 @@ function readBody(req) {
     if (req.body && typeof req.body === 'string') {
       try {
         resolve(JSON.parse(req.body));
-      } catch (error) {
+      } catch {
         resolve(req.body);
       }
       return;
     }
 
     let data = '';
-    req.on('data', (chunk) => {
-      data += chunk;
-    });
+    req.on('data', (chunk) => { data += chunk; });
     req.on('end', () => {
       if (!data) {
         resolve({});
         return;
       }
-
       try {
         resolve(JSON.parse(data));
-      } catch (error) {
+      } catch {
         resolve(data);
       }
     });
@@ -163,22 +215,17 @@ function readBody(req) {
   });
 }
 
-// Helper function to validate Gemini API key
 async function validateGeminiApiKey(apiKey) {
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+      `${GEMINI_BASE_URL}/models?key=${apiKey}`,
       {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       }
     );
-
     return response.ok;
-  } catch (error) {
-    console.error('Validation error:', error);
+  } catch {
     return false;
   }
 }
