@@ -1,4 +1,3 @@
-api/gemini.js
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
 module.exports = async function handler(req, res) {
