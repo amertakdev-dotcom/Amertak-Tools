@@ -12,94 +12,61 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const body = await readBody(req);
-    const { message } = (typeof body === 'string' ? JSON.parse(body) : body) || {};
+    const { message } = req.body;
 
     if (!message) {
-      return res.status(400).json({ ok: false, error: 'Message is required' });
+      return res.status(400).json({ error: 'Message required' });
     }
 
-    if (!GROQ_API_KEY) {
-      return res.status(500).json({ ok: false, error: 'Missing GROQ_API_KEY on server' });
+    const apiKey = process.env.GROQ_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Missing API key' });
     }
 
-    let groqResponse;
-    try {
-      groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'llama-3.1-70b-versatile',
           messages: [
-            { role: 'user', content: message }
+            {
+              role: 'system',
+              content: 'You are a helpful AI assistant.'
+            },
+            {
+              role: 'user',
+              content: message
+            }
           ],
           temperature: 0.7,
           max_tokens: 1024
         })
-      });
-    } catch (fetchErr) {
-      return res.status(502).json({
-        ok: false,
-        error: 'Failed to reach Groq API: ' + (fetchErr.message || 'Network error')
-      });
-    }
+      }
+    );
 
-    const rawText = await groqResponse.text();
+    const data = await response.json();
 
-    let data;
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      return res.status(502).json({
-        ok: false,
-        error: 'Groq returned invalid JSON',
-        raw: rawText.slice(0, 300)
-      });
-    }
+    const reply =
+      data?.choices?.[0]?.message?.content || 'No response from AI';
 
-    if (!groqResponse.ok) {
-      return res.status(groqResponse.status).json({
-        ok: false,
-        error: data?.error?.message || 'Groq API error'
-      });
-    }
+    res.status(200).json({
+      reply,
+      model: 'llama-3.1-70b-versatile'
+    });
 
-    const reply = data?.choices?.[0]?.message?.content;
-
-    if (!reply) {
-      return res.status(500).json({ ok: false, error: 'Empty reply from Groq' });
-    }
-
-    return res.status(200).json({ ok: true, reply });
-
-  } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message || 'Server error' });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || 'Server error'
+    });
   }
 };
-
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    if (req.body && typeof req.body === 'object') {
-      resolve(req.body);
-      return;
-    }
-    if (req.body && typeof req.body === 'string') {
-      try { resolve(JSON.parse(req.body)); } catch { resolve(req.body); }
-      return;
-    }
-    let data = '';
-    req.on('data', chunk => { data += chunk; });
-    req.on('end', () => {
-      if (!data) { resolve({}); return; }
-      try { resolve(JSON.parse(data)); } catch { resolve(data); }
-    });
-    req.on('error', reject);
-  });
-}
