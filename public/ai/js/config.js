@@ -7,6 +7,11 @@ const API_CONFIG = {
         endpoint: "/api/groq",
         name: "Groq AI",
         icon: "bolt"
+    },
+    gemini: {
+        endpoint: "/api/gemini",
+        name: "Gemini AI",
+        icon: "sparkles"
     }
 };
 
@@ -22,11 +27,24 @@ function getAvailableModels() {
     }));
 }
 
+// មុខងារកំណត់ម៉ូដែលដំបូង (ទាញចេញពី localStorage បើធ្លាប់រើស)
 function initializeActiveModel() {
-    ACTIVE_MODEL = "groq";
+    ACTIVE_MODEL = localStorage.getItem("amertak_active_model") || "groq";
+}
+
+// មុខងារសម្រាប់ឱ្យ UI ចុចប្តូរម៉ូដែល (Groq <-> Gemini)
+function setActiveModel(modelKey) {
+    if (API_CONFIG[modelKey]) {
+        ACTIVE_MODEL = modelKey;
+        localStorage.setItem("amertak_active_model", modelKey);
+    }
 }
 
 function isGroqConfigured() {
+    return true;
+}
+
+function isGeminiConfigured() {
     return true;
 }
 
