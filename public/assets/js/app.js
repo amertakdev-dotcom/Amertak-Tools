@@ -236,7 +236,9 @@ async function logoutUser() {
     } catch (error) {
         console.error('Logout failed:', error);
     } finally {
+        // Clear ALL auth-related localStorage items
         localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
         window.location.href = '/';
     }
 }
@@ -261,8 +263,7 @@ function renderDesktopProfile(user) {
 
     const profile = document.createElement('div');
     const displayName = user.name || 'User';
-    const email = user.email || '';
-    const initial = (displayName || email || 'U').trim().charAt(0).toUpperCase();
+    const initial = (displayName || 'U').trim().charAt(0).toUpperCase();
     profile.id = 'desktopProfile';
     profile.className = 'desktop-profile';
     profile.innerHTML = `
@@ -271,7 +272,6 @@ function renderDesktopProfile(user) {
             <span class="desktop-profile-name">${escapeHtml(displayName)}</span>
         </button>
         <div class="desktop-profile-menu">
-            <span>${escapeHtml(email)}</span>
             <button type="button">${navIcons.logout}<span>Logout</span></button>
         </div>
     `;
@@ -279,7 +279,8 @@ function renderDesktopProfile(user) {
         profile.classList.toggle('open');
     });
     profile.querySelector('.desktop-profile-menu button')?.addEventListener('click', logoutUser);
-    headerContainer.insertBefore(profile, desktopNavbar);
+    // Insert after the desktop navbar (same position as login button)
+    desktopNavbar.after(profile);
 }
 
 // Fetch user info on page load
@@ -292,6 +293,11 @@ async function fetchUserInfo() {
         if (response.ok) {
             const data = await response.json();
             if (data?.user) {
+                // Preserve email if API doesn't return it but we have it stored
+                const existingUser = JSON.parse(localStorage.getItem('user') || 'null');
+                if (!data.user.email && existingUser?.email) {
+                    data.user.email = existingUser.email;
+                }
                 localStorage.setItem('user', JSON.stringify(data.user));
             }
             if (data?.token || data?.accessToken || data?.authToken) {
@@ -299,41 +305,43 @@ async function fetchUserInfo() {
             }
             // Hide login buttons when user is logged in
             const loginBtn = document.getElementById('loginBtn');
-            const loginBtnMobile = document.getElementById('loginBtnMobile');
+            const LoginBtn = document.getElementById('LoginBtn');
             if (loginBtn) {
                 loginBtn.style.display = 'none';
             }
-            if (loginBtnMobile) {
-                loginBtnMobile.style.display = 'none';
+            if (LoginBtn) {
+                LoginBtn.style.display = 'none';
             }
             // Re-render sidebar with user info
             renderSidebar();
             renderDesktopProfile(data.user);
         } else {
             localStorage.removeItem('user');
+            localStorage.removeItem('authToken');
             // Show login buttons when not logged in
             const loginBtn = document.getElementById('loginBtn');
-            const loginBtnMobile = document.getElementById('loginBtnMobile');
+            const LoginBtn = document.getElementById('LoginBtn');
             if (loginBtn) {
                 loginBtn.style.display = 'flex';
             }
-            if (loginBtnMobile) {
-                loginBtnMobile.style.display = 'inline-flex';
+            if (LoginBtn) {
+                LoginBtn.style.display = 'inline-flex';
             }
             renderSidebar();
             renderDesktopProfile(null);
         }
     } catch (error) {
         localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
         console.log('Not authenticated or error fetching user');
         // Show login buttons on error
         const loginBtn = document.getElementById('loginBtn');
-        const loginBtnMobile = document.getElementById('loginBtnMobile');
+        const LoginBtn = document.getElementById('LoginBtn');
         if (loginBtn) {
             loginBtn.style.display = 'flex';
         }
-        if (loginBtnMobile) {
-            loginBtnMobile.style.display = 'inline-flex';
+        if (LoginBtn) {
+            LoginBtn.style.display = 'inline-flex';
         }
         renderSidebar();
         renderDesktopProfile(null);

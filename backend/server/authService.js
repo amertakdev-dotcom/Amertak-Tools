@@ -1,10 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const { getDb } = require('../api/_lib/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'please-change-this-secret';
 const JWT_EXPIRATION = '7d';
 const COOKIE_NAME = 'amertak_token';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const memoryUsers = [];
 
 async function getUserStore() {
@@ -94,6 +96,7 @@ async function registerUser({ name, email, password }) {
       name: name.trim(),
       email: normalizedEmail,
       passwordHash,
+      provider: 'credentials',
       createdAt: new Date()
     };
     memoryUsers.push(newUser);
@@ -102,7 +105,8 @@ async function registerUser({ name, email, password }) {
       user: {
         id: newUser.id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        provider: newUser.provider
       }
     };
   }
@@ -119,6 +123,7 @@ async function registerUser({ name, email, password }) {
     name: name.trim(),
     email: normalizedEmail,
     passwordHash,
+    provider: 'credentials',
     createdAt: new Date()
   });
 
@@ -126,7 +131,8 @@ async function registerUser({ name, email, password }) {
     user: {
       id: result.insertedId.toString(),
       name: name.trim(),
-      email: normalizedEmail
+      email: normalizedEmail,
+      provider: 'credentials'
     }
   };
 }
@@ -148,6 +154,13 @@ async function loginUser({ email, password }) {
     throw error;
   }
 
+  // If user registered via Google and has no password, they can't login with password
+  if (!user.passwordHash) {
+    const error = new Error('This account uses Google login. Please sign in with Google.');
+    error.code = 'GOOGLE_ACCOUNT';
+    throw error;
+  }
+
   const passwordMatch = await bcrypt.compare(password, user.passwordHash);
   if (!passwordMatch) {
     const error = new Error('Invalid email or password.');
@@ -159,7 +172,8 @@ async function loginUser({ email, password }) {
     user: {
       id: user.id || user._id?.toString?.() || null,
       name: user.name,
-      email: user.email
+      email: user.email,
+      provider: user.provider || 'credentials'
     }
   };
 }
@@ -180,7 +194,8 @@ async function getUserFromRequest(req) {
     return {
       id: user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      provider: user.provider
     };
   }
 
@@ -193,7 +208,153 @@ async function getUserFromRequest(req) {
   return {
     id: user._id.toString(),
     name: user.name,
-    email: user.email
+    email: user.email,
+    provider: user.provider
+  };
+}
+
+async function googleLogin({ credential }) {
+  if (!credential) {
+    throw new Error('Google credential is required.');
+  }
+
+  if (!GOOGLE_CLIENT_ID) {
+    throw new Error('Google OAuth is not configured. Set GOOGLE_CLIENT_ID in environment variables.');
+  }
+
+  // Verify the Google credential token
+  const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+  let payload;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    throw new Error('Invalid Google credential.');
+  }
+
+  if (!payload) {
+    throw new Error('Unable to verify Google credential.');
+  }
+
+  const { sub: googleId, email, name, picture } = payload;
+
+  if (!email) {
+    throw new Error('Google account must have an email address.');
+  }
+
+  const normalizedEmail = email.toLowerCase();
+  const { mode, users } = await getUserStore();
+
+  // Rule 1: Find user by googleId
+  let user = mode === 'memory'
+    ? memoryUsers.find((u) => u.googleId === googleId)
+    : await users.findOne({ googleId });
+
+  if (user) {
+    // User found by googleId → Login
+    return {
+      user: {
+        id: user.id || user._id?.toString?.() || null,
+        name: user.name,
+        email: user.email,
+        provider: user.provider,
+        avatar: user.avatar || picture
+      },
+      isNewUser: false
+    };
+  }
+
+  // Rule 2: No googleId found, search by email
+  user = mode === 'memory'
+    ? memoryUsers.find((u) => u.email === normalizedEmail)
+    : await users.findOne({ email: normalizedEmail });
+
+  if (user) {
+    // Found by email → Link Google account
+    if (mode === 'memory') {
+      user.googleId = googleId;
+      user.provider = 'google';
+      if (!user.avatar) {
+        user.avatar = picture;
+      }
+    } else {
+      const updateFields = {
+        $set: {
+          googleId,
+          provider: 'google'
+        }
+      };
+      if (!user.avatar && picture) {
+        updateFields.$set.avatar = picture;
+      }
+      await users.updateOne({ _id: user._id }, updateFields);
+      user.googleId = googleId;
+      user.provider = 'google';
+      if (!user.avatar) {
+        user.avatar = picture;
+      }
+    }
+
+    return {
+      user: {
+        id: user.id || user._id?.toString?.() || null,
+        name: user.name,
+        email: user.email,
+        provider: 'google',
+        avatar: user.avatar
+      },
+      isNewUser: false
+    };
+  }
+
+  // Rule 3: No user found by googleId or email → Create new user
+  const displayName = name || email.split('@')[0];
+
+  if (mode === 'memory') {
+    const newUser = {
+      id: `memory-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name: displayName,
+      email: normalizedEmail,
+      googleId,
+      provider: 'google',
+      avatar: picture || null,
+      createdAt: new Date()
+    };
+    memoryUsers.push(newUser);
+
+    return {
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        provider: newUser.provider,
+        avatar: newUser.avatar
+      },
+      isNewUser: true
+    };
+  }
+
+  const result = await users.insertOne({
+    name: displayName,
+    email: normalizedEmail,
+    googleId,
+    provider: 'google',
+    avatar: picture || null,
+    createdAt: new Date()
+  });
+
+  return {
+    user: {
+      id: result.insertedId.toString(),
+      name: displayName,
+      email: normalizedEmail,
+      provider: 'google',
+      avatar: picture || null
+    },
+    isNewUser: true
   };
 }
 
@@ -204,5 +365,6 @@ module.exports = {
   registerUser,
   loginUser,
   getUserFromRequest,
-  verifyTokenFromRequest
+  verifyTokenFromRequest,
+  googleLogin
 };

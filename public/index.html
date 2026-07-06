@@ -10,8 +10,8 @@
     <link rel="canonical" href="https://amertak.tools/">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/svg/logo.svg">
-    <link rel="shortcut icon" href="/svg/logo.svg">
+    <link rel="icon" type="image/png" href="/svg/logo-of-amertak.png">
+    <link rel="shortcut icon" href="/svg/logo-of-amertak.png">
 
     <!-- ================= OPEN GRAPH (Facebook / Discord / Messenger preview) ================= -->
     <meta property="og:type" content="website">
@@ -19,14 +19,14 @@
     <meta property="og:description" content="Use free browser tools for downloads, QR codes, image to PDF conversion, text counting, and color conversion.">
     
     <!-- 🔥 Banner Image (IMPORTANT for link preview) -->
-    <meta property="og:image" content="https://amertak.tools/svg/logo.svg">
+    <meta property="og:image" content="https://amertak.tools/svg/logo-of-amertak.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Website URL (change to your domain) -->
-    <meta property="og:url" content="https://amertak.tools/">
+    <meta property="og:url" content="https://amertak.vercel.app/">
 
-    <meta property="og:site_name" content="Amertak Tools">
+    <meta property="og:site_name" content="Amertak">
 
     <!-- ================= TWITTER CARD ================= -->
     <meta name="twitter:card" content="summary_large_image">
@@ -62,12 +62,6 @@
 
                 <button onclick="toggleSidebar()" class="hamburger-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,1)"><path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path></svg>
-                </button>
-
-                <button id="loginBtnMobile" class="login-btn-mobile" onclick="window.location.href='/login.html'">Login</button>
-
-                <button class="toggleMode" id="toggleModeMobile" onclick="toggleMode()">
-                    <img id="mode-btn-mobile" src="/svg/light-mode.svg" alt="Toggle theme">
                 </button>
 
                 <!-- Desktop Navigation Bar -->
@@ -117,11 +111,15 @@
                         </div>
                     </div>
 
-                    <!-- TOGGLE & PROFILE -->
-                    <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">Login</button>
-                    <button class="toggleMode" id="toggleMode" onclick="toggleMode()"></button>
-                    
                 </nav>
+
+                    <!-- TOGGLE & PROFILE FOR DESKTOP & MOBILE -->
+                    <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"></path></svg>
+                        Login
+                    </button>
+
+                    <!-- If User Logined/Registered Or Sigined, Remove login-btn For Desktop change to token box Like above for desktop site -->
             </div>
         </header>
 

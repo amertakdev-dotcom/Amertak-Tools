@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser, createToken, buildAuthCookie, clearAuthCookie, getUserFromRequest } = require('./authService');
+const { registerUser, loginUser, googleLogin, createToken, buildAuthCookie, clearAuthCookie, getUserFromRequest } = require('./authService');
 
 const router = express.Router();
 
@@ -27,6 +27,18 @@ router.post('/login', async (req, res) => {
     res.json({ user, token });
   } catch (error) {
     res.status(400).json({ message: error.message || 'Unable to login.' });
+  }
+});
+
+router.post('/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    const { user } = await googleLogin({ credential });
+    const token = createToken(user);
+    res.setHeader('Set-Cookie', buildAuthCookie(token));
+    res.json({ user, token });
+  } catch (error) {
+    res.status(400).json({ message: error.message || 'Unable to login with Google.' });
   }
 });
 

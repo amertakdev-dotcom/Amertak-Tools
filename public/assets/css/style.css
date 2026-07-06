@@ -208,14 +208,32 @@ a {
 .desktop-navbar {
     position: fixed;
     display: flex;
-    right: 50px;
+    right: 220px;
 }
 
 .desktop-profile {
     position: relative;
     display: flex;
-    right: -30%;
     z-index: 350;
+}
+
+/* Desktop: position profile in same spot as login button */
+@media (min-width: 1025px) {
+    .desktop-profile {
+        position: fixed;
+        right: 20px;
+        top: 16px;
+    }
+}
+
+/* Mobile: position profile to the left of hamburger */
+@media (max-width: 1024px) {
+    .desktop-profile {
+        position: absolute;
+        right: 75px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
 }
 
 .desktop-profile-btn {
@@ -254,7 +272,7 @@ a {
 .desktop-profile-menu {
     position: absolute;
     top: 48px;
-    left: 0;
+    right: 0;
     min-width: 190px;
     display: grid;
     gap: 10px;
@@ -781,31 +799,47 @@ svg {
     cursor: pointer;
 }
 
-.login-btn, .login-btn-mobile {
-    position: relative;
+.login-btn {
+    display: flex;
     height: 40px;
     padding: 0 18px;
-    display: flex;
     align-items: center;
-    justify-content: center;
-    color: var(--text-dim);
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    gap: 8px;
+    color: #ffffff;
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.25);
     border-radius: 999px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     transition: 0.3s ease;
     z-index: 300;
+    font-family: 'Kantumruy Pro', sans-serif;
 }
-.login-btn-mobile {
-    display: none;
+
+.login-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: #ffffff;
+    flex-shrink: 0;
 }
-@media (max-width: 760px) {
-    .login-btn-mobile {
+
+/* Desktop: position login button on right side of header */
+@media (min-width: 1025px) {
+    .login-btn {
         position: fixed;
-        display: flex;
-        right: 65px;
+        right: 20px;
+        top: 16px;
+    }
+}
+
+/* Mobile: position login button to the left of hamburger */
+@media (max-width: 1024px) {
+    .login-btn {
+        position: absolute;
+        right: 75px;
+        top: 50%;
+        transform: translateY(-50%);
     }
 }
 
@@ -817,11 +851,6 @@ svg {
 
 .nav-item .toggleMode {
     display: flex;
-}
-@media (max-width: 1024px) {
-    .login-btn {
-        display: none;
-    }
 }
 /* --- MODE ---- */
 
@@ -873,6 +902,16 @@ body.MODE .drop li {
 body.MODE .drop svg {
     fill: var(--text-dim);
 }
+body.MODE .login-btn {
+    background: transparent;
+    border-color: rgba(15, 23, 42, 0.2);
+    color: #253044;
+}
+
+body.MODE .login-btn svg {
+    fill: #253044;
+}
+
 body.MODE .tool-icons svg {
     fill: #ffffff;
 }
