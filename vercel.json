@@ -2,12 +2,6 @@
   "version": 2,
   "outputDirectory": "public",
   "cleanUrls": true,
-  "functions": {
-    "public/api/**/*.js": {
-      "memory": 512,
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     { "source": "/api/auth/config", "destination": "/api/auth/config.js" },
     { "source": "/api/groq", "destination": "/api/groq.js" },
