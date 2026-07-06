@@ -1,5 +1,3 @@
-let googleClientId = '';
-
 function getApiBase() {
   const hostname = window.location.hostname;
   const configuredBase = window.__AUTH_API_BASE__ || '';
@@ -86,6 +84,7 @@ async function handleLogin(event) {
     }
 
     if (data.user || data.token || data.accessToken || data.authToken) {
+      // Ensure email from login form is stored in user object
       if (data.user && !data.user.email && email) {
         data.user.email = email;
       }
@@ -134,6 +133,7 @@ async function handleRegister(event) {
     }
 
     if (data.user || data.token || data.accessToken || data.authToken) {
+      // Ensure email from register form is stored in user object
       if (data.user && !data.user.email && email) {
         data.user.email = email;
       }
@@ -150,102 +150,6 @@ async function handleRegister(event) {
   }
 }
 
-// ─── Google Sign-In ──────────────────────────────────────────────
-
-async function handleGoogleResponse(response) {
-  try {
-    const googleCredential = response.credential;
-
-    if (!googleCredential) {
-      showMessage('Google sign-in failed. Please try again.', true);
-      return;
-    }
-
-    const res = await fetch(`${API_BASE}/api/auth/google`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ credential: googleCredential })
-    });
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Google sign-in failed.');
-    }
-
-    if (data.user || data.token) {
-      persistAuthSession(data);
-      const next = new URLSearchParams(window.location.search).get('next') || '/';
-      window.location.href = next;
-    } else {
-      throw new Error('No user returned from server.');
-    }
-  } catch (error) {
-    showMessage(error.message || 'Unable to sign in with Google.', true);
-  }
-}
-
-async function initGoogleSignIn() {
-  // Try to get Google Client ID from Vercel config endpoint
-  try {
-    const configRes = await fetch('/api/auth/config');
-    const config = await configRes.json();
-    googleClientId = config.googleClientId || '';
-  } catch {
-    // Fallback: check environment variable set directly on window
-    googleClientId = window.__GOOGLE_CLIENT_ID__ || '';
-  }
-
-  // If no Client ID configured, hide Google button
-  if (!googleClientId) {
-    const googleBtns = document.querySelectorAll('.google-signin-btn');
-    googleBtns.forEach((btn) => {
-      btn.style.display = 'none';
-    });
-    return;
-  }
-
-  // Load Google Identity Services SDK if not already loaded
-  if (typeof google !== 'undefined' && google.accounts) {
-    renderGoogleButton();
-    return;
-  }
-
-  // Load the GIS script
-  const script = document.createElement('script');
-  script.src = 'https://accounts.google.com/gsi/client';
-  script.async = true;
-  script.defer = true;
-  script.onload = renderGoogleButton;
-  document.head.appendChild(script);
-}
-
-function renderGoogleButton() {
-  const googleButtons = document.querySelectorAll('.g_id_signin');
-  googleButtons.forEach((btn) => {
-    try {
-      google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: handleGoogleResponse,
-        cancel_on_tap_outside: false
-      });
-      google.accounts.id.renderButton(btn, {
-        type: 'standard',
-        shape: 'rectangular',
-        theme: 'outline',
-        text: 'signin_with',
-        size: 'large',
-        logo_alignment: 'left',
-        width: btn.parentElement?.offsetWidth || 300
-      });
-    } catch (e) {
-      // Button already rendered, skip
-    }
-  });
-}
-
-// Initialize Google Sign-In on page load
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
@@ -256,10 +160,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (registerForm) {
     registerForm.addEventListener('submit', handleRegister);
-  }
-
-  // Init Google Sign-In (only if any Google button exists)
-  if (document.querySelector('.g_id_signin')) {
-    initGoogleSignIn();
   }
 });

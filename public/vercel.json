@@ -2,7 +2,6 @@
   "version": 2,
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/api/auth/config", "destination": "/api/auth/config.js" },
     { "source": "/api/groq", "destination": "/api/groq.js" },
     { "source": "/api/gemini", "destination": "/api/gemini.js" },
     { "source": "/api/upload", "destination": "/api/upload.js" },
@@ -37,12 +36,6 @@
     {
       "source": "/assets/:path*",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
-    },
-    {
-      "source": "/api/:path*",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
-      ]
     },
     {
       "source": "/:path*",
