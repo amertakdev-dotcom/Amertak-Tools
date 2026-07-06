@@ -74,7 +74,7 @@
     .auth-button .auth-submit:hover {
       opacity: 0.85;
     }
-    
+
     .main h1 {
       font-family: 'amertak bolder';
       font-size: 3rem;
@@ -177,6 +177,15 @@
         <button class="auth-submit" type="button" onclick="window.location.href='/register.html'">Register</button>
       </div>
     </form>
+
+    <!-- Google Sign-In -->
+    <div style="display:flex;align-items:center;gap:10px;margin:1.2rem 0 0.8rem">
+      <hr style="flex:1;border:0;border-top:1px solid var(--border);opacity:0.4">
+      <span style="color:#888;font-size:0.85rem">or continue with</span>
+      <hr style="flex:1;border:0;border-top:1px solid var(--border);opacity:0.4">
+    </div>
+    <div class="g_id_signin" style="display:flex;justify-content:center;margin-bottom:0.5rem"></div>
+
     <p>Don't have an account? <a href="/register.html">Register now</a></p>
   </main>
 
