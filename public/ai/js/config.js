@@ -12,7 +12,7 @@ const API_CONFIG = {
     openrouter: {
         endpoint: "/api/openrouter", // រត់ទៅកាន់ api/modelname.js ដែលបានបង្កើត
         name: "Llama 3.2 Vision (Free)",
-        icon: "eye"                 // ប្រើ Icon ភ្នែក ព្រោះវាគាំទ្រការមើលរូបភាព (Vision)
+        icon: "cloud"                 // ប្រើ Icon ភ្នែក ព្រោះវាគាំទ្រការមើលរូបភាព (Vision)
     },
 
     gemini: {
