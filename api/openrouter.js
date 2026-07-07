@@ -42,7 +42,7 @@ module.exports = async function handler(req, res) {
         },
         body: JSON.stringify({
           // ប្រើប្រាស់ម៉ូដែល Free ដែលមានល្បឿនលឿន និង High Limit + គាំទ្រ Vision
-          model: 'meta-llama/llama-3.2-11b-vision-instruct:free',
+          model: 'meta-llama/llama-3.2-11b-vision-instruct',
           messages: [
             { role: 'user', content: message } // content នេះអាចទទួលយកបានទាំង Text និង រចនាសម្ព័ន្ធរូបភាព
           ],
