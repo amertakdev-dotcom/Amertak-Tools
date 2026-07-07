@@ -12,6 +12,7 @@ const qrCodeRouter = require('./api/tools/qr-code');
 const textTranslatorRouter = require('./api/tools/text-translator');
 const textCounterRouter = require('./api/tools/text-counter');
 const colorConverterRouter = require('./api/tools/color-converter');
+const likesRouter = require('./api/tools/likes');
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/tools/qr-code', qrCodeRouter);
 app.use('/api/tools/text-translator', textTranslatorRouter);
 app.use('/api/tools/text-counter', textCounterRouter);
 app.use('/api/tools/color-converter', colorConverterRouter);
+app.use('/api/tools', likesRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

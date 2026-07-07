@@ -449,6 +449,116 @@ function initAuthToolBlocker() {
     });
 }
 
+// Like Button Functionality
+async function handleLikeClick(button) {
+    const toolId = button.dataset.toolId;
+    const likeCountSpan = button.querySelector('.like-count');
+    const currentCount = parseInt(likeCountSpan.textContent) || 0;
+    
+    // Check if user is logged in
+    const user = getCurrentUser();
+    if (!user) {
+        showAuthPopup();
+        return;
+    }
+
+    const isLiked = button.classList.contains('liked');
+    
+    // Optimistic update
+    if (isLiked) {
+        // Unlike
+        button.classList.remove('liked');
+        likeCountSpan.textContent = Math.max(0, currentCount - 1);
+    } else {
+        // Like
+        button.classList.add('liked');
+        likeCountSpan.textContent = currentCount + 1;
+    }
+
+    try {
+        const endpoint = isLiked ? 'unlike' : 'like';
+        const response = await fetch(getApiUrl(`/api/tools/${toolId}/${endpoint}`), {
+            method: isLiked ? 'DELETE' : 'POST',
+            headers: buildAuthHeaders({
+                'Content-Type': 'application/json'
+            }),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Update with actual count from server
+            likeCountSpan.textContent = data.likes;
+            if (data.likedByUser) {
+                button.classList.add('liked');
+            } else {
+                button.classList.remove('liked');
+            }
+        } else {
+            // Revert on error
+            if (isLiked) {
+                button.classList.add('liked');
+                likeCountSpan.textContent = currentCount;
+            } else {
+                button.classList.remove('liked');
+                likeCountSpan.textContent = currentCount;
+            }
+            
+            if (data.message && !data.message.includes('already liked')) {
+                console.error('Like error:', data.message);
+            }
+        }
+    } catch (error) {
+        // Revert on network error
+        if (isLiked) {
+            button.classList.add('liked');
+            likeCountSpan.textContent = currentCount;
+        } else {
+            button.classList.remove('liked');
+            likeCountSpan.textContent = currentCount;
+        }
+        console.error('Like request failed:', error);
+    }
+}
+
+// Load like counts on page load
+async function loadLikeCounts() {
+    const likeButtons = document.querySelectorAll('.like-btn');
+    if (!likeButtons.length) return;
+
+    const promises = Array.from(likeButtons).map(async (button) => {
+        const toolId = button.dataset.toolId;
+        const likeCountSpan = button.querySelector('.like-count');
+        
+        try {
+            const response = await fetch(getApiUrl(`/api/tools/${toolId}/likes`), {
+                headers: buildAuthHeaders({
+                    'Accept': 'application/json'
+                }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                likeCountSpan.textContent = data.likes || 0;
+                if (data.likedByUser) {
+                    button.classList.add('liked');
+                } else {
+                    button.classList.remove('liked');
+                }
+            } else {
+                likeCountSpan.textContent = '0';
+            }
+        } catch (error) {
+            likeCountSpan.textContent = '0';
+            console.error(`Failed to load likes for ${toolId}:`, error);
+        }
+    });
+
+    await Promise.all(promises);
+}
+
 // THEME TOGGLE: toggles `MODE` class on <body>, swaps icon, persists choice
 function initThemeToggle() {
     const btn = document.getElementById('toggleMode');
@@ -492,3 +602,4 @@ document.addEventListener('DOMContentLoaded', () => renderDesktopProfile(getCurr
 document.addEventListener('DOMContentLoaded', renderDesktopDropdowns);
 document.addEventListener('DOMContentLoaded', initThemeToggle);
 document.addEventListener('DOMContentLoaded', initAuthToolBlocker);
+document.addEventListener('DOMContentLoaded', loadLikeCounts);
