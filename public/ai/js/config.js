@@ -11,7 +11,7 @@ const API_CONFIG = {
 
     gemini: {
         endpoint: "/api/gemini",
-        name: "Gemini Flash-Lite",
+        name: "Gemini - 2.0-flash",
         icon: "cloud"
     },
 
