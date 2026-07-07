@@ -1,4 +1,4 @@
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');

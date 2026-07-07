@@ -1,5 +1,5 @@
 // ===============================
-// UI CONFIG - SAFE FRONTEND ONLY
+// UI CONFIG - AI AMERTAK CONFIG
 // ===============================
 
 const API_CONFIG = {
@@ -7,7 +7,25 @@ const API_CONFIG = {
         endpoint: "/api/groq",
         name: "Groq AI",
         icon: "bolt"
-    }
+    },
+
+    gemini: {
+        endpoint: "/api/gemini",
+        name: "Gemini Flash-Lite",
+        icon: "cloud"
+    },
+
+    openai: {
+        endpoint: "/api/gpt",
+        name: "ChatGPT - 5.5",
+        icon: "news"
+    },
+
+    claude: {
+        endpoint: "/api/claude",
+        name: "Claude - Sonnet 4.6",
+        icon: "bolt"
+    },
 };
 
 let ACTIVE_MODEL = "groq";

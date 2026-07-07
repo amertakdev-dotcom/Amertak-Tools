@@ -6,7 +6,7 @@
     --bg: #000000;
     --header: #00000087;
     --card: linear-gradient(to right, #52525258, #1b0b2e09);
-    --primary: #3b82f6;
+    --primary: #ff0022;
     --primary-dark: #2563eb;
     --secondary: #a855f7;
     --accent: #06b6d4;
@@ -15,7 +15,7 @@
     --surface-container: #f5f5f5;
     --outline: #999999;
     --outline-variant: #cccccc;
-    --on-surface: #1a1a1a;
+    --on-surface: #ffffff;
     --on-surface-variant: #666666;
     --error: #ff0022;
     --success: #10b981;
@@ -383,12 +383,12 @@ p {
     align-items: center;
     gap: 8px;
     padding: 8px 0;
+    transition: .5s;
 }
 
 /* Scrollbar */
 .chat-scroll::-webkit-scrollbar {
-    width: 8px;
-    height: 5px;
+    width: 5px;
 }
 
 .chat-scroll::-webkit-scrollbar-track {
@@ -397,13 +397,14 @@ p {
 }
 
 .chat-scroll::-webkit-scrollbar-thumb {
-    background: var(--error);
+    background: var(--primary);
     border-radius: 10px;
     transition: background 0.3s;
+    cursor: pointer;
 }
 
 .chat-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--card);
+    background: var(--error);
 }
 
 /* Material Icons */
@@ -655,8 +656,7 @@ p {
     opacity: 1;
 }
 .suggestionsContainer::-webkit-scrollbar {
-    width: 10px;
-    height: 5px;
+    height: 3px;
 }
 
 .suggestionsContainer::-webkit-scrollbar-track {
@@ -669,6 +669,11 @@ p {
     background: var(--card);
     backdrop-filter: blur(10px);
     border-radius: 4000px;
+    cursor: pointer;
+    transition: .5s;
+}
+.suggestionsContainer::-webkit-scrollbar-thumb:hover {
+    background: var(--error);
 }
 
 .suggestion-pill {
@@ -738,16 +743,16 @@ p {
     position: absolute;
     top: 100%;
     right: 0;
-    background: var(--card);
+    background: var(--header);
     backdrop-filter: blur(20px);
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     z-index: 100;
     min-width: 240px;
     margin-top: 0.75rem;
     display: none;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border);
     animation: fadeInScale 0.2s ease;
 }
 
@@ -759,9 +764,11 @@ p {
     width: 100%;
     padding: 1rem 1.25rem;
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     text-align: left;
     border: none;
-    background: var(--card);
+    border-radius: 2px;
+    background: var(--header);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -779,7 +786,7 @@ p {
 
 .model-dropdown-menu button.selected {
     backdrop-filter: blur(20px);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(168, 85, 247, 0.15));
+    background: #000000;
     color: var(--primary);
     font-weight: 700;
     border-left: 3px solid var(--primary);
@@ -824,11 +831,10 @@ p {
 /* Input Area */
 .bottom-gradient {
     position: fixed;
-    bottom: 0;
+    bottom: -1rem;
     left: 0;
     width: 100%;
     z-index: 40;
-    background: none;
 }
 
 .input-container {

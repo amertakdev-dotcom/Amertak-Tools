@@ -239,7 +239,7 @@ function switchModel(model) {
     successMsg.className = 'flex items-center justify-center py-4 message-bubble';
     successMsg.style.animation = 'fadeInScale 0.4s ease';
     successMsg.innerHTML = `
-        <div class="glass-bubble rounded-full px-6 py-3 flex items-center gap-2">
+        <div class="glass-bubble rounded-full px-6 py-3 flex items-center gap-2" style="background: var(--card)">
             <span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
             <span class="text-sm font-medium text-on-surface">បានប្តូរទៅ ${config.name}</span>
         </div>

@@ -189,8 +189,7 @@ function renderSidebar() {
         profileToggle.className = 'user-profile-section user-profile-toggle';
         profileToggle.innerHTML = `
             <div class="user-info">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C15.3137 4 18 6.68629 18 10C18 13.3137 15.3137 16 12 16C8.68629 16 6 13.3137 6 10C6 6.68629 8.68629 4 12 4ZM12 17C15.3137 17 18 18.5 18 20.5C18 20.7761 17.7761 21 17.5 21H6.5C6.22386 21 6 20.7761 6 20.5C6 18.5 8.68629 17 12 17Z"></path></svg>
-                <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"></path></svg>
                     <div class="user-name">${user.name || 'User'}</div>
                     <div class="user-email">${user.email || ''}</div>
                 </div>

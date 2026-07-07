@@ -11,6 +11,7 @@
     --bg-withe: #ffffff;
     --header-bg: rgba(0, 0, 0, 0.253);
     --card-bg: linear-gradient(45deg, #acacac18, #1f1f1f0a);
+    --border-light: rgba(255, 255, 255, 0.148);
     --border: rgba(255, 255, 255, 0.08);
     --shadow: #0000005c;
     --accent: #0b84f5;
@@ -37,6 +38,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     user-select: none;
+    cursor: url(/svg/logo.svg), auto;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -208,7 +210,7 @@ a {
 .desktop-navbar {
     position: fixed;
     display: flex;
-    right: 220px;
+    right: 100px;
 }
 
 .desktop-profile {
@@ -714,12 +716,13 @@ svg {
     gap: 10px;
     flex: 1;
     min-width: 0;
+    cursor: pointer;
 }
 
 .user-info svg {
     flex: 0 0 32px;
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
     fill: #ff0080;
 }
 
@@ -733,6 +736,7 @@ svg {
 }
 
 .user-email {
+    display: none;
     font-size: 11px;
     color: var(--text-main);
     opacity: 0.7;
@@ -806,8 +810,9 @@ svg {
     align-items: center;
     gap: 8px;
     color: #ffffff;
-    background: transparent;
-    border: 1.5px solid rgba(255,255,255,0.25);
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-left: 2px solid var(--border-light);
     border-radius: 999px;
     font-size: 13px;
     font-weight: 700;
