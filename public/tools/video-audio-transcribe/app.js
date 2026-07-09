@@ -215,7 +215,7 @@ function downloadCaptions() {
     const link = document.createElement('a');
     link.href = url;
     link.download = `captions.${captionFormat.value}`;
-    document.body.appendChild(link);
+    "#bg-animated".appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);

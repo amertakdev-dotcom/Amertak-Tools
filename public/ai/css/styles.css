@@ -57,13 +57,13 @@ body::before {
     background: #ff0037;
     top: -120px;
     left: -120px;
-    opacity: .35;
+    opacity: .20;
 }
 body::after {
     background: #ff0055;
     bottom: -120px;
     right: -120px;
-    opacity: .35;
+    opacity: .20;
 }
 
 /* Header */

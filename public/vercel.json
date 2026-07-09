@@ -17,7 +17,7 @@
     { "source": "/tools/cloude/share/:id", "destination": "/tools/cloude/share/index.html" },
     { "source": "/tools/file-converter", "destination": "/tools/file-converter/index.html" },
     { "source": "/tools/:tool", "destination": "/tools/:tool/index.html" },
-    { "source": "/login", "destination": "/login.html" },
+    { "source": "/login", "destination": "/register.html" },
     { "source": "/register", "destination": "/register.html" }
   ],
   "redirects": [

@@ -10,6 +10,9 @@
 </head>
 <body>
 
+    <!-- BACKGROUND ANIMATED -->
+    <div id="bg-animated"></div>
+
     <!-- Mobile Sidebar Drawer (Hidden on Desktop) -->
     <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
     <aside id="sidebar" class="sidebar-mobile"></aside>
@@ -141,13 +144,13 @@
 
     <script>
     VANTA.GLOBE({
-        el: document.body,
+        el: "#bg-animated",
         size: 1,
         mouseControls: true,
         touchControls: true,
         gyroControls: true,
 
-        backgroundColor: 0x0b1220,
+        backgroundColor: 0x050b11,
         color: 0xff3f81,
         color2: 0xffffff,
 

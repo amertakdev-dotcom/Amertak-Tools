@@ -48,6 +48,7 @@ const navIcons = {
     downloader: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.4142 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H10.4142L12.4142 5ZM4 5V19H20V7H11.5858L9.58579 5H4ZM13 13H16L12 17L8 13H11V9H13V13Z"></path></svg>',
     qr: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16 17V16H13V13H16V15H18V17H17V19H15V21H13V18H15V17H16ZM21 21H17V19H19V17H21ZM3 3H11V11H3ZM5 5V9H9V5ZM13 3H21V11H13ZM15 5V9H19V5ZM3 13H11V21H3ZM5 15V19H9V15ZM18 13H21V15H18ZM6 6H8V8H6ZM6 16H8V18H6ZM16 6H18V8H16Z"></path></svg>',
     pdf: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5 4H15V8H19V20H5V4ZM3.9985 2C3.44749 2 3 2.44405 3 2.9918V21.0082C3 21.5447 3.44476 22 3.9934 22H20.0066C20.5551 22 21 21.5489 21 20.9925L20.9997 7L16 2H3.9985ZM10.4999 7.5C10.4999 9.07749 10.0442 10.9373 9.27493 12.6534C8.50287 14.3757 7.46143 15.8502 6.37524 16.7191L7.55464 18.3321C10.4821 16.3804 13.7233 15.0421 16.8585 15.49L17.3162 13.5513C14.6435 12.6604 12.4999 9.98994 12.4999 7.5H10.4999ZM11.0999 13.4716C11.3673 12.8752 11.6042 12.2563 11.8037 11.6285C12.2753 12.3531 12.8553 13.0182 13.5101 13.5953C12.5283 13.7711 11.5665 14.0596 10.6352 14.4276C10.7999 14.1143 10.9551 13.7948 11.0999 13.4716Z"></path></svg>',
+    share: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20" weight="20" fill="currentColor"><path d="M4 19H20V14H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V14H4V19ZM12 10H9C7.00442 10 5.23638 10.9742 4.14556 12.473C4.85831 8.78512 8.10391 6 12 6V2L20 8L12 14V10Z"></path></svg>',
     translate: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5 15V17C5 18.0544 5.81588 18.9182 6.85074 18.9945L7 19H10V21H7C4.79086 21 3 19.2091 3 17V15H5ZM18 10L22.4 21H20.245L19.044 18H14.954L13.755 21H11.601L16 10H18ZM17 12.8852L15.753 16H18.245ZM8 2V4H12V11H8V14H6V11H2V4H6V2ZM17 3C19.2091 3 21 4.79086 21 7V9H19V7C19 5.89543 18.1046 5 17 5H14V3ZM6 6H4V9H6ZM10 6H8V9H10Z"></path></svg>',
     speech: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 7H10V17H8ZM4 10H6V14H4ZM12 4H14V20H12ZM16 8H18V16H16ZM20 10H22V14H20ZM2 17H4V19H2ZM2 5H4V7H2ZM20.7134 7.12811L20.4668 7.69379C20.2864 8.10792 19.7136 8.10792 19.5331 7.69379L19.2866 7.12811C18.8471 6.11947 18.0555 5.31641 17.0677 4.87708L16.308 4.53922C15.8973 4.35653 15.8973 3.75881 16.308 3.57612L17.0252 3.25714C18.0384 2.80651 18.8442 1.97373 19.2761 0.930828L19.5293 0.319534C19.7058 -0.106511 20.2942 -0.106511 20.4706 0.319534L20.7238 0.930828C21.1558 1.97373 21.9616 2.80651 22.9748 3.25714L23.6919 3.57612C24.1027 3.75881 24.1027 4.35653 23.6919 4.53922L22.9323 4.87708C21.9445 5.31641 21.1529 6.11947 20.7134 7.12811Z"></path></svg>',
     count: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 3H20C20.5523 3 21 3.44772 21 4V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V4C3 3.44772 3.44772 3 4 3ZM5 5V19H19V5ZM7 7H17V9H7ZM7 11H17V13H7ZM7 15H13V17H7Z"></path></svg>',
@@ -69,7 +70,7 @@ const navSections = [
             { label: 'Downloader', href: '/tools/downloader', icon: navIcons.downloader },
             { label: 'QR Code', href: '/tools/qr-code', icon: navIcons.qr },
             { label: 'Image PDF', href: '/tools/image-to-pdf', icon: navIcons.pdf },
-            { label: 'Cloud Share', href: '/tools/cloude', icon: navIcons.pdf },
+            { label: 'Cloud Share', href: '/tools/cloude', icon: navIcons.share },
             { label: 'Text Translator', href: '/tools/text-translator', icon: navIcons.translate },
             { label: 'Text to Speech', href: '/tools/text-to-speech-khmer', icon: navIcons.speech },
             { label: 'Text Counter', href: '/tools/text-counter', icon: navIcons.count },
@@ -84,7 +85,7 @@ const navSections = [
         items: [
             { label: 'TikTok', href: 'https://tiktok.com/@amertak.tools', icon: navIcons.tiktok, external: true },
             { label: 'Telegram', href: 'https://t.me/Amertak_Network', icon: navIcons.telegram, external: true },
-            { label: 'Discord', href: '/', icon: navIcons.discord }
+            { label: 'Discord', href: '#', icon: navIcons.discord }
         ]
     },
     {
@@ -219,7 +220,7 @@ function renderSidebar() {
         profileWrapper.appendChild(userActions);
         nav.appendChild(profileWrapper);
     } else {
-        nav.appendChild(createNavLink({ label: 'Login', href: '/login.html', icon: navIcons.login }));
+        nav.appendChild(createNavLink({ label: 'Sign Up', href: '/register.html', icon: navIcons.login }));
     }
 
     sidebar.replaceChildren(nav);
@@ -395,13 +396,13 @@ function createAuthPopup() {
             <p>Please sign in to access the tools and save your progress.</p>
             <div class="auth-popup-actions">
                 <button type="button" class="auth-popup-register">Register</button>
-                <button type="button" class="auth-popup-login">Login</button>
+                <button type="button" class="auth-popup-login">Sign Up</button>
                 <button type="button" class="auth-popup-close-btn">Close</button>
             </div>
         </div>
     `;
 
-    document.body.appendChild(popup);
+    "#bg-animated".appendChild(popup);
 
     popup.querySelector('.auth-popup-close')?.addEventListener('click', hideAuthPopup);
     popup.querySelector('.auth-popup-close-btn')?.addEventListener('click', hideAuthPopup);
@@ -409,7 +410,7 @@ function createAuthPopup() {
         window.location.href = '/register.html';
     });
     popup.querySelector('.auth-popup-login')?.addEventListener('click', () => {
-        window.location.href = '/login.html';
+        window.location.href = '/register.html';
     });
     popup.addEventListener('click', (event) => {
         if (event.target === popup) {
@@ -563,7 +564,7 @@ async function loadLikeCounts() {
 function initThemeToggle() {
     const btn = document.getElementById('toggleMode');
     const icon = document.getElementById('mode-btn');
-    const body = document.body;
+    const body = "#bg-animated";
     if (!btn || !icon) return;
 
     const setTheme = (isLight) => {

@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="/tools/cloude/style.css" />
 </head>
 <body>
+  <!-- BACKGROUND ANIMATED -->
+  <div id="bg-animated"></div>
+
   <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
   <aside id="sidebar" class="sidebar-mobile"></aside>
   <div class="app-wrapper">
@@ -29,7 +32,7 @@
         </button>
 
         <nav class="desktop-navbar">
-          <button id="loginBtn" class="login-btn" onclick="window.location.href='/login.html'">Login</button>
+          <button id="loginBtn" class="login-btn" onclick="window.location.href='/register.html'">Sign Up</button>
         </nav>
       </div>
     </header>
@@ -37,7 +40,6 @@
     <div class="page-shell">
       <header class="hero-card">
       <div class="hero-copy">
-        <p class="eyebrow">CloudShare • Vercel + MongoDB</p>
         <h1>Send files in seconds.</h1>
         <p class="hero-text">Drag and drop files, upload them securely, and share a public link with a clean WeTransfer-style experience.</p>
         <div class="hero-pills">
@@ -116,13 +118,13 @@
 
     <script>
     VANTA.GLOBE({
-        el: document.body,
+        el: "#bg-animated",
         size: 1,
         mouseControls: true,
         touchControls: true,
         gyroControls: true,
 
-        backgroundColor: 0x0b1220,
+        backgroundColor: 0x050b11,
         color: 0xff3f81,
         color2: 0xffffff,
 

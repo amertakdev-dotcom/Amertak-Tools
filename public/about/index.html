@@ -44,6 +44,9 @@
 </head>
 <body>
 
+    <!-- BACKGROUND ANIMATED -->
+    <div id="bg-animated"></div>
+
     <!-- Mobile Sidebar Drawer (Hidden on Desktop) -->
     <div id="overlay" onclick="toggleSidebar()" class="overlay hidden"></div>
     <aside id="sidebar" class="sidebar-mobile"></aside>
@@ -142,6 +145,31 @@
             duration: 600,
             once: false
         });
+    </script>
+
+    <!-- BACKGROUND ANIMATION -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+
+    <script>
+    VANTA.GLOBE({
+        el: "#bg-animated",
+        
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: true,
+
+        backgroundColor: 0x050b11,
+        color: 0xff3f81,
+        color2: 0xffffff,
+
+        minHeight: 100.00,
+        minWidth: 100.00,
+        
+        size: 1.00,
+        scale: 1.00,
+        scaleMobile: 1.0
+    });
     </script>
 </body>
 </html>

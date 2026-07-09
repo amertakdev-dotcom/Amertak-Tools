@@ -10,6 +10,7 @@
     --bg-dark: #05070c;
     --bg-withe: #ffffff;
     --header-bg: rgba(0, 0, 0, 0.253);
+    --card: #00000022;
     --card-bg: linear-gradient(45deg, #acacac18, #1f1f1f0a);
     --border-light: rgba(255, 255, 255, 0.148);
     --border: rgba(255, 255, 255, 0.08);
@@ -30,15 +31,17 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
-    font-family: 'Kantumruy Pro', sans-serif;
+    font-family: 'Poppins';
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
     user-select: none;
-    cursor: url(/svg/logo.svg), auto;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -57,15 +60,22 @@ body::before {
     background: #ff0037;
     top: -120px;
     left: -120px;
-    opacity: .35;
+    opacity: .20;
 }
 body::after {
     background: #ff0055;
     bottom: -120px;
     right: -120px;
-    opacity: .35;
+    opacity: .20;
 }
 
+#bg-animated {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background: #070f18;
+    inset: 0;
+}
 .title {
     position: relative;
     margin: auto;
@@ -1031,8 +1041,9 @@ h2 strong {
     border-top: 1.5px solid var(--border);
     margin-top: 40px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.683);
-    background: #00000098;
-    backdrop-filter: blur(5px);
+    background: #00000044;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(30px);
     display: block;
     margin: auto;
 }
@@ -1172,9 +1183,10 @@ body.MODE h4 {
     cursor: pointer;
     width: 100%;
     padding: 18px;
-    background: var(--card-bg);
+    background: var(--card);
     box-shadow: 0 0 10px #1616169a;
-    backdrop-filter: blur(50px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(0px);
     border-radius: 10px;
     border: 1px solid var(--border);
     border-bottom: 1.5px solid #e7e7e71f;
@@ -1186,11 +1198,11 @@ body.MODE h4 {
 .tool-card:before {
     content: '';
     position: fixed;
-    left: 0;
+    left: 5px;
     width: 4px;
-    height: 150px;
-
-    z-index: 1000;
+    height: 50px;
+    border-radius: 10px;
+    transition: .25s ease-in-out;
 }
 .tool-card:nth-child(1):before {
     background: #c70000;
@@ -1228,6 +1240,12 @@ body.MODE h4 {
 }
 .tool-card:hover {
     scale: 1.01;
+}
+.tool-card:hover .tool-icons svg {
+    rotate: 25deg;
+}
+.tool-card:hover:before {
+    height: 80px;
 }
 .tool-icons {
     position: relative;
@@ -1273,6 +1291,7 @@ body.MODE h4 {
     align-items: center;
     fill: #ffffff;
     width: 25px;
+    transition: .25s ease-in-out;
 }
 .tool-txt {
     position: relative;
@@ -1282,7 +1301,7 @@ body.MODE h4 {
 }
 .tool-txt h2 {
     position: relative;
-    font-family: 'amertak bolder', sans-serif;
+    font-family: 'Poppins', 'amertak bolder';
     font-size: 1.15rem;
     color: transparent;
     -webkit-background-clip: text;
@@ -1291,7 +1310,7 @@ body.MODE h4 {
 }
 .tool-txt p {
     color: var(--text-dim);
-    font-family: 'amertak', sans-serif;
+    font-family: 'Poppins', 'amertak';
     text-align: left;
     font-weight: 500;
     font-size: 0.8rem;

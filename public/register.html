@@ -13,18 +13,26 @@
       justify-content: center;
       align-items: center;
     }
-    .auth-page { max-width: 85%; width: 400px; margin: 5rem auto; padding: 2rem; border: 1px solid var(--border); background: var(--card-bg); border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.12); }
+    .auth-page { max-width: 85%; width: 400px; margin: 5rem auto; padding: 2rem; border: 1px solid var(--border); background: var(--card); border-radius: 18px; box-shadow: 0 18px 40px rgba(0,0,0,0.12); }
     .auth-page h1 { font-size: 1.5rem; color: #fff;}
     .auth-page form { display: grid; gap: 1rem; }
-    .auth-page input { width: 100%; padding: 0.95rem 1rem; border: 1px solid var(--border); border-radius: 15px; font-size: 1rem; outline: none; background: var(--card-bg); color: var(--danger); fill: var(--danger);}
+    .auth-page input { width: 100%; padding: 0.95rem 1rem; border: 1px solid var(--border); font-size: 1rem; outline: none; background: var(--card-bg); color: var(--danger); fill: var(--danger);}
     .auth-page input:focus {
       border: 1.5px solid var(--danger);
+    }
+
+    input {
+      border-radius: 50px;
+      backdrop-filter: blur(20px);
     }
     .auth-page button { padding: 0.95rem 1rem; border:none; border-radius: 10px; background: #0c5bff; color:#fff; font-weight:600; cursor:pointer; }
     .auth-page .message { padding: 0.9rem 1rem; border-radius: 10px; background: #effffe; color: #0a3d7f; }
     .auth-page p { margin-top: 1rem; text-align: center; }
     .auth-page a { color: var(--danger); text-decoration: none; }
 
+    .auth-page {
+      backdrop-filter: blur(10px);
+    }
     .auth-page .auth-header {
       display: flex;
       align-items: center;
@@ -52,12 +60,28 @@
     .auth-button .auth-submit {
       width: 110px;
       background: var(--danger);
-      border-radius: 50px;
+      border-radius: 5px 25px 25px 20px;
     }
     .auth-submit:nth-last-child(1) {
       background: none;
       border: 1px solid var(--danger);
+      border-radius: 25px 5px 25px 25px;
       color: var(--danger);
+    }
+    .auth-submit.google {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--danger);
+      border-radius: 50px;
+      gap: 10px;
+      margin: auto;
+      color: #bcbcbcea;
+    }
+
+    .auth-submit.google svg {
+      fill: #bcbcbcea;
     }
     
     /* INTRO */
@@ -160,6 +184,9 @@
   </style>
 </head>
 <body>
+
+  <!-- BACKGROUND ANIMATED -->
+  <div id="bg-animated"></div>
 <!-- LOGIN PAGE -->
 <div class="page">
   <main class="auth-page" id="auth-page">
@@ -167,7 +194,7 @@
       <div class="auth-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="50"><path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 7C10.8954 7 10 7.89543 10 9C10 9.74025 10.4022 10.3866 10.9999 10.7324L11 15H13L13.0011 10.7318C13.5983 10.3858 14 9.73984 14 9C14 7.89543 13.1046 7 12 7Z"></path></svg>
       </div>
-      <h1>Login</h1>
+      <h1>Register</h1>
     </div>
     <div id="status"></div>
     <form id="registerForm">
@@ -178,8 +205,12 @@
         <button class="auth-submit" type="submit">Register</button>
         <button class="auth-submit" type="button" onclick="window.location.href='/login.html'">Login</button>
       </div>
+
+      <div class="continue-with-google">
+        <button class="auth-submit google" type="button" onclick="window.location.href='/'"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="rgba(255,255,255,1)"><path d="M3.06364 7.50914C4.70909 4.24092 8.09084 2 12 2C14.6954 2 16.959 2.99095 18.6909 4.60455L15.8227 7.47274C14.7864 6.48185 13.4681 5.97727 12 5.97727C9.39542 5.97727 7.19084 7.73637 6.40455 10.1C6.2045 10.7 6.09086 11.3409 6.09086 12C6.09086 12.6591 6.2045 13.3 6.40455 13.9C7.19084 16.2636 9.39542 18.0227 12 18.0227C13.3454 18.0227 14.4909 17.6682 15.3864 17.0682C16.4454 16.3591 17.15 15.3 17.3818 14.05H12V10.1818H21.4181C21.5364 10.8363 21.6 11.5182 21.6 12.2273C21.6 15.2727 20.5091 17.8363 18.6181 19.5773C16.9636 21.1046 14.7 22 12 22C8.09084 22 4.70909 19.7591 3.06364 16.4909C2.38638 15.1409 2 13.6136 2 12C2 10.3864 2.38638 8.85911 3.06364 7.50914Z"></path></svg> Continue With Google</button>
+      </div>
     </form>
-    <p>Already have an account? <a href="/login.html">Login now</a></p>
+    <p>Already have an account? <a href="/register.html">Login now</a></p>
   </main>
 </div>
 
@@ -215,13 +246,13 @@
 
     <script>
     VANTA.GLOBE({
-        el: document.body,
+        el: "#bg-animated",
         size: 1,
         mouseControls: true,
         touchControls: true,
         gyroControls: true,
 
-        backgroundColor: 0x0b1220,
+        backgroundColor: 0x050b11,
         color: 0xff3f81,
         color2: 0xffffff,
 

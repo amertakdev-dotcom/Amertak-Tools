@@ -42,6 +42,6 @@ window.amertakToolAuth = (async function protectToolPage() {
   }
 
   const next = `${window.location.pathname}${window.location.search}`;
-  window.location.replace(`/login.html?next=${encodeURIComponent(next)}`);
+  window.location.replace(`/register.html?next=${encodeURIComponent(next)}`);
   return false;
 }());

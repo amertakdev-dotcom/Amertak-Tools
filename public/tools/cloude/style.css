@@ -17,9 +17,10 @@ body {
   color: var(--text);
   min-height: 100vh;
 }
-.page-shell { max-width: 1200px; margin: 0 auto; padding: 24px 20px 56px; }
+
+.page-shell { max-width: 1200px; margin: 75px auto; padding: 24px 20px 56px; }
 .hero-card {
-  display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; padding: 28px; border: 1px solid var(--border); border-radius: 28px; background: rgba(255,255,255,0.08); backdrop-filter: blur(18px); box-shadow: 0 20px 55px rgba(0,0,0,0.25);
+  display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; padding: 28px; border: 1px solid var(--border); border-radius: 28px; background: rgba(0, 0, 0, 0.08); backdrop-filter: blur(18px); box-shadow: 0 20px 55px rgba(0,0,0,0.25);
 }
 .eyebrow { text-transform: uppercase; letter-spacing: 0.24em; font-size: 0.74rem; color: #c7bcff; margin-bottom: 8px; }
 .hero-card h1 { font-size: clamp(2rem, 3.8vw, 3rem); margin: 4px 0 12px; }
@@ -30,8 +31,8 @@ body {
 .hero-stats > div { padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); }
 .hero-stats strong { display: block; font-size: 1.1rem; }
 .hero-stats span { color: var(--muted); font-size: 0.92rem; }
-.workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }
-.panel { padding: 20px; border-radius: 24px; background: rgba(255,255,255,0.07); border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.18); }
+.workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; backdrop-filter: blur(15px); }
+.panel { padding: 20px; border-radius: 24px; background: rgba(0, 0, 0, 0.07); border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.18); }
 .panel-heading { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
 .panel-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
 .panel-heading h2 { margin: 0 0 4px; font-size: 1.06rem; }
