@@ -9,9 +9,15 @@ const API_CONFIG = {
         icon: "bolt"
     },
 
+    openrouter: {
+        endpoint: "/api/openrouter", // រត់ទៅកាន់ api/modelname.js ដែលបានបង្កើត
+        name: "Llama 3.2 Vision",
+        icon: "cloud"                 // ប្រើ Icon ភ្នែក ព្រោះវាគាំទ្រការមើលរូបភាព (Vision)
+    },
+
     gemini: {
         endpoint: "/api/gemini",
-        name: "Gemini Flash-Lite",
+        name: "Gemini - 2.0-flash",
         icon: "cloud"
     },
 

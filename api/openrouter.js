@@ -1,4 +1,5 @@
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+// ប្តូរទៅប្រើប្រាស់ Environment Variable របស់ OpenRouter
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -23,36 +24,40 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Message is required' });
     }
 
-    if (!GEMINI_API_KEY) {
-      return res.status(500).json({ ok: false, error: 'Missing GEMINI_API_KEY on server' });
+    if (!OPENROUTER_API_KEY) {
+      return res.status(500).json({ ok: false, error: 'Missing OPENROUTER_API_KEY on server' });
     }
 
-    let geminiResponse;
+    let openrouterResponse;
     try {
-      // ហៅទៅកាន់ Google Gemini API ដោយប្រើម៉ូដែល gemini-2.0-flash-lite
-      geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      // ប្តូរ Endpoint ទៅកាន់ OpenRouter
+      openrouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          // បន្ថែមដើម្បីឱ្យ OpenRouter ស្គាល់ឈ្មោះ App របស់អ្នក (ដាក់អ្វីក៏បាន)
+          'HTTP-Referer': 'https://localhost:3000', 
+          'X-Title': 'My AI Project'
         },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: message }
-              ]
-            }
-          ]
+          // ប្រើប្រាស់ម៉ូដែល Free ដែលមានល្បឿនលឿន និង High Limit + គាំទ្រ Vision
+          model: 'meta-llama/llama-3.2-11b-vision-instruct',
+          messages: [
+            { role: 'user', content: message } // content នេះអាចទទួលយកបានទាំង Text និង រចនាសម្ព័ន្ធរូបភាព
+          ],
+          temperature: 0.7,
+          max_tokens: 1024
         })
       });
     } catch (fetchErr) {
       return res.status(502).json({
         ok: false,
-        error: 'Failed to reach Gemini API: ' + (fetchErr.message || 'Network error')
+        error: 'Failed to reach OpenRouter API: ' + (fetchErr.message || 'Network error')
       });
     }
 
-    const rawText = await geminiResponse.text();
+    const rawText = await openrouterResponse.text();
 
     let data;
     try {
@@ -60,26 +65,24 @@ module.exports = async function handler(req, res) {
     } catch {
       return res.status(502).json({
         ok: false,
-        error: 'Gemini returned invalid JSON',
+        error: 'OpenRouter returned invalid JSON',
         raw: rawText.slice(0, 300)
       });
     }
 
-    if (!geminiResponse.ok) {
-      return res.status(geminiResponse.status).json({
+    if (!openrouterResponse.ok) {
+      return res.status(openrouterResponse.status).json({
         ok: false,
-        error: data?.error?.message || 'Gemini API error'
+        error: data?.error?.message || 'OpenRouter API error'
       });
     }
 
-    // ចាប់យកអត្ថបទឆ្លើយតបចេញពី Structure របស់ Gemini API
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data?.choices?.[0]?.message?.content;
 
     if (!reply) {
-      return res.status(500).json({ ok: false, error: 'Empty reply from Gemini' });
+      return res.status(500).json({ ok: false, error: 'Empty reply from OpenRouter' });
     }
 
-    // ត្រឡប់ទៅ Frontend វិញតាមទម្រង់ចាស់ { ok: true, reply } ដូច Groq បេះបិទ
     return res.status(200).json({ ok: true, reply });
 
   } catch (err) {
