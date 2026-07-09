@@ -38,11 +38,16 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Render + other deployments may not always send an origin header
+    // Allow if origin is missing OR explicitly allowed.
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    // Fallback: allow common Render hostnames in case env CORS_ORIGIN wasn't set correctly.
+    const isRender = origin.includes('onrender.com') || origin.endsWith('.onrender.com');
+    if (isRender) return callback(null, true);
+
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
@@ -64,6 +69,11 @@ app.use('/api/tools', likesRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is running' });
+});
+
+// Some deployments reverse-proxy / mount paths; keep a second alias.
+app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 

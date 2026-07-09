@@ -10,24 +10,24 @@ const execFileAsync = promisify(execFile);
 const YTDLP_BINARY = process.env.YTDLP_PATH || 'yt-dlp';
 
 const SUPPORTED_PLATFORMS = [
-  'TikTok',
-  'Instagram',
   'YouTube',
-  'Facebook',
-  'X / Twitter',
-  'Threads',
-  'Snapchat',
+  'TikTok',
+  'Spotify',
   'Pinterest',
-  'Reddit',
-  'Vimeo',
-  'Dailymotion',
-  'SoundCloud',
-  'Bilibili'
+  'Instagram'
 ];
+
+
+
+
+
+
+
 
 function isValidUrl(value) {
   try {
     const parsed = new URL(value);
+
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
   } catch {
     return false;
